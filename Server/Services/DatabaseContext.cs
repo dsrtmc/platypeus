@@ -3,10 +3,40 @@ using Server.Models;
 
 namespace Server.Services;
 
-internal class DatabaseContext : DbContext
+public class DatabaseContext : DbContext
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) {}
 
-    public DbSet<User> Users => Set<User>();
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        OnUpdate();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+    
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        OnUpdate();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+    
+    /// <summary>
+    /// Updates every modified <see cref="BaseEntity"/>'s <see cref="BaseEntity.UpdatedAt"/> field upon saving the changes to the database.
+    /// </summary>
+    private void OnUpdate()
+    {
+        // I have a note saying that it changes UpdatedAt everytime we USE the entity
+        // not sure if that's any bit real so I keep it here to verify it later
+        var entries = ChangeTracker.Entries();
+        var now = DateTime.UtcNow;
+        foreach (var entry in entries)
+        {
+            if (entry.Entity is not BaseEntity entity) continue;
+
+            if (entry.State == EntityState.Modified)
+                entity.UpdatedAt = now;
+        }
+    }
+
+    public DbSet<User> Users { get; set; } = null!;
 }

@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="2.5.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.2.1" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.2.1" />
+    <PackageReference Include="HotChocolate.Types.Analyzers" Version="13.2.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.5.23280.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

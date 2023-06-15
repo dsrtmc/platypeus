@@ -1,10 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Server.Services;
+using Server.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,13 +16,24 @@ builder.Services.AddDbContextPool<DatabaseContext>(o =>
     o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
 });
 
+builder.Services.AddGraphQLServer()
+    .AddTypes()
+    .RegisterDbContext<DatabaseContext>()
+    .RegisterService<IHttpContextAccessor>();
+
+builder.Services.AddHttpContextAccessor();
+
 // Set up the JWT
 // TODO: move secret somewhere else
 builder.Services.AddAuthentication("jwt").AddJwtBearer("jwt", o =>
 {
     o.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidIssuer = "http://localhost:5053",
+        ValidIssuers = new List<string>
+        {
+            "http://localhost:5053",
+            "https://localhost:7128"
+        },
         ValidAudiences = new List<string>
         {
             "http://localhost:58384",
@@ -43,21 +55,41 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// debug debug debug
+IdentityModelEventSource.ShowPII = true;
+
+app.Use((ctx, next) =>
+{
+    string? authorization = ctx.Request.Headers.Authorization;
+    if (authorization is null) throw new Exception("Authorization header not present");
+    
+    try
+    {
+        var token = authorization.Split(" ")[1];
+        Authentication.AssertValidToken(token, Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!);
+    }
+    catch
+    {
+        throw new Exception("Incorrect token - not authenticated");
+    }
+    
+    return next();
+});
+
 app.MapGet("/", () => "><((((*>");
 
 // Setting up a basic development environment to help with authentication setup
 // TODO: remove after implementing GraphQL
-
 string CreateToken()
 {
     var tokenHandler = new JwtSecurityTokenHandler();
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secret-sadflkjasdjklasdjksldjaskfljakadev-key"));
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")));
     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
     var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, "name")
     };
-    var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: credentials);
+    var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: credentials, issuer: "http://localhost:5053");
     return tokenHandler.WriteToken(token);
 }
 
@@ -73,5 +105,7 @@ app.MapGet("/login", async (HttpContext ctx) =>
 });
 app.MapGet("/get-token", CreateToken);
 app.MapGet("/secret", (ClaimsPrincipal user) => $"top secret").RequireAuthorization();
+
+app.MapGraphQL();
 
 app.Run();
