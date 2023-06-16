@@ -19,16 +19,20 @@ public static class Authentication
         var tokenValidationParameters = new TokenValidationParameters
         {
             IssuerSigningKey = key,
+            ValidateIssuerSigningKey = true,
             ValidateAudience = false,
             ValidateIssuer = false
         };
+        // lol surely that's not how you write code in C#
         var result = tokenHandler.ValidateToken(token, tokenValidationParameters);
-        // XD
-        if (!result.Exception.Message.IsNullOrEmpty()) Console.WriteLine($"exception: {result.Exception.Message}");
+        if (result.Exception is not null) throw result.Exception;
     }
 
-    public static string CreateAccessToken(User user) => CreateToken(user, Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!, DateTime.Now.AddMinutes(15));
-    public static string CreateRefreshToken(User user) => CreateToken(user, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!, DateTime.Now.AddDays(31));
+    public static string CreateAccessToken(User user) =>
+        CreateToken(user, Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!, DateTime.Now.AddMinutes(15));
+    
+    public static string CreateRefreshToken(User user) =>
+        CreateToken(user, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!, DateTime.Now.AddDays(31));
     
     private static string CreateToken(User user, string secret, DateTime expires)
     {
@@ -36,20 +40,14 @@ public static class Authentication
         var tokenHandler = new JsonWebTokenHandler();
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        // var tokenValidationParameters = new TokenValidationParameters
-        // {
-        //     IssuerSigningKey = key,
-        // };
         var descriptor = new SecurityTokenDescriptor
         {
             SigningCredentials = credentials,
             Claims = new Dictionary<string, object>
             {
-                // { ClaimTypes.NameIdentifier, user.ID },
                 { ClaimTypes.Name, "xd" },
             },
         };
-        // return tokenHandler.CreateToken(JsonSerializer.Serialize(user), credentials);
         return tokenHandler.CreateToken(descriptor);
     }
 }

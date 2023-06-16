@@ -66,6 +66,7 @@ app.Use((ctx, next) =>
     try
     {
         var token = authorization.Split(" ")[1];
+        Console.WriteLine($"The token: {token}");
         Authentication.AssertValidToken(token, Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!);
     }
     catch
@@ -92,18 +93,6 @@ string CreateToken()
     var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: credentials, issuer: "http://localhost:5053");
     return tokenHandler.WriteToken(token);
 }
-
-app.MapGet("/login", async (HttpContext ctx) =>
-{
-    var claims = new List<Claim> { new Claim("usr", "qwe") };
-    var identity = new ClaimsIdentity(claims, "cookie");
-    var user = new ClaimsPrincipal(identity);
-     
-    // figure out how signing in with jwt would work
-    // await ctx.SignInAsync("jwt", user);
-    return "logged in";
-});
-app.MapGet("/get-token", CreateToken);
 app.MapGet("/secret", (ClaimsPrincipal user) => $"top secret").RequireAuthorization();
 
 app.MapGraphQL();
