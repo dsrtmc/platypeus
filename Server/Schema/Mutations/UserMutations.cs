@@ -8,7 +8,7 @@ using Server.Utilities;
 
 namespace Server.Schema.Mutations;
 
-public record LoginPayload(string accessToken);
+public record LoginPayload(string AccessToken);
 
 [MutationType]
 public static class UserMutations
@@ -33,6 +33,7 @@ public static class UserMutations
             return new LoginPayload("no access");
         
         accessor.HttpContext!.Response.Headers.SetCookie = $"jid={Authentication.CreateRefreshToken(user)}";
+        
         return new LoginPayload(Authentication.CreateAccessToken(user));
     }
 }
