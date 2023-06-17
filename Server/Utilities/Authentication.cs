@@ -12,20 +12,18 @@ namespace Server.Utilities;
 
 public static class Authentication
 {
-    public static void AssertValidToken(string token, string secret)
+    public static TokenValidationResult? ValidateToken(string token, string secret)
     {
         var tokenHandler = new JsonWebTokenHandler();
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var tokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = key,
+            // TODO: add issuer/audience
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
             ValidateIssuerSigningKey = true,
             ValidateAudience = false,
             ValidateIssuer = false
         };
-        // lol surely that's not how you write code in C#
-        var result = tokenHandler.ValidateToken(token, tokenValidationParameters);
-        if (result.Exception is not null) throw result.Exception;
+        return tokenHandler.ValidateToken(token, tokenValidationParameters);
     }
 
     public static string CreateAccessToken(User user) =>
@@ -45,7 +43,7 @@ public static class Authentication
             SigningCredentials = credentials,
             Claims = new Dictionary<string, object>
             {
-                { ClaimTypes.Name, "xd" },
+                { ClaimTypes.NameIdentifier, user.ID },
             },
         };
         return tokenHandler.CreateToken(descriptor);

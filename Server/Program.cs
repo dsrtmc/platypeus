@@ -1,6 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -24,28 +28,26 @@ builder.Services.AddGraphQLServer()
 builder.Services.AddHttpContextAccessor();
 
 // Set up the JWT
-// TODO: move secret somewhere else
-builder.Services.AddAuthentication("jwt").AddJwtBearer("jwt", o =>
+builder.Services.AddAuthentication(o =>
 {
+    o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.RequireAuthenticatedSignIn = false;
+}).AddJwtBearer(o =>
+{
+    // Right now I'm basically duplicating code here from the Authentication class.
+    // Could be a good idea to unify those token validation parameters, though I'm not sure
+    // how to make it nice considering we only need to deal with the access token secret here,
+    // whereas the Authentication class also has to deal with the refresh token secret.
     o.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidIssuers = new List<string>
-        {
-            "http://localhost:5053",
-            "https://localhost:7128"
-        },
-        ValidAudiences = new List<string>
-        {
-            "http://localhost:58384",
-            "https://localhost:44356",
-            "https://localhost:7218",
-            "http://localhost:5053"
-        },
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secret-sadflkjasdjklasdjksldjaskfljakadev-key")),
-        ValidateIssuer = true,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true
+        // TODO: add issuer/audience
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!)),
+        ValidateIssuerSigningKey = true,
+        ValidateIssuer = false, // probably true
+        ValidateAudience = false, // probably true
     };
 });
 builder.Services.AddAuthorization();
@@ -55,45 +57,45 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// debug debug debug
-IdentityModelEventSource.ShowPII = true;
-
-app.Use((ctx, next) =>
-{
-    string? authorization = ctx.Request.Headers.Authorization;
-    if (authorization is null) throw new Exception("Authorization header not present");
-    
-    try
-    {
-        var token = authorization.Split(" ")[1];
-        Console.WriteLine($"The token: {token}");
-        Authentication.AssertValidToken(token, Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!);
-    }
-    catch
-    {
-        throw new Exception("Incorrect token - not authenticated");
-    }
-    
-    return next();
-});
+if (app.Environment.IsDevelopment())
+    IdentityModelEventSource.ShowPII = true;
 
 app.MapGet("/", () => "><((((*>");
+app.MapGet("/secret", () => $"top secret").RequireAuthorization();
 
-// Setting up a basic development environment to help with authentication setup
-// TODO: remove after implementing GraphQL
-string CreateToken()
+// TODO: make POST later, GET for easier development
+app.MapGet("/refresh-token", (IHttpContextAccessor accessor, DatabaseContext db) =>
 {
-    var tokenHandler = new JwtSecurityTokenHandler();
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")));
-    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-    var claims = new List<Claim>
+    // bad name
+    var invalidJson = new JsonObject { ["ok"] = false, ["accessToken"] = "" };
+    
+    // TODO: make better validation and error handling
+    var token = accessor.HttpContext!.Request.Cookies["jid"];
+    if (token is null)
+        return invalidJson;
+
+    var data = Authentication.ValidateToken(token, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!);
+    if (data is null)
+        return invalidJson;
+
+    if (!data.IsValid)
     {
-        new Claim(ClaimTypes.Name, "name")
-    };
-    var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: credentials, issuer: "http://localhost:5053");
-    return tokenHandler.WriteToken(token);
-}
-app.MapGet("/secret", (ClaimsPrincipal user) => $"top secret").RequireAuthorization();
+        Console.WriteLine("data is invalid");
+        if (data.Exception is not null)
+            Console.WriteLine($"exception: {data.Exception.Message}");
+        return invalidJson;
+    }
+
+    // The claim should never be empty and should always be a string
+    var user = db.Users.Find(new Guid((data.Claims[ClaimTypes.NameIdentifier] as string)!));
+    if (user is null)
+        return invalidJson;
+
+    // refresh the refresh token
+    accessor.HttpContext.Response.Headers.SetCookie = $"jid={Authentication.CreateRefreshToken(user)}";
+
+    return new JsonObject { ["ok"] = true, ["accessToken"] = Authentication.CreateAccessToken(user) };
+});
 
 app.MapGraphQL();
 

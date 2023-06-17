@@ -13,15 +13,15 @@ public record LoginPayload(string accessToken);
 [MutationType]
 public static class UserMutations
 {
-    public static User Register(string name, DatabaseContext db)
+    public static async Task<User> Register(string name, string email, DatabaseContext db)
     {
         var user = new User
         {
             Username = name,
-            Email = "qwe@qwe.com"
+            Email = email
         };
-        db.Users.Add(user); // do async
-        db.SaveChanges();
+        await db.Users.AddAsync(user);
+        await db.SaveChangesAsync();
         return user;
     }
 
@@ -29,14 +29,10 @@ public static class UserMutations
     {
         var user = db.Users.FirstOrDefault(u => u.Username == name);
 
-        // refresh token
-        if (user is not null)
-            accessor.HttpContext.Response.Headers.SetCookie = $"jid={Authentication.CreateRefreshToken(user)}";
-            
-        // access token
-        if (user is not null)
-            return new LoginPayload(Authentication.CreateAccessToken(user));
-
-        return new LoginPayload("no access");
+        if (user is null)
+            return new LoginPayload("no access");
+        
+        accessor.HttpContext!.Response.Headers.SetCookie = $"jid={Authentication.CreateRefreshToken(user)}";
+        return new LoginPayload(Authentication.CreateAccessToken(user));
     }
 }
