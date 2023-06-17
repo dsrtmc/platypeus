@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Nodes;
+using HotChocolate.Execution;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +60,10 @@ app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
     IdentityModelEventSource.ShowPII = true;
+
+// Write the GraphQL schema to a file
+var executor = await app.Services.GetRequestExecutorAsync();
+await File.WriteAllTextAsync("schema.graphql", executor.Schema.ToString());
 
 app.MapGet("/", () => "><((((*>");
 app.MapGet("/secret", () => $"top secret").RequireAuthorization();

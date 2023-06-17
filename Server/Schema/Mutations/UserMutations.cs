@@ -13,11 +13,11 @@ public record LoginPayload(string AccessToken);
 [MutationType]
 public static class UserMutations
 {
-    public static async Task<User> Register(string name, string email, DatabaseContext db)
+    public static async Task<User> Register(string username, string email, DatabaseContext db)
     {
         var user = new User
         {
-            Username = name,
+            Username = username,
             Email = email
         };
         await db.Users.AddAsync(user);
@@ -25,9 +25,9 @@ public static class UserMutations
         return user;
     }
 
-    public static LoginPayload Login(string name, DatabaseContext db, IHttpContextAccessor accessor)
+    public static LoginPayload Login(string username, DatabaseContext db, IHttpContextAccessor accessor)
     {
-        var user = db.Users.FirstOrDefault(u => u.Username == name);
+        var user = db.Users.FirstOrDefault(u => u.Username == username);
 
         if (user is null)
             return new LoginPayload("no access");
