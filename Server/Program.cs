@@ -67,7 +67,7 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-app.UseCors();
+app.UseCors("default");
 
 app.UseAuthentication();
 app.UseAuthorization();
