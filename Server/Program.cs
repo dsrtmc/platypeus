@@ -21,14 +21,25 @@ builder.Services.AddDbContextPool<DatabaseContext>(o =>
     o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
 });
 
+// CORS setup
+builder.Services.AddCors((o) =>
+{
+    o.AddPolicy("default", pb =>
+    {
+        pb.WithOrigins("http://localhost:3000") // TODO: .env variable
+            .WithMethods("GET", "POST")
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
+// GraphQL setup
 builder.Services.AddGraphQLServer()
     .AddTypes()
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>();
 
-builder.Services.AddHttpContextAccessor();
-
-// Set up the JWT
+// JWT setup
 builder.Services.AddAuthentication(o =>
 {
     o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -55,6 +66,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -65,6 +78,7 @@ if (app.Environment.IsDevelopment())
 var executor = await app.Services.GetRequestExecutorAsync();
 await File.WriteAllTextAsync("schema.graphql", executor.Schema.ToString());
 
+// REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE
 app.MapGet("/", () => "><((((*>");
 app.MapGet("/secret", () => $"top secret").RequireAuthorization();
 
