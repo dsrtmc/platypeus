@@ -1,4 +1,5 @@
 import RegisterForm from "@/app/register/RegisterForm";
+import { getAccessToken } from "@/accessToken";
 
 export default function Register() {
   return (

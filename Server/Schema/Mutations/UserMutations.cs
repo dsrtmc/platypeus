@@ -1,7 +1,5 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication;
 using Server.Models;
 using Server.Services;
 using Server.Utilities;
@@ -25,14 +23,16 @@ public static class UserMutations
         return user;
     }
 
-    public static LoginPayload Login(string username, DatabaseContext db, IHttpContextAccessor accessor)
+    public static async Task<LoginPayload> Login(string username, DatabaseContext db, IHttpContextAccessor accessor)
     {
         var user = db.Users.FirstOrDefault(u => u.Username == username);
 
         if (user is null)
             return new LoginPayload("no access");
-        
-        accessor.HttpContext!.Response.Headers.SetCookie = $"jid={Authentication.CreateRefreshToken(user)}";
+
+        //var test = new CookieOptions();
+
+        accessor.HttpContext!.Response.Cookies.Append("jid", Authentication.CreateRefreshToken(user));
         
         return new LoginPayload(Authentication.CreateAccessToken(user));
     }

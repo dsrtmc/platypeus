@@ -1,12 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Nodes;
 using HotChocolate.Execution;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Server.Services;
@@ -27,17 +25,11 @@ builder.Services.AddCors((o) =>
     o.AddPolicy("default", pb =>
     {
         pb.WithOrigins("http://localhost:3000") // TODO: .env variable
-            .WithMethods("GET", "POST")
+            .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
     });
 });
-
-// GraphQL setup
-builder.Services.AddGraphQLServer()
-    .AddTypes()
-    .RegisterDbContext<DatabaseContext>()
-    .RegisterService<IHttpContextAccessor>();
 
 // JWT setup
 builder.Services.AddAuthentication(o =>
@@ -60,12 +52,23 @@ builder.Services.AddAuthentication(o =>
         ValidateIssuerSigningKey = true,
         ValidateIssuer = false, // probably true
         ValidateAudience = false, // probably true
+        ClockSkew = TimeSpan.Zero
     };
 });
+
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
+// GraphQL setup
+builder.Services.AddGraphQLServer()
+    .AddTypes()
+    .AddAuthorization()
+    .RegisterDbContext<DatabaseContext>()
+    .RegisterService<IHttpContextAccessor>();
+
 var app = builder.Build();
+
+app.UseHttpLogging();
 
 app.UseCors("default");
 
@@ -86,13 +89,25 @@ app.MapGet("/secret", () => $"top secret").RequireAuthorization();
 // TODO: make POST later, GET for easier development
 app.MapGet("/refresh-token", (IHttpContextAccessor accessor, DatabaseContext db) =>
 {
+    Console.WriteLine("THERE HAS JUST BEEN A REQUEST TO /refresh-token");
     // bad name
     var invalidJson = new JsonObject { ["ok"] = false, ["accessToken"] = "" };
     
     // TODO: make better validation and error handling
+    Console.WriteLine("LOGGING COOKIES:");
+    foreach (var cookie in accessor.HttpContext!.Request.Cookies)
+    {
+        Console.WriteLine(cookie);
+    }
+    
     var token = accessor.HttpContext!.Request.Cookies["jid"];
     if (token is null)
+    {
+        Console.WriteLine("NO TOKEN");
+        Console.WriteLine("NO TOKEN");
+        Console.WriteLine("NO TOKEN");
         return invalidJson;
+    }
 
     var data = Authentication.ValidateToken(token, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!);
     if (data is null)

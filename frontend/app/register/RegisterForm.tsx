@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { RegisterDocument } from "@/graphql/generated/graphql";
+import { getAccessToken } from "@/accessToken";
 
 export default function RegisterForm() {
   const [username, setUsername] = useState("");
@@ -24,6 +25,9 @@ export default function RegisterForm() {
       <input type={"text"} placeholder={"username"} value={username} onChange={(e) => setUsername(e.target.value)} />
       <input type={"email"} placeholder={"email"} value={email} onChange={(e) => setEmail(e.target.value)} />
       <button type={"submit"}>register</button>
+      <button type="button" onClick={() => console.log(getAccessToken())}>
+        log access token
+      </button>
     </form>
   );
 }

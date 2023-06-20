@@ -21,13 +21,15 @@ public static class Authentication
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
             ValidateIssuerSigningKey = true,
             ValidateAudience = false,
-            ValidateIssuer = false
+            ValidateIssuer = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
         };
         return tokenHandler.ValidateToken(token, tokenValidationParameters);
     }
 
     public static string CreateAccessToken(User user) =>
-        CreateToken(user, Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!, DateTime.Now.AddMinutes(15));
+        CreateToken(user, Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!, DateTime.Now.AddMinutes(5));
     
     public static string CreateRefreshToken(User user) =>
         CreateToken(user, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!, DateTime.Now.AddDays(31));
@@ -45,6 +47,7 @@ public static class Authentication
             {
                 { ClaimTypes.NameIdentifier, user.ID },
             },
+            Expires = expires
         };
         return tokenHandler.CreateToken(descriptor);
     }
