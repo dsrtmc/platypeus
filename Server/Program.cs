@@ -41,10 +41,6 @@ builder.Services.AddAuthentication(o =>
     o.RequireAuthenticatedSignIn = false;
 }).AddJwtBearer(o =>
 {
-    // Right now I'm basically duplicating code here from the Authentication class.
-    // Could be a good idea to unify those token validation parameters, though I'm not sure
-    // how to make it nice considering we only need to deal with the access token secret here,
-    // whereas the Authentication class also has to deal with the refresh token secret.
     o.TokenValidationParameters = new TokenValidationParameters
     {
         // TODO: add issuer/audience
@@ -89,25 +85,13 @@ app.MapGet("/secret", () => $"top secret").RequireAuthorization();
 // TODO: make POST later, GET for easier development
 app.MapGet("/refresh-token", (IHttpContextAccessor accessor, DatabaseContext db) =>
 {
-    Console.WriteLine("THERE HAS JUST BEEN A REQUEST TO /refresh-token");
     // bad name
     var invalidJson = new JsonObject { ["ok"] = false, ["accessToken"] = "" };
     
     // TODO: make better validation and error handling
-    Console.WriteLine("LOGGING COOKIES:");
-    foreach (var cookie in accessor.HttpContext!.Request.Cookies)
-    {
-        Console.WriteLine(cookie);
-    }
-    
     var token = accessor.HttpContext!.Request.Cookies["jid"];
     if (token is null)
-    {
-        Console.WriteLine("NO TOKEN");
-        Console.WriteLine("NO TOKEN");
-        Console.WriteLine("NO TOKEN");
         return invalidJson;
-    }
 
     var data = Authentication.ValidateToken(token, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!);
     if (data is null)

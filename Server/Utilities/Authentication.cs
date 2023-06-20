@@ -15,6 +15,7 @@ public static class Authentication
     public static TokenValidationResult? ValidateToken(string token, string secret)
     {
         var tokenHandler = new JsonWebTokenHandler();
+        
         var tokenValidationParameters = new TokenValidationParameters
         {
             // TODO: add issuer/audience
@@ -25,6 +26,7 @@ public static class Authentication
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
         };
+        
         return tokenHandler.ValidateToken(token, tokenValidationParameters);
     }
 
@@ -38,8 +40,10 @@ public static class Authentication
     {
         // TODO: check secret for null in case bad .env
         var tokenHandler = new JsonWebTokenHandler();
+        
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        
         var descriptor = new SecurityTokenDescriptor
         {
             SigningCredentials = credentials,
@@ -49,6 +53,7 @@ public static class Authentication
             },
             Expires = expires
         };
+        
         return tokenHandler.CreateToken(descriptor);
     }
 }
