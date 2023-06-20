@@ -77,7 +77,7 @@ function makeClient() {
 
           try {
             const { exp } = jwt_decode(token);
-            return Date.now() >= exp * 1000;
+            return Date.now() < exp * 1000;
           } catch (err) {
             return false;
           }

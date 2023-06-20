@@ -61,13 +61,14 @@ export const { getClient }: { getClient: () => ApolloClient<any> } = registerApo
         accessTokenField: "accessToken", // has to match the name of the field we return in /refresh-token json
         isTokenValidOrUndefined: async () => {
           const token = getAccessToken();
+
           if (!token) {
             return false;
           }
 
           try {
             const { exp } = jwt_decode(token);
-            return Date.now() >= exp * 1000;
+            return Date.now() < exp * 1000;
           } catch (err) {
             return false;
           }

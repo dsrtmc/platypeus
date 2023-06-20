@@ -24,28 +24,7 @@ public class UserQueries
     
     // a test resolver for making sure authorization works
     [Authorize]
-    public string Bye(IHttpContextAccessor accessor)
-    {
-        // Console.WriteLine("Bye resolver:");
-        //
-        // Console.WriteLine("Logging headers:");
-        // foreach (var header in accessor.HttpContext!.Request.Headers)
-        //     Console.WriteLine($"{header.Key}: {header.Value}");
-        //
-        // Console.WriteLine("Logging cookies:");
-        // foreach (var cookie in accessor.HttpContext!.Request.Cookies)
-        //     Console.WriteLine($"{cookie.Key}: {cookie.Value}");
-        //
-        var token = accessor.HttpContext!.Request.Headers.Authorization;
-        Console.WriteLine(token);
-        var result = Authentication.ValidateToken(token.ToString().Split(" ")[1], Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET"));
-        Console.WriteLine($"VAlidaiotn result: {result.IsValid}");
-        //
-        return "goodbye";
-    }
+    public string Bye(IHttpContextAccessor accessor) => "goodbye";
     
-    public List<User> GetAllUsers(DatabaseContext db)
-    {
-        return db.Users.ToList();
-    }
+    public List<User> GetAllUsers(DatabaseContext db) => db.Users.ToList();
 }
