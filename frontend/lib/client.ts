@@ -53,9 +53,7 @@ const requestLink = new ApolloLink(
 );
 
 export const { getClient }: { getClient: () => ApolloClient<any> } = registerApolloClient(() => {
-  console.log("when using the getClient, my access token is:", getAccessToken());
   return new ApolloClient({
-    // link: authLink.concat(httpLink),
     link: ApolloLink.from([
       new TokenRefreshLink({
         accessTokenField: "accessToken", // has to match the name of the field we return in /refresh-token json

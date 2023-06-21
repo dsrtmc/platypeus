@@ -1,12 +1,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Server.Models;
 using Server.Services;
 using Server.Utilities;
 
 namespace Server.Schema.Mutations;
 
-public record LoginPayload(string AccessToken);
+public record LoginPayload(User? User, string AccessToken);
 
 [MutationType]
 public static class UserMutations
@@ -25,15 +26,15 @@ public static class UserMutations
 
     public static async Task<LoginPayload> Login(string username, DatabaseContext db, IHttpContextAccessor accessor)
     {
-        var user = db.Users.FirstOrDefault(u => u.Username == username);
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Username == username);
 
         if (user is null)
-            return new LoginPayload("no access");
+            return new LoginPayload(null, "no access");
 
         //var test = new CookieOptions();
 
         accessor.HttpContext!.Response.Cookies.Append("jid", Authentication.CreateRefreshToken(user));
         
-        return new LoginPayload(Authentication.CreateAccessToken(user));
+        return new LoginPayload(user, Authentication.CreateAccessToken(user));
     }
 }

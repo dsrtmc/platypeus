@@ -2,9 +2,9 @@
 
 import "./globals.css";
 import { Inter } from "next/font/google";
-import Link from "next/link";
-import { ReactNode, useEffect } from "react";
-import { setAccessToken } from "@/accessToken";
+import { ReactNode } from "react";
+import { ApolloWrapper } from "@/lib/apollo-provider";
+import Navbar from "@/app/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,24 +16,12 @@ export const metadata = {
 // I have no idea how to make that work while keeping RootLayout as a server component.
 // I've spent 10+ hours non-stop brute-forcing "every" possible way to solve that and did not even come close to success.
 export default function RootLayout({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    console.info("first log");
-    fetch("http://localhost:5053/refresh-token", { credentials: "include" }).then(async (res) => {
-      const data = await res.json();
-      setAccessToken(data.accessToken);
-    });
-  }, []);
-
-  // if (loading) return <div>loading...</div>; // XD? why cant i do that?
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav style={{ display: "flex", gap: "10px" }}>
-          <Link href={"/"}>home</Link>
-          <Link href={"/register"}>register</Link>
-          <Link href={"/login"}>login</Link>
-          <Link href={"/bye"}>bye</Link>
-        </nav>
+        <ApolloWrapper>
+          <Navbar />
+        </ApolloWrapper>
         {children}
       </body>
     </html>

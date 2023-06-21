@@ -1,5 +1,10 @@
 mutation Login($username: String!) {
     login(username: $username) {
         accessToken
+        user {
+            id
+            username
+            email
+        }
     }
 }
