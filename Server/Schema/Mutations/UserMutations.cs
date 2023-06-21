@@ -31,10 +31,25 @@ public static class UserMutations
         if (user is null)
             return new LoginPayload(null, "no access");
 
-        //var test = new CookieOptions();
-
-        accessor.HttpContext!.Response.Cookies.Append("jid", Authentication.CreateRefreshToken(user));
+        // TODO: Abstract that logic to a SendRefreshToken() function or something alike
+        var cookieOptions = new CookieOptions
+        {
+            Path = "/refresh-token"
+        };
+        accessor.HttpContext!.Response.Cookies.Append("jid", Authentication.CreateRefreshToken(user), cookieOptions);
         
         return new LoginPayload(user, Authentication.CreateAccessToken(user));
+    }
+
+    public static bool Logout(DatabaseContext db, IHttpContextAccessor accessor)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            Path = "/refresh-token"
+        };
+        // Clears the refresh token, effectively logging the user out
+        accessor.HttpContext!.Response.Cookies.Append("jid", "");
+        
+        return true;
     }
 }
