@@ -1,34 +1,13 @@
 "use client";
 
-import { ByeDocument, MeDocument } from "@/graphql/generated/graphql";
-import { useLazyQuery, useQuery } from "@apollo/client";
-import { getAccessToken } from "@/accessToken";
+import { ByeDocument } from "@/graphql/generated/graphql";
+import { useQuery } from "@apollo/client";
 
 export default function Bye() {
   const { data, loading, error } = useQuery(ByeDocument, { fetchPolicy: "network-only" });
-  const [fetchMe, { data: dataMe, error: errorMe }] = useLazyQuery(MeDocument, { fetchPolicy: "network-only" });
-  let body = (
-    <>
-      <button onClick={() => console.log(dataMe)}>log me</button>
-      <button
-        onClick={async () => {
-          await fetchMe();
-          console.log("access token:", getAccessToken());
-        }}
-      >
-        get me
-      </button>
-    </>
-  );
   if (loading) return <div>loading</div>;
-  if (error) return <div>error{body}</div>;
+  if (error) return <div>error</div>;
   if (!data) return <div>no data</div>;
-  if (data)
-    return (
-      <div>
-        {JSON.stringify(data)}
-        {body}
-      </div>
-    );
+  if (data) return <div>{JSON.stringify(data)}</div>;
   return <div>shouldnt happen ever</div>;
 }
