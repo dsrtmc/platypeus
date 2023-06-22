@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { LogoutDocument, MeDocument } from "@/graphql/generated/graphql";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { setAccessToken } from "@/accessToken";
-import { useApolloClient, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 export default function Navbar() {
   const { data, loading, error } = useQuery(MeDocument);
+
   const [logout, { client }] = useMutation(LogoutDocument);
+
   useEffect(() => {
-    console.info("first log");
     fetch("http://localhost:5053/refresh-token", { credentials: "include" }).then(async (res) => {
       const data = await res.json();
       setAccessToken(data.accessToken);

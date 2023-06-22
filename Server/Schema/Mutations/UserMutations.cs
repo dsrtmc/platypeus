@@ -31,28 +31,17 @@ public static class UserMutations
         if (user is null)
             return new LoginPayload(null, "no access");
 
-        // TODO: Abstract that logic to a SendRefreshToken() function or something alike
-        var cookieOptions = new CookieOptions
-        {
-            Path = "/refresh-token",
-            // Secure = __prod__,
-            HttpOnly = true
-        };
-        accessor.HttpContext!.Response.Cookies.Append("jid", Authentication.CreateRefreshToken(user), cookieOptions);
+        Authentication.SendRefreshToken(Authentication.CreateRefreshToken(user), accessor.HttpContext!);
         
         return new LoginPayload(user, Authentication.CreateAccessToken(user));
     }
 
     public static bool Logout(DatabaseContext db, IHttpContextAccessor accessor)
     {
-        var cookieOptions = new CookieOptions
-        {
-            Path = "/refresh-token",
-            // Secure = __prod__,
-            HttpOnly = true
-        };
         // Clears the refresh token, effectively logging the user out
-        accessor.HttpContext!.Response.Cookies.Append("jid", "");
+        // surely, surely, surely, surely, there's a better way to write that
+        // DI is really funny to wrap my head around with static classes
+        Authentication.SendRefreshToken("", accessor.HttpContext!);
         
         return true;
     }

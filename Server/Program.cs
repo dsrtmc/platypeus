@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -85,41 +86,58 @@ app.MapGet("/secret", () => $"top secret").RequireAuthorization();
 // TODO: make POST later, GET for easier development
 app.MapGet("/refresh-token", (IHttpContextAccessor accessor, DatabaseContext db) =>
 {
-    // bad name
-    var invalidJson = new JsonObject { ["ok"] = false, ["accessToken"] = "" };
+    var resultJson = new JsonObject
+    {
+        ["accessToken"] = "",
+        ["error"] = "",
+    };
     
     // TODO: make better validation and error handling
-    var token = accessor.HttpContext!.Request.Cookies["jid"];
+    var token = accessor.HttpContext!.Request.Cookies[Environment.GetEnvironmentVariable("REFRESH_TOKEN_COOKIE_NAME")!];
     if (token is null)
-        return invalidJson;
+    {
+        resultJson["error"] = "token is null";
+        return resultJson;
+    }
 
     var result = Authentication.ValidateToken(token, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!);
     if (result is null)
-        return invalidJson;
-
+    {
+        resultJson["error"] = "token validation result is null";
+        return resultJson;
+    }
+    
     if (!result.IsValid)
     {
-        Console.WriteLine("data is invalid");
+        resultJson["error"] = "token validation result is invalid";
         if (result.Exception is not null)
-            Console.WriteLine($"exception: {result.Exception.Message}");
-        return invalidJson;
+            Console.WriteLine($"Token validation exception: {result.Exception.Message}");
+        
+        return resultJson;
     }
     
     // The claims should never be empty and should always be strings
-    var userIdClaim = result.Claims["ID"] as string;
-    var tokenVersionClaim = result.Claims["TokenVersion"] as string;
+    var userIdClaim = (string)result.Claims[ClaimTypes.NameIdentifier];
+    var tokenVersionClaim = (int)result.Claims[ClaimTypes.Version];
     
     var user = db.Users.Find(new Guid(userIdClaim!));
     if (user is null)
-        return invalidJson;
+    {
+        resultJson["error"] = "cannot find user with such an id";
+        return resultJson;
+    }
 
-    if (user.TokenVersion != int.Parse(tokenVersionClaim!))
-        return invalidJson;
+    if (user.TokenVersion != tokenVersionClaim)
+    {
+        resultJson["error"] = "incorrect token version";
+        return resultJson;
+    }
 
     // refresh the refresh token
-    accessor.HttpContext.Response.Headers.SetCookie = $"jid={Authentication.CreateRefreshToken(user)}";
+    Authentication.SendRefreshToken(Authentication.CreateRefreshToken(user), accessor.HttpContext!);
 
-    return new JsonObject { ["ok"] = true, ["accessToken"] = Authentication.CreateAccessToken(user) };
+    resultJson["accessToken"] = Authentication.CreateAccessToken(user);
+    return resultJson;
 });
 
 app.MapGraphQL();

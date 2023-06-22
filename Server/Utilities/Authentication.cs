@@ -35,7 +35,18 @@ public static class Authentication
     
     public static string CreateRefreshToken(User user) =>
         CreateToken(user, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!, DateTime.Now.AddDays(31));
-    
+
+    public static void SendRefreshToken(string token, HttpContext context)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            Path = "/refresh-token",
+            HttpOnly = true
+            // Secure = __prod__, // TODO
+        };
+        context.Response.Cookies.Append(Environment.GetEnvironmentVariable("REFRESH_TOKEN_COOKIE_NAME")!, token, cookieOptions);
+    }
+
     private static string CreateToken(User user, string secret, DateTime expires)
     {
         // TODO: check secret for null in case bad .env
@@ -47,12 +58,12 @@ public static class Authentication
         var descriptor = new SecurityTokenDescriptor
         {
             SigningCredentials = credentials,
+            Expires = expires,
             Claims = new Dictionary<string, object>
             {
-                { "ID", user.ID },
-                { "TokenVersion", user.TokenVersion }
-            },
-            Expires = expires
+                { ClaimTypes.NameIdentifier, user.ID },
+                { ClaimTypes.Version, user.TokenVersion }
+            }
         };
         
         return tokenHandler.CreateToken(descriptor);

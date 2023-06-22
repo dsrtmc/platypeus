@@ -20,6 +20,7 @@ public class UserQueries
         if (authorizationHeader == StringValues.Empty)
             return null;
         
+        // TODO: error handling here
         var jwt = authorizationHeader.ToString().Split(" ")[1];
         var token = tokenHandler.ReadJsonWebToken(jwt);
 
