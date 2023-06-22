@@ -93,21 +93,27 @@ app.MapGet("/refresh-token", (IHttpContextAccessor accessor, DatabaseContext db)
     if (token is null)
         return invalidJson;
 
-    var data = Authentication.ValidateToken(token, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!);
-    if (data is null)
+    var result = Authentication.ValidateToken(token, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!);
+    if (result is null)
         return invalidJson;
 
-    if (!data.IsValid)
+    if (!result.IsValid)
     {
         Console.WriteLine("data is invalid");
-        if (data.Exception is not null)
-            Console.WriteLine($"exception: {data.Exception.Message}");
+        if (result.Exception is not null)
+            Console.WriteLine($"exception: {result.Exception.Message}");
         return invalidJson;
     }
-
-    // The claim should never be empty and should always be a string
-    var user = db.Users.Find(new Guid((data.Claims[ClaimTypes.NameIdentifier] as string)!));
+    
+    // The claims should never be empty and should always be strings
+    var userIdClaim = result.Claims["ID"] as string;
+    var tokenVersionClaim = result.Claims["TokenVersion"] as string;
+    
+    var user = db.Users.Find(new Guid(userIdClaim!));
     if (user is null)
+        return invalidJson;
+
+    if (user.TokenVersion != int.Parse(tokenVersionClaim!))
         return invalidJson;
 
     // refresh the refresh token

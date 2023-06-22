@@ -49,7 +49,8 @@ public static class Authentication
             SigningCredentials = credentials,
             Claims = new Dictionary<string, object>
             {
-                { ClaimTypes.NameIdentifier, user.ID },
+                { "ID", user.ID },
+                { "TokenVersion", user.TokenVersion }
             },
             Expires = expires
         };

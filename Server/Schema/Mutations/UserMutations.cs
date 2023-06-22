@@ -34,7 +34,9 @@ public static class UserMutations
         // TODO: Abstract that logic to a SendRefreshToken() function or something alike
         var cookieOptions = new CookieOptions
         {
-            Path = "/refresh-token"
+            Path = "/refresh-token",
+            // Secure = __prod__,
+            HttpOnly = true
         };
         accessor.HttpContext!.Response.Cookies.Append("jid", Authentication.CreateRefreshToken(user), cookieOptions);
         
@@ -45,10 +47,25 @@ public static class UserMutations
     {
         var cookieOptions = new CookieOptions
         {
-            Path = "/refresh-token"
+            Path = "/refresh-token",
+            // Secure = __prod__,
+            HttpOnly = true
         };
         // Clears the refresh token, effectively logging the user out
         accessor.HttpContext!.Response.Cookies.Append("jid", "");
+        
+        return true;
+    }
+    
+    // Only for development purposes // TODO: create some funny internal function that'll do the same
+    public static async Task<bool> RevokeRefreshToken(Guid userId, DatabaseContext db, IHttpContextAccessor accessor)
+    {
+        var user = await db.Users.FindAsync(userId);
+        if (user is null)
+            return false;
+
+        user.TokenVersion++;
+        await db.SaveChangesAsync();
         
         return true;
     }
