@@ -15,7 +15,7 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      Authorization: token ? `Bearer ${token}` : "",
     },
   };
 });
@@ -76,11 +76,6 @@ export const { getClient }: { getClient: () => ApolloClient<any> } = registerApo
         },
         handleFetch: (accessToken) => {
           setAccessToken(accessToken);
-        },
-        handleResponse: (_operation, _accessTokenField) => (_response) => {
-          // here you can parse response, handle errors, prepare returned token to further operations
-          // returned object should be like this:
-          // { access_token: 'token string here' }
         },
         handleError: (err) => {
           // full control over handling token fetch Error
