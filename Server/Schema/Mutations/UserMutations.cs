@@ -12,23 +12,28 @@ public record LoginPayload(User? User, string AccessToken);
 [MutationType]
 public static class UserMutations
 {
-    public static async Task<User> Register(string username, string email, DatabaseContext db)
+    public static async Task<User> Register(string username, string email, string password, DatabaseContext db)
     {
+        var hashedPassword = await PasswordHasher.Hash(password);
         var user = new User
         {
             Username = username,
-            Email = email
+            Email = email,
+            Password = hashedPassword
         };
         await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
         return user;
     }
 
-    public static async Task<LoginPayload> Login(string username, DatabaseContext db, IHttpContextAccessor accessor)
+    public static async Task<LoginPayload> Login(string username, string password, DatabaseContext db, IHttpContextAccessor accessor)
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.Username == username);
 
         if (user is null)
+            return new LoginPayload(null, "no access");
+
+        if (!await PasswordHasher.Verify(user.Password, password))
             return new LoginPayload(null, "no access");
 
         Authentication.SendRefreshToken(Authentication.CreateRefreshToken(user), accessor.HttpContext!);
