@@ -1,0 +1,16 @@
+.word {
+    display: flex;
+    background-color: dimgray;
+}
+
+.letter {
+    color: red;
+    /*width: 0;*/
+    /*border: 1px solid darkslategray;*/
+}
+
+.caret {
+    background-color: red;
+    width: 3px;
+    height: 30px;
+}

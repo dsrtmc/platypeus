@@ -2,7 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import { ApolloWrapper } from "@/lib/apollo-provider";
-import Navbar from "@/app/Navbar";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
