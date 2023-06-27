@@ -1,10 +1,11 @@
 import styles from "./Test.module.css";
+import { forwardRef } from "react";
 
 interface Props {
   x: number;
   y: number;
 }
 
-export function Caret({ x, y }: Props) {
-  return <div className={styles.caret} />;
-}
+export const Caret = forwardRef<HTMLDivElement, Props>(({ x, y }, ref) => {
+  return <div className={styles.caret} ref={ref} />;
+});
