@@ -3,6 +3,8 @@
 import { Word } from "@/components/test/Word";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Caret } from "@/components/test/Caret";
+import { Letter } from "@/components/test/Letter";
+import styles from "./Test.module.css";
 
 export function Test() {
   const words: string[] = [
@@ -22,7 +24,8 @@ export function Test() {
     "under",
   ];
   const [active, setActive] = useState(true);
-  const [index, setIndex] = useState(0);
+  const [wordIndex, setWordIndex] = useState(0);
+  const [letterIndex, setLetterIndex] = useState(0);
   const ref = useRef<HTMLDivElement | null>(null);
   const itemsRef = useRef<Array<HTMLDivElement>>([]);
   const caretRef = useRef<HTMLDivElement | null>(null);
@@ -37,32 +40,119 @@ export function Test() {
       console.log("not active");
     }
   }
-  function focusNext() {
-    console.log("index:", index);
-    let next = itemsRef.current?.[index];
-    console.log("offset top:", next?.offsetTop);
-    console.log("offset left:", next?.offsetLeft);
-    console.log("caret left:", caretRef.current?.style.left);
-    // why does it show up as invalid lhs assignment if it's not read only lol?
-    caretRef.current?.style.left = `${next?.offsetLeft}px`;
-    setIndex(index + 1);
+
+  function goForward() {
+    const currentWord = itemsRef.current[wordIndex];
+    const letters = currentWord.children;
+    const currentLetter = letters[letterIndex] as HTMLDivElement;
+    let nextLetter;
+    // go to next word
+    if (letterIndex >= letters.length - 1) {
+      setLetterIndex(0);
+      setWordIndex(wordIndex + 1);
+      const nextWord = itemsRef.current[wordIndex + 1];
+      const nextLetters = nextWord.children;
+      nextLetter = nextWord.firstChild;
+    } else {
+      console.log("SECOND");
+      setLetterIndex(letterIndex + 1);
+      nextLetter = letters[letterIndex + 1];
+    }
+    if (caretRef.current) caretRef.current.style.left = `${nextLetter.offsetLeft + nextLetter.offsetWidth}px`;
   }
-  function handleKeyPress(e: globalThis.KeyboardEvent) {
+
+  function goToNextLetter() {
+    const currentWord = itemsRef.current[wordIndex];
+    const letters = currentWord.children;
+    if (letterIndex == letters.length - 1) return;
+    // go to next word
+    setLetterIndex(letterIndex + 1);
+    const nextLetter = letters[letterIndex] as HTMLElement;
+    if (caretRef.current) caretRef.current.style.left = `${nextLetter.offsetLeft + nextLetter.offsetWidth}px`;
+  }
+
+  function goToNextWord() {
+    const currentWord = itemsRef.current[wordIndex];
+    const letters = currentWord.children;
+    const nextWord = itemsRef.current[wordIndex + 1];
+    setLetterIndex(0);
+    setWordIndex(wordIndex + 1);
+    if (caretRef.current) caretRef.current.style.left = `${nextWord.offsetLeft}px`;
+  }
+
+  function goBackward() {
+    const currentWord = itemsRef.current[wordIndex];
+    const letters = currentWord.children;
+    const currentLetter = letters[letterIndex] as HTMLDivElement;
+    if (letterIndex <= 0) {
+      setWordIndex(wordIndex - 1);
+      const newLetters = itemsRef.current[wordIndex - 1];
+      setLetterIndex(newLetters.children.length - 1);
+    } else {
+      setLetterIndex(letterIndex - 1);
+    }
+  }
+
+  function focusNext(e: globalThis.KeyboardEvent) {
+    // TODO: make sure some funny stuff isn't undefined
+    const currentWord = itemsRef.current[wordIndex];
+    const letters = currentWord.children;
+    console.log("letter index:", letterIndex);
+    console.log("letters length:", letters?.length);
+    // const newWordIndex = wordIndex + 1;
+    // const newLetterIndex = letterIndex + 1;
+    // const currentLetter = letters[letterIndex] as HTMLDivElement;
+    // why does it show up as invalid lhs assignment if it's not read only lol?
+    const currentLetter = letters[letterIndex] as HTMLDivElement;
+    console.log("key:", e.key);
+    switch (e.key) {
+      case " ": {
+        // if (newLetterIndex >= letters?.length) {
+        //   setLetterIndex(0);
+        //   setWordIndex(wordIndex + 1);
+        //   caretRef.current?.style.left = `${itemsRef.current?.[wordIndex + 1].offsetLeft}px`;
+        // }
+        goToNextWord();
+        break;
+      }
+      case "Backspace": {
+        // const previousLetter = letters[letterIndex - 1] as HTMLElement;
+        // setLetterIndex(letterIndex - 1);
+        // caretRef.current?.style.left = `${previousLetter?.offsetLeft + previousLetter?.offsetWidth}px`;
+        goBackward();
+        break;
+      }
+      default: {
+        // coloring
+        // if (e.key == currentLetter.textContent) {
+        //   currentLetter.classList.toggle(styles.correct);
+        // } else {
+        //   currentLetter.classList.toggle(styles.incorrect);
+        // }
+        // caretRef.current?.style.left = `${currentLetter?.offsetLeft + currentLetter?.offsetWidth}px`;
+        goToNextLetter();
+      }
+    }
+    console.log("current letter:", currentLetter);
+  }
+
+  function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (active) {
       console.log("clicked when test is active");
-      focusNext();
+      focusNext(e);
     } else {
       console.log("clicked when test is not active");
     }
   }
+
   useEffect(() => {
     document.addEventListener("click", handleClick);
-    document.addEventListener("keypress", handleKeyPress);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("click", handleClick);
-      document.removeEventListener("keypress", handleKeyPress);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [active, index]);
+  }, [active, wordIndex, letterIndex]);
   return (
     <div style={{ display: "flex", gap: "1rem" }} ref={ref}>
       {words.map((word, index) => (
@@ -80,6 +170,8 @@ export function Test() {
       ))}
       <p>{active ? "ACTIVE" : "INACTIVE"}</p>
       <Caret x={10} y={10} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
+      letter position: {letterIndex}
+      word position: {wordIndex}
     </div>
   );
 }

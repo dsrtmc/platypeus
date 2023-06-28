@@ -4,9 +4,7 @@
 }
 
 .letter {
-    color: red;
-    /*width: 0;*/
-    /*border: 1px solid darkslategray;*/
+    color: dodgerblue;
 }
 
 .caret {
@@ -14,4 +12,12 @@
     background-color: red;
     width: 3px;
     height: 30px;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
 }
