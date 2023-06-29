@@ -41,56 +41,48 @@ export function Test() {
     }
   }
 
-  function goForward() {
+  function goForwardOneLetter() {
     const currentWord = itemsRef.current[wordIndex];
     const letters = currentWord.children;
-    const currentLetter = letters[letterIndex] as HTMLDivElement;
-    let nextLetter;
-    // go to next word
-    if (letterIndex >= letters.length - 1) {
-      setLetterIndex(0);
-      setWordIndex(wordIndex + 1);
-      const nextWord = itemsRef.current[wordIndex + 1];
-      const nextLetters = nextWord.children;
-      nextLetter = nextWord.firstChild;
-    } else {
-      console.log("SECOND");
+    const nextLetter = letters[letterIndex + 1] as HTMLElement | undefined;
+    const currentLetter = letters[letterIndex] as HTMLElement;
+    if (!currentLetter) return;
+    if (!nextLetter) {
+      if (caretRef.current) caretRef.current.style.left = `${currentLetter.offsetLeft + currentLetter.offsetWidth}px`;
       setLetterIndex(letterIndex + 1);
-      nextLetter = letters[letterIndex + 1];
+      return;
     }
-    if (caretRef.current) caretRef.current.style.left = `${nextLetter.offsetLeft + nextLetter.offsetWidth}px`;
-  }
-
-  function goToNextLetter() {
-    const currentWord = itemsRef.current[wordIndex];
-    const letters = currentWord.children;
-    if (letterIndex == letters.length - 1) return;
     // go to next word
     setLetterIndex(letterIndex + 1);
-    const nextLetter = letters[letterIndex] as HTMLElement;
-    if (caretRef.current) caretRef.current.style.left = `${nextLetter.offsetLeft + nextLetter.offsetWidth}px`;
+    if (caretRef.current) caretRef.current.style.left = `${nextLetter.offsetLeft}px`;
   }
 
-  function goToNextWord() {
+  function goForwardOneWord() {
     const currentWord = itemsRef.current[wordIndex];
-    const letters = currentWord.children;
-    const nextWord = itemsRef.current[wordIndex + 1];
+    const nextWord = itemsRef.current[wordIndex + 1] as HTMLElement | undefined;
+    if (!nextWord) return;
     setLetterIndex(0);
     setWordIndex(wordIndex + 1);
     if (caretRef.current) caretRef.current.style.left = `${nextWord.offsetLeft}px`;
   }
 
-  function goBackward() {
+  function goBackOneLetter() {
     const currentWord = itemsRef.current[wordIndex];
     const letters = currentWord.children;
-    const currentLetter = letters[letterIndex] as HTMLDivElement;
-    if (letterIndex <= 0) {
-      setWordIndex(wordIndex - 1);
-      const newLetters = itemsRef.current[wordIndex - 1];
-      setLetterIndex(newLetters.children.length - 1);
-    } else {
-      setLetterIndex(letterIndex - 1);
-    }
+    const previousLetter = letters[letterIndex - 1] as HTMLElement | undefined;
+    const nextLetter = letters[letterIndex + 1] as HTMLElement | undefined;
+    if (!previousLetter) return;
+    setLetterIndex(letterIndex - 1);
+    if (caretRef.current) caretRef.current.style.left = `${previousLetter.offsetLeft}px`;
+  }
+
+  function goBackOneWord() {
+    const currentWord = itemsRef.current[wordIndex];
+    const previousWord = itemsRef.current[wordIndex - 1] as HTMLElement | undefined;
+    if (!previousWord) return;
+    setLetterIndex(previousWord.children.length - 1);
+    setWordIndex(wordIndex - 1);
+    if (caretRef.current) caretRef.current.style.left = `${previousWord.offsetLeft + previousWord.offsetWidth}px`;
   }
 
   function focusNext(e: globalThis.KeyboardEvent) {
@@ -112,14 +104,14 @@ export function Test() {
         //   setWordIndex(wordIndex + 1);
         //   caretRef.current?.style.left = `${itemsRef.current?.[wordIndex + 1].offsetLeft}px`;
         // }
-        goToNextWord();
+        goForwardOneWord();
         break;
       }
       case "Backspace": {
         // const previousLetter = letters[letterIndex - 1] as HTMLElement;
         // setLetterIndex(letterIndex - 1);
         // caretRef.current?.style.left = `${previousLetter?.offsetLeft + previousLetter?.offsetWidth}px`;
-        goBackward();
+        goBackOneLetter();
         break;
       }
       default: {
@@ -130,7 +122,7 @@ export function Test() {
         //   currentLetter.classList.toggle(styles.incorrect);
         // }
         // caretRef.current?.style.left = `${currentLetter?.offsetLeft + currentLetter?.offsetWidth}px`;
-        goToNextLetter();
+        goForwardOneLetter();
       }
     }
     console.log("current letter:", currentLetter);
