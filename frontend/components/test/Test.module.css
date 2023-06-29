@@ -1,6 +1,21 @@
+.box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 600px;
+    background-color: #b4b4ed;
+    margin: auto;
+}
+
+.words {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #ccc;
+    gap: 0.5rem;
+}
+
 .word {
     display: flex;
-    background-color: dimgray;
 }
 
 .letter {
@@ -15,9 +30,9 @@
 }
 
 .correct {
-    color: green;
+    color: mediumspringgreen;
 }
 
 .incorrect {
-    color: red;
+    color: palevioletred;
 }

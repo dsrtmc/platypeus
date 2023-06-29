@@ -22,118 +22,124 @@ export function Test() {
     "give",
     "present",
     "under",
+    "after",
+    "how",
+    "thing",
+    "right",
+    "against",
+    "of",
+    "both",
+    "day",
+    "those",
+    "most",
+    "what",
+    "give",
+    "present",
+    "under",
   ];
   const [active, setActive] = useState(true);
   const [wordIndex, setWordIndex] = useState(0);
   const [letterIndex, setLetterIndex] = useState(0);
   const ref = useRef<HTMLDivElement | null>(null);
-  const itemsRef = useRef<Array<HTMLDivElement>>([]);
+  const wordsRef = useRef<Array<HTMLDivElement>>([]);
   const caretRef = useRef<HTMLDivElement | null>(null);
-  function handleClick(e: globalThis.MouseEvent) {
-    // uncomment when debugging not that useful
-    // setActive(ref.current?.contains(e.target));
-    if (ref.current?.contains(e.target)) {
-      setActive(true);
-      console.log("active");
-    } else {
-      setActive(false);
-      console.log("not active");
-    }
+
+  function moveCaret(x: number, y: number) {
+    if (!caretRef.current) return;
+    caretRef.current!.style.left = `${x}px`;
+    caretRef.current!.style.top = `${y}px`;
   }
 
-  function goForwardOneLetter() {
-    const currentWord = itemsRef.current[wordIndex];
+  function goForwardOneLetter(input: string) {
+    const currentWord = wordsRef.current[wordIndex];
     const letters = currentWord.children;
-    const nextLetter = letters[letterIndex + 1] as HTMLElement | undefined;
+    const nextLetter = letters[letterIndex + 1] as HTMLElement;
     const currentLetter = letters[letterIndex] as HTMLElement;
+
     if (!currentLetter) return;
+    const correct = currentLetter.textContent == input;
+    currentLetter.classList.add(correct ? styles.correct : styles.incorrect);
+
     if (!nextLetter) {
-      if (caretRef.current) caretRef.current.style.left = `${currentLetter.offsetLeft + currentLetter.offsetWidth}px`;
+      moveCaret(currentLetter.offsetLeft + currentLetter.offsetWidth, currentLetter.offsetTop);
       setLetterIndex(letterIndex + 1);
       return;
     }
     // go to next word
     setLetterIndex(letterIndex + 1);
-    if (caretRef.current) caretRef.current.style.left = `${nextLetter.offsetLeft}px`;
+    moveCaret(nextLetter.offsetLeft, nextLetter.offsetTop);
   }
 
   function goForwardOneWord() {
-    const currentWord = itemsRef.current[wordIndex];
-    const nextWord = itemsRef.current[wordIndex + 1] as HTMLElement | undefined;
+    const nextWord = wordsRef.current[wordIndex + 1] as HTMLElement | undefined;
     if (!nextWord) return;
     setLetterIndex(0);
     setWordIndex(wordIndex + 1);
-    if (caretRef.current) caretRef.current.style.left = `${nextWord.offsetLeft}px`;
+    moveCaret(nextWord.offsetLeft, nextWord.offsetTop);
   }
 
   function goBackOneLetter() {
-    const currentWord = itemsRef.current[wordIndex];
+    const currentWord = wordsRef.current[wordIndex];
     const letters = currentWord.children;
     const previousLetter = letters[letterIndex - 1] as HTMLElement | undefined;
-    const nextLetter = letters[letterIndex + 1] as HTMLElement | undefined;
     if (!previousLetter) return;
+    previousLetter.classList.remove(styles.correct, styles.incorrect);
     setLetterIndex(letterIndex - 1);
-    if (caretRef.current) caretRef.current.style.left = `${previousLetter.offsetLeft}px`;
+    moveCaret(previousLetter.offsetLeft, previousLetter.offsetTop);
   }
 
   function goBackOneWord() {
-    const currentWord = itemsRef.current[wordIndex];
-    const previousWord = itemsRef.current[wordIndex - 1] as HTMLElement | undefined;
-    if (!previousWord) return;
-    setLetterIndex(previousWord.children.length - 1);
+    const currentWord = wordsRef.current[wordIndex];
+    for (const letter of currentWord.children) {
+      letter.classList.remove(styles.correct, styles.incorrect);
+    }
+    const previousWord = wordsRef.current[wordIndex - 1] as HTMLElement | undefined;
+    if (!previousWord) {
+      setLetterIndex(0);
+      moveCaret(currentWord.offsetLeft, currentWord.offsetTop);
+      return;
+    }
+    setLetterIndex(previousWord.children.length);
     setWordIndex(wordIndex - 1);
-    if (caretRef.current) caretRef.current.style.left = `${previousWord.offsetLeft + previousWord.offsetWidth}px`;
+    moveCaret(previousWord.offsetLeft + previousWord.offsetWidth, previousWord.offsetTop);
   }
 
-  function focusNext(e: globalThis.KeyboardEvent) {
-    // TODO: make sure some funny stuff isn't undefined
-    const currentWord = itemsRef.current[wordIndex];
-    const letters = currentWord.children;
-    console.log("letter index:", letterIndex);
-    console.log("letters length:", letters?.length);
-    // const newWordIndex = wordIndex + 1;
-    // const newLetterIndex = letterIndex + 1;
-    // const currentLetter = letters[letterIndex] as HTMLDivElement;
-    // why does it show up as invalid lhs assignment if it's not read only lol?
-    const currentLetter = letters[letterIndex] as HTMLDivElement;
-    console.log("key:", e.key);
-    switch (e.key) {
-      case " ": {
-        // if (newLetterIndex >= letters?.length) {
-        //   setLetterIndex(0);
-        //   setWordIndex(wordIndex + 1);
-        //   caretRef.current?.style.left = `${itemsRef.current?.[wordIndex + 1].offsetLeft}px`;
-        // }
-        goForwardOneWord();
-        break;
-      }
-      case "Backspace": {
-        // const previousLetter = letters[letterIndex - 1] as HTMLElement;
-        // setLetterIndex(letterIndex - 1);
-        // caretRef.current?.style.left = `${previousLetter?.offsetLeft + previousLetter?.offsetWidth}px`;
-        goBackOneLetter();
-        break;
-      }
-      default: {
-        // coloring
-        // if (e.key == currentLetter.textContent) {
-        //   currentLetter.classList.toggle(styles.correct);
-        // } else {
-        //   currentLetter.classList.toggle(styles.incorrect);
-        // }
-        // caretRef.current?.style.left = `${currentLetter?.offsetLeft + currentLetter?.offsetWidth}px`;
-        goForwardOneLetter();
-      }
+  function clearWord() {
+    const currentWord = wordsRef.current[wordIndex];
+    for (const letter of currentWord.children) {
+      letter.classList.remove(styles.correct, styles.incorrect);
     }
-    console.log("current letter:", currentLetter);
+    if (!currentWord) return;
+    setLetterIndex(0);
+    moveCaret(currentWord.offsetLeft, currentWord.offsetTop);
+  }
+
+  function handleClick(e: globalThis.MouseEvent) {
+    setActive(ref.current?.contains(e.target));
   }
 
   function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (active) {
-      console.log("clicked when test is active");
-      focusNext(e);
-    } else {
-      console.log("clicked when test is not active");
+      if (e.key.length == 1) {
+        if (e.key == " ") {
+          goForwardOneWord();
+        } else {
+          goForwardOneLetter(e.key);
+        }
+      } else {
+        if (e.key == "Backspace") {
+          if (!letterIndex) {
+            clearWord();
+            goBackOneWord();
+          } else {
+            if (e.ctrlKey) {
+              clearWord();
+            } else {
+              goBackOneLetter();
+            }
+          }
+        }
+      }
     }
   }
 
@@ -144,26 +150,25 @@ export function Test() {
       document.removeEventListener("click", handleClick);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [active, wordIndex, letterIndex]);
+  }, [handleClick, handleKeyDown]);
   return (
-    <div style={{ display: "flex", gap: "1rem" }} ref={ref}>
-      {words.map((word, index) => (
-        <Word
-          word={word}
-          key={index}
-          id={`word-${index}`}
-          ref={(el: HTMLDivElement) => el && (itemsRef.current[index] = el)}
-        />
-        // might consider putting <Letter />s in word's children props
-        // can't think of a good way to loop over them
-        // ---
-        // actually u could just loop over word's children from via javascript
-        // by not putting it into children props i can ensure there's not going to be any non-letters in word
-      ))}
+    <div className={styles.box} ref={ref}>
+      <div className={styles.words}>
+        {words.map((word, index) => (
+          <Word
+            word={word}
+            key={index}
+            id={`word-${index}`}
+            ref={(el: HTMLDivElement) => el && (wordsRef.current[index] = el)}
+          />
+        ))}
+      </div>
       <p>{active ? "ACTIVE" : "INACTIVE"}</p>
       <Caret x={10} y={10} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
-      letter position: {letterIndex}
-      word position: {wordIndex}
+      <p>
+        letter position: {letterIndex}
+        word position: {wordIndex}
+      </p>
     </div>
   );
 }
