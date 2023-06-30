@@ -7,5 +7,5 @@ interface Props {
 }
 
 export const Caret = forwardRef<HTMLDivElement, Props>(({ x, y }, ref) => {
-  return <div className={styles.caret} ref={ref} />;
+  return <div className={styles.caret} style={{ left: x, top: y }} ref={ref} />;
 });

@@ -3,6 +3,8 @@
     align-items: center;
     flex-direction: column;
     width: 600px;
+    overflow: hidden;
+    height: 100px;
     background-color: #b4b4ed;
     margin: auto;
 }
@@ -24,9 +26,10 @@
 
 .caret {
     position: absolute;
-    background-color: red;
+    background-color: darkred;
+    border-radius: 35%;
     width: 3px;
-    height: 30px;
+    height: 20px;
 }
 
 .correct {
