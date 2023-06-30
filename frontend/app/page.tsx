@@ -1,7 +1,7 @@
 import styles from "./page.module.css";
 import { getClient } from "@/lib/client";
 import { GetAllUsersDocument } from "@/graphql/generated/graphql";
-import { Test } from "@/components/test/Test";
+import { TestBox } from "@/components/test/TestBox";
 
 export default async function Home() {
   const { data } = await getClient().query({ query: GetAllUsersDocument });
@@ -20,7 +20,7 @@ export default async function Home() {
             </li>
           ))}
         </ul>
-        <Test />
+        <TestBox />
       </div>
     </main>
   );

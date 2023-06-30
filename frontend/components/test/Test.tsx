@@ -5,45 +5,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Caret } from "@/components/test/Caret";
 import styles from "./Test.module.css";
 
-const words: string[] = [
-  "after",
-  "how",
-  "thing",
-  "right",
-  "against",
-  "of",
-  "both",
-  "day",
-  "those",
-  "most",
-  "what",
-  "give",
-  "present",
-  "under",
-  "after",
-  "how",
-  "thing",
-  "right",
-  "against",
-  "of",
-  "both",
-  "day",
-  "those",
-  "most",
-  "what",
-  "give",
-  "present",
-  "under",
-  "most",
-  "what",
-  "give",
-  "present",
-  "under",
-  "after",
-];
+interface Props {
+  active: boolean;
+}
 
-export function Test() {
-  const [active, setActive] = useState(true);
+export function Test({ active }: Props) {
   const [wordIndex, setWordIndex] = useState(0);
   const [letterIndex, setLetterIndex] = useState(0);
 
@@ -112,7 +78,7 @@ export function Test() {
   }
   const [caretPosition, setCaretPosition] = useState({ x: -999, y: -999 });
 
-  function goForwardOneLetter(input: string) {
+  function moveForwardOneLetter(input: string) {
     const currentWord = wordsRef.current[wordIndex];
     const letters = currentWord.children;
     const nextLetter = letters[letterIndex + 1] as HTMLElement;
@@ -134,7 +100,7 @@ export function Test() {
     moveCaret(left, top);
   }
 
-  function goForwardOneWord() {
+  function moveForwardOneWord() {
     const nextWord = wordsRef.current[wordIndex + 1] as HTMLElement | undefined;
 
     if (!nextWord) return;
@@ -145,7 +111,7 @@ export function Test() {
     moveCaret(left, top);
   }
 
-  function goBackOneLetter() {
+  function moveBackOneLetter() {
     const currentWord = wordsRef.current[wordIndex];
     const letters = currentWord.children;
     const previousLetter = letters[letterIndex - 1] as HTMLElement | undefined;
@@ -158,7 +124,7 @@ export function Test() {
     moveCaret(left, top);
   }
 
-  function goBackOneWord() {
+  function moveBackOneWord() {
     const currentWord = wordsRef.current[wordIndex];
     const previousWord = wordsRef.current[wordIndex - 1] as HTMLElement | undefined;
 
@@ -199,46 +165,63 @@ export function Test() {
     const currentWord = wordsRef.current[wordIndex];
     const { top: previousTop } = previousWord.getBoundingClientRect();
     const { top: currentTop } = currentWord.getBoundingClientRect();
+    let numberOfWordsToAddToPool = 0;
     if (currentTop !== previousTop) {
       for (const word of wordsRef.current) {
-        word.style.transform = `translateY(-100%)`;
+        if (word.getBoundingClientRect().top < currentTop) {
+          numberOfWordsToAddToPool++;
+        }
+        // word.style.transform = `translateY(-100%)`;
       }
+      const copy = wordPool;
+      for (let i = 0; i < numberOfWordsToAddToPool; i++) {
+        const letters = wordsRef.current[i].children;
+        for (const letter of letters) {
+          letter.classList.remove(styles.correct, styles.incorrect);
+          // hmm idk if thats the play
+        }
+        copy.shift();
+        console.log(`We should be removing ${numberOfWordsToAddToPool} words`);
+        copy.push(String.fromCharCode(97 + Math.random() * 20)); // random word here
+        // copy.push("a"); // random word here
+      }
+      setWordPool(copy);
+      setWordIndex(0);
+      const { left, top } = wordsRef.current[0].getBoundingClientRect();
+      moveCaret(left, top);
     }
-  }
-
-  function handleClick(e: globalThis.MouseEvent) {
-    setActive(ref.current?.contains(e.target));
+    // TODO: implement re-adding to pool
+    console.log(`we should add ${numberOfWordsToAddToPool} words to pool.`);
   }
 
   function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (active) {
-      if (e.key == "[") {
-        return;
-      }
-      moveToNextLine();
       if (e.key.length == 1) {
+        e.preventDefault();
         if (e.key == " ") {
-          goForwardOneWord();
+          moveForwardOneWord();
         } else {
-          goForwardOneLetter(e.key);
+          moveForwardOneLetter(e.key);
         }
       } else {
         if (e.key == "Backspace") {
           if (!letterIndex) {
             clearWord();
-            goBackOneWord();
+            moveBackOneWord();
           } else {
             if (e.ctrlKey) {
               clearWord();
             } else {
-              goBackOneLetter();
+              moveBackOneLetter();
             }
           }
         }
       }
+      moveToNextLine();
     }
   }
 
+  // Move caret to the beginning
   useEffect(() => {
     const firstWord = wordsRef.current[0];
     if (!firstWord) return;
@@ -247,27 +230,20 @@ export function Test() {
   }, []);
 
   useEffect(() => {
-    document.addEventListener("click", handleClick);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("click", handleClick);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleClick, handleKeyDown]);
+  }, [handleKeyDown]);
   return (
-    <div className={styles.box} ref={ref}>
+    <>
       <div className={styles.words}>
         {wordPool.map((word, index) => (
-          <Word
-            word={word}
-            key={index}
-            id={`word-${index}`}
-            ref={(el: HTMLDivElement) => el && (wordsRef.current[index] = el)}
-          />
+          <Word word={word} key={index} ref={(el: HTMLDivElement) => el && (wordsRef.current[index] = el)} />
         ))}
       </div>
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
-      <p>{active ? "ACTIVE" : "INACTIVE"}</p>
-    </div>
+      <button onClick={() => console.log("Word index:", wordIndex)}>log word index</button>
+    </>
   );
 }

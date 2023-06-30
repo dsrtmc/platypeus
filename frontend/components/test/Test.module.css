@@ -3,7 +3,7 @@
     align-items: center;
     flex-direction: column;
     width: 600px;
-    overflow: hidden;
+    /*overflow: hidden;*/
     height: 100px;
     background-color: #b4b4ed;
     margin: auto;
