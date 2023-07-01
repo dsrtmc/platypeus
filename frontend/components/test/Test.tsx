@@ -1,7 +1,7 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Caret } from "@/components/test/Caret";
 import styles from "./Test.module.css";
 
@@ -12,6 +12,7 @@ interface Props {
 export function Test({ active }: Props) {
   const [wordIndex, setWordIndex] = useState(0);
   const [letterIndex, setLetterIndex] = useState(0);
+  const [skipLine, setSkipLine] = useState(true);
 
   const [wordPool, setWordPool] = useState<Array<string>>([
     "a",
@@ -50,6 +51,38 @@ export function Test({ active }: Props) {
     "h",
     "j",
     "k",
+    "l",
+    "m",
+    "n",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "l",
+    "m",
+    "n",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
     "l",
     "m",
     "n",
@@ -160,39 +193,53 @@ export function Test({ active }: Props) {
   }
 
   function moveToNextLine() {
-    const previousWord = wordsRef.current[wordIndex - 1];
-    if (!previousWord) return;
+    const nextWord = wordsRef.current[wordIndex + 1];
+    if (!nextWord) return;
     const currentWord = wordsRef.current[wordIndex];
-    const { top: previousTop } = previousWord.getBoundingClientRect();
     const { top: currentTop } = currentWord.getBoundingClientRect();
+    const { top: nextTop } = nextWord.getBoundingClientRect();
     let numberOfWordsToAddToPool = 0;
-    if (currentTop !== previousTop) {
+    if (nextTop !== currentTop) {
+      if (skipLine) {
+        setSkipLine(false);
+        console.log("it should fail and return?");
+        return;
+      }
       for (const word of wordsRef.current) {
         if (word.getBoundingClientRect().top < currentTop) {
           numberOfWordsToAddToPool++;
         }
         // word.style.transform = `translateY(-100%)`;
       }
-      const copy = wordPool;
-      for (let i = 0; i < numberOfWordsToAddToPool; i++) {
-        const letters = wordsRef.current[i].children;
-        for (const letter of letters) {
-          letter.classList.remove(styles.correct, styles.incorrect);
-          // hmm idk if thats the play
-        }
-        copy.shift();
-        console.log(`We should be removing ${numberOfWordsToAddToPool} words`);
-        copy.push(String.fromCharCode(97 + Math.random() * 20)); // random word here
-        // copy.push("a"); // random word here
+      const newWordPool = [...wordPool];
+      for (let i = numberOfWordsToAddToPool; i < newWordPool.length; i++) {
+        newWordPool[i - numberOfWordsToAddToPool] = newWordPool[i];
+        // idk man its good thinking but it doesnt really work
+        wordsRef.current[i - numberOfWordsToAddToPool] = wordsRef.current[i];
       }
-      setWordPool(copy);
-      setWordIndex(0);
-      const { left, top } = wordsRef.current[0].getBoundingClientRect();
-      moveCaret(left, top);
+      // for (let i = 0; i < numberOfWordsToAddToPool; i++) {
+      //   const letters = wordsRef.current[i].children;
+      //   for (const letter of letters) {
+      //     letter.classList.remove(styles.correct, styles.incorrect);
+      //     // hmm idk if that's the play
+      //   }
+      //   copy.shift();
+      //   console.log(`We should be removing ${numberOfWordsToAddToPool} words`);
+      //   copy.push(String.fromCharCode(97 + Math.random() * 20, 97 + Math.random() * 20)); // random word here
+      // }
+      console.log("new word index:", wordIndex + 1 - numberOfWordsToAddToPool);
+      setWordPool(newWordPool);
+      setWordIndex(wordIndex + 1 - numberOfWordsToAddToPool);
     }
     // TODO: implement re-adding to pool
     console.log(`we should add ${numberOfWordsToAddToPool} words to pool.`);
   }
+
+  // Handle moving the caret after line change
+  useEffect(() => {
+    const { left, top } = wordsRef.current[wordIndex].getBoundingClientRect();
+    moveCaret(left, top);
+  }, [wordPool]);
 
   function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (active) {
@@ -200,6 +247,7 @@ export function Test({ active }: Props) {
         e.preventDefault();
         if (e.key == " ") {
           moveForwardOneWord();
+          moveToNextLine();
         } else {
           moveForwardOneLetter(e.key);
         }
@@ -217,7 +265,6 @@ export function Test({ active }: Props) {
           }
         }
       }
-      moveToNextLine();
     }
   }
 
