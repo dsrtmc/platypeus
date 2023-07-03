@@ -36,6 +36,14 @@
     color: mediumspringgreen;
 }
 
+.correct > * {
+    color: mediumspringgreen !important;
+}
+
 .incorrect {
     color: palevioletred;
+}
+
+.incorrect > * {
+    color: palevioletred !important;
 }

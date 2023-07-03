@@ -1,7 +1,7 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Caret } from "@/components/test/Caret";
 import styles from "./Test.module.css";
 
@@ -12,93 +12,94 @@ interface Props {
 export function Test({ active }: Props) {
   const [wordIndex, setWordIndex] = useState(0);
   const [letterIndex, setLetterIndex] = useState(0);
+  // does not account for the funny situation if someone goes down and then back up
   const [skipLine, setSkipLine] = useState(true);
 
   const [wordPool, setWordPool] = useState<Array<string>>([
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "l",
-    "m",
-    "n",
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "l",
-    "m",
-    "n",
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
+    "aa",
+    "bb",
+    "cc",
+    "dd",
+    "ee",
+    "ff",
+    "gg",
+    "hh",
+    "jj",
+    "kk",
+    "ll",
+    "mm",
+    "nn",
+    "aa",
+    "bb",
+    "cc",
+    "dd",
+    "ee",
+    "ff",
+    "gg",
+    "hh",
+    "jj",
+    "kk",
+    "ll",
+    "mm",
+    "nn",
+    "aa",
+    "bb",
+    "cc",
+    "dd",
+    "ee",
+    "ff",
+    "gg",
+    "hh",
+    "jj",
+    "kk",
+    "ll",
+    "mm",
+    "nn",
+    "aa",
+    "bb",
+    "cc",
+    "dd",
+    "ee",
+    "ff",
+    "gg",
+    "hh",
+    "jj",
+    "kk",
+    "ll",
+    "mm",
+    "nn",
+    "ll",
+    "mm",
+    "nn",
+    "aa",
+    "bb",
+    "cc",
+    "dd",
+    "ee",
+    "ff",
+    "gg",
+    "hh",
+    "jj",
+    "kk",
+    "ll",
+    "mm",
+    "nn",
+    "ll",
+    "mm",
+    "nn",
+    "aa",
+    "bb",
+    "cc",
+    "dd",
+    "ee",
+    "ff",
+    "gg",
+    "hh",
+    "jj",
+    "kk",
+    "ll",
+    "mm",
+    "nn",
   ]);
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -138,6 +139,21 @@ export function Test({ active }: Props) {
 
     if (!nextWord) return;
 
+    const currentWord = wordsRef.current[wordIndex] as HTMLElement | undefined;
+    if (!currentWord) return;
+
+    let correct = false;
+    for (const letter of currentWord.children) {
+      if (letter.classList.contains(styles.incorrect)) {
+        correct = false;
+        break;
+      } else {
+        correct = letter.classList.contains(styles.correct);
+      }
+      letter.classList.remove(styles.correct, styles.incorrect);
+    }
+    currentWord.classList.add(correct ? styles.correct : styles.incorrect);
+
     setLetterIndex(0);
     setWordIndex(wordIndex + 1);
     const { left, top } = nextWord.getBoundingClientRect();
@@ -159,6 +175,9 @@ export function Test({ active }: Props) {
 
   function moveBackOneWord() {
     const currentWord = wordsRef.current[wordIndex];
+    if (!currentWord) return;
+    currentWord.classList.remove(styles.correct, styles.incorrect);
+
     const previousWord = wordsRef.current[wordIndex - 1] as HTMLElement | undefined;
 
     for (const letter of currentWord.children) {
@@ -180,6 +199,8 @@ export function Test({ active }: Props) {
 
   function clearWord() {
     const currentWord = wordsRef.current[wordIndex];
+    if (!currentWord) return;
+    currentWord.classList.remove(styles.correct, styles.incorrect);
 
     for (const letter of currentWord.children) {
       letter.classList.remove(styles.correct, styles.incorrect);
@@ -202,40 +223,40 @@ export function Test({ active }: Props) {
     if (nextTop !== currentTop) {
       if (skipLine) {
         setSkipLine(false);
-        console.log("it should fail and return?");
         return;
       }
       for (const word of wordsRef.current) {
         if (word.getBoundingClientRect().top < currentTop) {
           numberOfWordsToAddToPool++;
         }
-        // word.style.transform = `translateY(-100%)`;
       }
       const newWordPool = [...wordPool];
       for (let i = numberOfWordsToAddToPool; i < newWordPool.length; i++) {
         newWordPool[i - numberOfWordsToAddToPool] = newWordPool[i];
-        // idk man its good thinking but it doesnt really work
-        wordsRef.current[i - numberOfWordsToAddToPool] = wordsRef.current[i];
+        // clear the previous row's word and assign the correct class
+        wordsRef.current[i - numberOfWordsToAddToPool].classList.remove(styles.correct, styles.incorrect);
+        if (wordsRef.current[i].classList.contains(styles.correct)) {
+          wordsRef.current[i - numberOfWordsToAddToPool].classList.add(styles.correct);
+        } else if (wordsRef.current[i].classList.contains(styles.incorrect)) {
+          wordsRef.current[i - numberOfWordsToAddToPool].classList.add(styles.incorrect);
+        }
+
+        wordsRef.current[i].classList.remove(styles.correct, styles.incorrect);
       }
-      // for (let i = 0; i < numberOfWordsToAddToPool; i++) {
-      //   const letters = wordsRef.current[i].children;
-      //   for (const letter of letters) {
-      //     letter.classList.remove(styles.correct, styles.incorrect);
-      //     // hmm idk if that's the play
-      //   }
-      //   copy.shift();
-      //   console.log(`We should be removing ${numberOfWordsToAddToPool} words`);
-      //   copy.push(String.fromCharCode(97 + Math.random() * 20, 97 + Math.random() * 20)); // random word here
-      // }
-      console.log("new word index:", wordIndex + 1 - numberOfWordsToAddToPool);
+      for (let i = newWordPool.length - numberOfWordsToAddToPool; i < newWordPool.length; i++) {
+        newWordPool[i] = createNewWord();
+      }
       setWordPool(newWordPool);
       setWordIndex(wordIndex + 1 - numberOfWordsToAddToPool);
     }
     // TODO: implement re-adding to pool
-    console.log(`we should add ${numberOfWordsToAddToPool} words to pool.`);
+  }
+  // rly temporary remove soon
+  function createNewWord() {
+    return String.fromCharCode(97 + Math.random() * 20, 97 + Math.random() * 20);
   }
 
-  // Handle moving the caret after line change
+  // Handle line change
   useEffect(() => {
     const { left, top } = wordsRef.current[wordIndex].getBoundingClientRect();
     moveCaret(left, top);
@@ -282,15 +303,22 @@ export function Test({ active }: Props) {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleKeyDown]);
+
   return (
     <>
       <div className={styles.words}>
         {wordPool.map((word, index) => (
-          <Word word={word} key={index} ref={(el: HTMLDivElement) => el && (wordsRef.current[index] = el)} />
+          <Word
+            word={word}
+            key={index} // idk xd
+            ref={(el: HTMLDivElement) => el && (wordsRef.current[index] = el)}
+          />
         ))}
       </div>
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
-      <button onClick={() => console.log("Word index:", wordIndex)}>log word index</button>
+      <button onClick={() => console.log("first word classlist:", wordsRef.current[0].classList)}>
+        log class List
+      </button>
     </>
   );
 }
