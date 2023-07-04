@@ -39,4 +39,5 @@ public class DatabaseContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Score> Scores { get; set; } = null!;
 }

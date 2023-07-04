@@ -60,6 +60,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddGraphQLServer()
     .AddTypes()
     .AddAuthorization()
+    .AddMutationConventions()
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>();
 
