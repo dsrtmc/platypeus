@@ -5,34 +5,66 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Caret } from "@/components/test/Caret";
 import styles from "./Test.module.css";
 import { generateWords } from "@/utils/generateWords";
+import { MouseEvent } from "react";
+import { useInterval } from "@/utils/useInterval";
+import { TimeSettingButton } from "@/components/test/TimeSettingButton";
+import { ResetButton } from "@/components/test/ResetButton";
 
 interface Props {
   active: boolean;
+  running: boolean;
+  finished: boolean;
+  handleStart: () => void;
 }
 
-export function Test({ active }: Props) {
+export function Test({ active, running, finished, handleStart }: Props) {
   // TODO: CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP
   const [wordIndex, setWordIndex] = useState(0);
   const [letterIndex, setLetterIndex] = useState(0);
   // does not account for the funny situation if someone goes down and then back up
   const [skipLine, setSkipLine] = useState(true);
-  const [running, setRunning] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
+  // const [timeRemaining, setTimeRemaining] = useState(5);
+  const [caretPosition, setCaretPosition] = useState({ x: -999, y: -999 });
 
   const [wordPool, setWordPool] = useState<Array<string>>([""]);
 
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
   const caretRef = useRef<HTMLDivElement | null>(null);
+  const intervalRef = useRef<NodeJS.Timer | null>(null);
+
+  useEffect(() => {
+    // Move caret to the beginning
+    const firstWord = wordsRef.current[0];
+    if (!firstWord) return;
+    const { left, top } = firstWord.getBoundingClientRect();
+    moveCaret(left, top);
+
+    setWordPool(generateWords(50));
+  }, []);
+
+  useEffect(() => {
+    // Handle line change
+    const { left, top } = wordsRef.current[wordIndex].getBoundingClientRect();
+    moveCaret(left, top);
+  }, [wordPool]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  useEffect(() => {
+    if (finished) {
+      // submit score and redirect to the url of created score
+      console.log("[TODO] redirecting to url of score...");
+    }
+  }, [finished]);
 
   // maybe no need for this function
   function moveCaret(x: number, y: number) {
     setCaretPosition({ x, y });
-  }
-  const [caretPosition, setCaretPosition] = useState({ x: -999, y: -999 });
-
-  function startTest(time: number) {
-    setTimeRemaining(time);
-    setRunning(true);
   }
 
   function moveForwardOneLetter(input: string) {
@@ -177,25 +209,9 @@ export function Test({ active }: Props) {
     }
   }
 
-  // Handle line change
-  useEffect(() => {
-    const { left, top } = wordsRef.current[wordIndex].getBoundingClientRect();
-    moveCaret(left, top);
-  }, [wordPool]);
-
-  // doesnt work lol temp!
-  useEffect(() => {
-    if (running) {
-      const id = setInterval(() => setTimeRemaining(timeRemaining - 1), 1000);
-      return () => {
-        clearInterval(id);
-        setRunning(false);
-      };
-    }
-  }, [running]);
-
   function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (active) {
+      if (!running) handleStart();
       if (e.key.length == 1) {
         e.preventDefault();
         if (e.key == " ") {
@@ -220,26 +236,6 @@ export function Test({ active }: Props) {
       }
     }
   }
-
-  // Move caret to the beginning
-  useEffect(() => {
-    const firstWord = wordsRef.current[0];
-    if (!firstWord) return;
-    const { left, top } = firstWord.getBoundingClientRect();
-    moveCaret(left, top);
-  }, []);
-  // could probably be inside a single useEffect
-  useEffect(() => {
-    setWordPool(generateWords(50));
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
-
   return (
     <>
       <div className={styles.words}>
@@ -252,14 +248,6 @@ export function Test({ active }: Props) {
         ))}
       </div>
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
-      <code>TIME REMAINING: {timeRemaining}</code>
-      <button
-        onClick={() => {
-          startTest(5);
-        }}
-      >
-        start test
-      </button>
     </>
   );
 }

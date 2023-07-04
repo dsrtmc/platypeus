@@ -7,13 +7,14 @@ import { getAccessToken, setAccessToken } from "@/accessToken";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const [login] = useMutation(LoginDocument);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const response = await login({
-      variables: { username },
+      variables: { username, password },
       update: (store, { data }) => {
         if (!data) {
           return null;
@@ -38,6 +39,12 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit}>
         <h3>login</h3>
         <input type={"text"} placeholder={"username"} value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input
+          type={"password"}
+          placeholder={"password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
         <button type={"submit"}>login</button>
       </form>
     </>
