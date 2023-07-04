@@ -4,105 +4,23 @@ import { Word } from "@/components/test/Word";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Caret } from "@/components/test/Caret";
 import styles from "./Test.module.css";
+import { generateWords } from "@/utils/generateWords";
 
 interface Props {
   active: boolean;
 }
 
 export function Test({ active }: Props) {
+  // TODO: CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP
   const [wordIndex, setWordIndex] = useState(0);
   const [letterIndex, setLetterIndex] = useState(0);
   // does not account for the funny situation if someone goes down and then back up
   const [skipLine, setSkipLine] = useState(true);
+  const [running, setRunning] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
 
-  const [wordPool, setWordPool] = useState<Array<string>>([
-    "aa",
-    "bb",
-    "cc",
-    "dd",
-    "ee",
-    "ff",
-    "gg",
-    "hh",
-    "jj",
-    "kk",
-    "ll",
-    "mm",
-    "nn",
-    "aa",
-    "bb",
-    "cc",
-    "dd",
-    "ee",
-    "ff",
-    "gg",
-    "hh",
-    "jj",
-    "kk",
-    "ll",
-    "mm",
-    "nn",
-    "aa",
-    "bb",
-    "cc",
-    "dd",
-    "ee",
-    "ff",
-    "gg",
-    "hh",
-    "jj",
-    "kk",
-    "ll",
-    "mm",
-    "nn",
-    "aa",
-    "bb",
-    "cc",
-    "dd",
-    "ee",
-    "ff",
-    "gg",
-    "hh",
-    "jj",
-    "kk",
-    "ll",
-    "mm",
-    "nn",
-    "ll",
-    "mm",
-    "nn",
-    "aa",
-    "bb",
-    "cc",
-    "dd",
-    "ee",
-    "ff",
-    "gg",
-    "hh",
-    "jj",
-    "kk",
-    "ll",
-    "mm",
-    "nn",
-    "ll",
-    "mm",
-    "nn",
-    "aa",
-    "bb",
-    "cc",
-    "dd",
-    "ee",
-    "ff",
-    "gg",
-    "hh",
-    "jj",
-    "kk",
-    "ll",
-    "mm",
-    "nn",
-  ]);
+  const [wordPool, setWordPool] = useState<Array<string>>([""]);
 
-  const ref = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
   const caretRef = useRef<HTMLDivElement | null>(null);
 
@@ -111,6 +29,11 @@ export function Test({ active }: Props) {
     setCaretPosition({ x, y });
   }
   const [caretPosition, setCaretPosition] = useState({ x: -999, y: -999 });
+
+  function startTest(time: number) {
+    setTimeRemaining(time);
+    setRunning(true);
+  }
 
   function moveForwardOneLetter(input: string) {
     const currentWord = wordsRef.current[wordIndex];
@@ -190,6 +113,7 @@ export function Test({ active }: Props) {
       moveCaret(left, top);
       return;
     }
+    previousWord.classList.remove(styles.correct, styles.incorrect);
 
     setLetterIndex(previousWord.children.length);
     setWordIndex(wordIndex - 1);
@@ -243,17 +167,14 @@ export function Test({ active }: Props) {
 
         wordsRef.current[i].classList.remove(styles.correct, styles.incorrect);
       }
+      const newWords = generateWords(numberOfWordsToAddToPool);
+      let index = 0;
       for (let i = newWordPool.length - numberOfWordsToAddToPool; i < newWordPool.length; i++) {
-        newWordPool[i] = createNewWord();
+        newWordPool[i] = newWords[index++];
       }
       setWordPool(newWordPool);
       setWordIndex(wordIndex + 1 - numberOfWordsToAddToPool);
     }
-    // TODO: implement re-adding to pool
-  }
-  // rly temporary remove soon
-  function createNewWord() {
-    return String.fromCharCode(97 + Math.random() * 20, 97 + Math.random() * 20);
   }
 
   // Handle line change
@@ -261,6 +182,17 @@ export function Test({ active }: Props) {
     const { left, top } = wordsRef.current[wordIndex].getBoundingClientRect();
     moveCaret(left, top);
   }, [wordPool]);
+
+  // doesnt work lol temp!
+  useEffect(() => {
+    if (running) {
+      const id = setInterval(() => setTimeRemaining(timeRemaining - 1), 1000);
+      return () => {
+        clearInterval(id);
+        setRunning(false);
+      };
+    }
+  }, [running]);
 
   function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (active) {
@@ -296,6 +228,10 @@ export function Test({ active }: Props) {
     const { left, top } = firstWord.getBoundingClientRect();
     moveCaret(left, top);
   }, []);
+  // could probably be inside a single useEffect
+  useEffect(() => {
+    setWordPool(generateWords(50));
+  }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -316,8 +252,13 @@ export function Test({ active }: Props) {
         ))}
       </div>
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
-      <button onClick={() => console.log("first word classlist:", wordsRef.current[0].classList)}>
-        log class List
+      <code>TIME REMAINING: {timeRemaining}</code>
+      <button
+        onClick={() => {
+          startTest(5);
+        }}
+      >
+        start test
       </button>
     </>
   );

@@ -14,6 +14,8 @@
     flex-wrap: wrap;
     background-color: #ccc;
     gap: 0.5rem;
+    font-family: monospace;
+    font-size: 18px;
 }
 
 .word {
@@ -29,21 +31,21 @@
     background-color: darkred;
     border-radius: 35%;
     width: 3px;
-    height: 20px;
+    height: 30px;
 }
 
 .correct {
-    color: mediumspringgreen;
-}
-
-.correct > * {
     color: mediumspringgreen !important;
 }
 
+.correct > * {
+    color: mediumspringgreen;
+}
+
 .incorrect {
-    color: palevioletred;
+    color: palevioletred !important;
 }
 
 .incorrect > * {
-    color: palevioletred !important;
+    color: palevioletred;
 }
