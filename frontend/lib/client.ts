@@ -1,14 +1,22 @@
 import { registerApolloClient } from "@apollo/experimental-nextjs-app-support/rsc";
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { cookies, headers } from "next/headers";
 
 export const { getClient }: { getClient: () => ApolloClient<any> } = registerApolloClient(() => {
+  const cookie = headers().get("cookie");
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
       uri: "http://localhost:5053/graphql",
       credentials: "include",
+      headers: {
+        cookie,
+      },
     }),
     credentials: "include",
+    headers: {
+      cookie,
+    },
   });
 });
 
