@@ -1,15 +1,12 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Server.Models;
 
 namespace Server.Utilities;
 
+// JWT authentication class, not used
 public static class Authentication
 {
     public static TokenValidationResult? ValidateToken(string token, string secret)

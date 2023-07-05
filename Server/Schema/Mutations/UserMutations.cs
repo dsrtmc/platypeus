@@ -12,7 +12,7 @@ public record LoginPayload(User? User, string AccessToken);
 [MutationType]
 public static class UserMutations
 {
-    public static async Task<User> Register(string username, string email, string password, DatabaseContext db)
+    public static async Task<User> Register(string username, string email, string password, DatabaseContext db, IHttpContextAccessor accessor)
     {
         var hashedPassword = await PasswordHasher.Hash(password);
         var user = new User
@@ -23,31 +23,39 @@ public static class UserMutations
         };
         await db.Users.AddAsync(user);
         await db.SaveChangesAsync();
+        await accessor.HttpContext!.SignInAsync("default", new ClaimsPrincipal(
+            new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user!.ID.ToString()) }, "default")
+        ));
         return user;
     }
 
-    public static async Task<LoginPayload> Login(string username, string password, DatabaseContext db, IHttpContextAccessor accessor)
+    public static async Task<User?> Login(string username, string password, DatabaseContext db, IHttpContextAccessor accessor)
     {
+        // TODO: better validation
         var user = await db.Users.FirstOrDefaultAsync(u => u.Username == username);
 
         if (user is null)
-            return new LoginPayload(null, "no access");
+        {
+            Console.WriteLine("user is null");
+            return null;
+        }
 
         if (!await PasswordHasher.Verify(user.Password, password))
-            return new LoginPayload(null, "no access");
+        {
+            Console.WriteLine("password is incorrect");
+            return null;
+        }
 
-        Authentication.SendRefreshToken(Authentication.CreateRefreshToken(user), accessor.HttpContext!);
-        
-        return new LoginPayload(user, Authentication.CreateAccessToken(user));
+        await accessor.HttpContext!.SignInAsync("default", new ClaimsPrincipal(
+            new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user!.ID.ToString()) }, "default")
+        ));
+
+        return user;
     }
 
-    public static bool Logout(DatabaseContext db, IHttpContextAccessor accessor)
+    public static async Task<bool> Logout(DatabaseContext db, IHttpContextAccessor accessor)
     {
-        // Clears the refresh token, effectively logging the user out
-        // surely, surely, surely, surely, there's a better way to write that
-        // DI is really funny to wrap my head around with static classes
-        Authentication.SendRefreshToken("", accessor.HttpContext!);
-        
+        await accessor.HttpContext!.SignOutAsync();
         return true;
     }
     

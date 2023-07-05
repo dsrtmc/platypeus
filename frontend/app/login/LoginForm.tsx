@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { LoginDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
-import { getAccessToken, setAccessToken } from "@/accessToken";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
@@ -14,7 +13,7 @@ export default function LoginForm() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const response = await login({
-      variables: { username, password },
+      variables: { input: { username, password } },
       update: (store, { data }) => {
         if (!data) {
           return null;
@@ -29,9 +28,6 @@ export default function LoginForm() {
         });
       },
     });
-    if (response?.data) {
-      setAccessToken(response.data.login.accessToken);
-    }
   }
 
   return (
