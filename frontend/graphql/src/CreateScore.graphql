@@ -1,0 +1,7 @@
+mutation CreateScore($input: CreateScoreInput!) {
+    createScore(input: $input) {
+        score {
+            id
+        }
+    }
+}

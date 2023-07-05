@@ -9,6 +9,9 @@ import { MouseEvent } from "react";
 import { useInterval } from "@/utils/useInterval";
 import { TimeSettingButton } from "@/components/test/TimeSettingButton";
 import { ResetButton } from "@/components/test/ResetButton";
+import { useApolloClient, useLazyQuery, useMutation } from "@apollo/client";
+import { CreateScoreDocument } from "@/graphql/generated/graphql";
+import { useRouter } from "next/navigation";
 
 interface Props {
   active: boolean;
@@ -18,6 +21,9 @@ interface Props {
 }
 
 export function Test({ active, running, finished, handleStart }: Props) {
+  const [createScore] = useMutation(CreateScoreDocument);
+  const router = useRouter();
+
   // TODO: CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP
   const [wordIndex, setWordIndex] = useState(0);
   const [letterIndex, setLetterIndex] = useState(0);
@@ -39,7 +45,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
     const { left, top } = firstWord.getBoundingClientRect();
     moveCaret(left, top);
 
-    setWordPool(generateWords(50));
+    setWordPool(generateWords(9));
   }, []);
 
   useEffect(() => {
@@ -58,6 +64,12 @@ export function Test({ active, running, finished, handleStart }: Props) {
   useEffect(() => {
     if (finished) {
       // submit score and redirect to the url of created score
+      (async () => {
+        const response = await createScore({ variables: { input: { time: 5, averageWpm: 200, rawWpm: 200 } } });
+        console.log("data:", response);
+        const id = response.data?.createScore.score?.id;
+        if (id) await router.push(`/score/${id}`);
+      })();
       console.log("[TODO] redirecting to url of score...");
     }
   }, [finished]);

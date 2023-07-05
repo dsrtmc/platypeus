@@ -11,11 +11,10 @@
 
 .words {
     display: flex;
-    flex-wrap: wrap;
     background-color: #ccc;
     gap: 0.5rem;
     font-family: monospace;
-    font-size: 18px;
+    font-size: 36px;
 }
 
 .word {
@@ -30,8 +29,8 @@
     position: absolute;
     background-color: darkcyan;
     border-radius: 35%;
-    width: 3px;
-    height: 27px;
+    width: 4px;
+    height: 48px;
 }
 
 .correct {

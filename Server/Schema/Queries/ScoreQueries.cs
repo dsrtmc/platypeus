@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Server.Models;
 using Server.Services;
 
@@ -8,6 +9,11 @@ public static class ScoreQueries
 {
     public static async Task<List<Score>> GetAllScores(DatabaseContext db)
     {
-        return db.Scores.ToList();
+        return await db.Scores.ToListAsync();
+    }
+    
+    public static async Task<Score?> GetScore(Guid id, DatabaseContext db)
+    {
+        return await db.Scores.FindAsync(id);
     }
 }
