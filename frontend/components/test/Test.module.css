@@ -3,7 +3,6 @@
     align-items: center;
     flex-direction: column;
     width: 600px;
-    /*overflow: hidden;*/
     height: 100px;
     background-color: #b4b4ed;
     margin: auto;
@@ -12,9 +11,17 @@
 .words {
     display: flex;
     background-color: #ccc;
-    gap: 0.5rem;
+    gap: 1rem;
     font-family: monospace;
     font-size: 36px;
+}
+
+.previous * {
+    color: dimgray !important;
+}
+
+.next * {
+    color: yellow !important;
 }
 
 .word {

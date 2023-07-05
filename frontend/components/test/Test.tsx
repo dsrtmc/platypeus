@@ -64,13 +64,12 @@ export function Test({ active, running, finished, handleStart }: Props) {
   useEffect(() => {
     if (finished) {
       // submit score and redirect to the url of created score
-      (async () => {
-        const response = await createScore({ variables: { input: { time: 5, averageWpm: 200, rawWpm: 200 } } });
-        console.log("data:", response);
-        const id = response.data?.createScore.score?.id;
-        if (id) await router.push(`/score/${id}`);
-      })();
-      console.log("[TODO] redirecting to url of score...");
+      // (async () => {
+      //   const response = await createScore({ variables: { input: { time: 5, averageWpm: 200, rawWpm: 200 } } });
+      //   console.log("data:", response);
+      //   const id = response.data?.createScore.score?.id;
+      //   if (id) await router.push(`/score/${id}`);
+      // })();
     }
   }, [finished]);
 

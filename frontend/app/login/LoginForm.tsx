@@ -12,13 +12,14 @@ export default function LoginForm() {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const response = await login({
+    await login({
       variables: { input: { username, password } },
       update: (store, { data }) => {
         if (!data) {
           return null;
         }
 
+        // cache update doesnt work for whatever reason lol
         store.writeQuery<MeQuery>({
           query: MeDocument,
           data: {

@@ -3,7 +3,6 @@ mutation Login($input: LoginInput!) {
         user {
             id
             username
-            email
         }
     }
 }

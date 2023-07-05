@@ -6,6 +6,7 @@ import { Test } from "@/components/test/Test";
 import { TimeSettingButton } from "@/components/test/TimeSettingButton";
 import { ResetButton } from "@/components/test/ResetButton";
 import { Timer } from "@/components/test/Timer";
+import { TestHorizontal } from "@/components/test/TestHorizontal";
 
 export function TestBox() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -63,7 +64,7 @@ export function TestBox() {
     <div className={styles.box} ref={ref}>
       <Timer time={timeRemaining} />
       <p>{active ? "ACTIVE" : "INACTIVE"}</p>
-      <Test active={active} running={running} finished={finished} handleStart={handleStart} />
+      <TestHorizontal active={active} running={running} finished={finished} handleStart={handleStart} />
       {[1, 5, 10].map((number) => (
         <TimeSettingButton handleTimeSettingSelection={handleTimeSettingSelection(number)} key={number}>
           {number}
