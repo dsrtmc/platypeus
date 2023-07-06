@@ -8,16 +8,42 @@
     margin: auto;
 }
 
+.main {
+    display: flex;
+    justify-content: flex-end;
+    /*gap: 1rem;*/
+}
+
 .words {
     display: flex;
     background-color: #ccc;
     gap: 1rem;
     font-family: monospace;
     font-size: 36px;
+    overflow: hidden;
+}
+
+.current {
+    margin: auto;
+    overflow: visible;
+}
+
+.current * {
+    color: paleturquoise !important;
+}
+
+.previous {
+    justify-content: flex-end;
+    width: 100%;
 }
 
 .previous * {
     color: dimgray !important;
+}
+
+.next {
+    float: right;
+    width: 100%;
 }
 
 .next * {

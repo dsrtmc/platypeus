@@ -8,6 +8,7 @@ import { generateWord, generateWords } from "@/utils/generateWords";
 import { useMutation } from "@apollo/client";
 import { CreateScoreDocument } from "@/graphql/generated/graphql";
 import { useRouter } from "next/navigation";
+import { nextStart } from "next/dist/cli/next-start";
 
 interface Props {
   active: boolean;
@@ -32,26 +33,13 @@ export function TestHorizontal({ active, running, finished, handleStart }: Props
   const [nextWords, setNextWords] = useState<Array<string>>([""]);
 
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
-  const currentWordRef = useRef<HTMLDivElement | null>(null):
+  const currentWordRef = useRef<HTMLDivElement | null>(null);
   const caretRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
 
   useEffect(() => {
-    // Move caret to the beginning
-    // const firstWord = wordsRef.current[0];
-    // if (!firstWord) return;
-    // const { left, top } = firstWord.getBoundingClientRect();
-    // moveCaret(left, top);
-
-    setCurrentWord(generateWord());
     setNextWords(generateWords(4));
   }, []);
-
-  useEffect(() => {
-    // Handle line change
-    // const { left, top } = wordsRef.current[wordIndex].getBoundingClientRect();
-    // moveCaret(left, top);
-  }, [currentWord]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -78,111 +66,44 @@ export function TestHorizontal({ active, running, finished, handleStart }: Props
   }
 
   function moveForwardOneLetter(input: string) {
-    // const currentWord = wordsRef.current[wordIndex];
-    // const letters = currentWord.children;
-    // const nextLetter = letters[letterIndex + 1] as HTMLElement;
-    // const currentLetter = letters[letterIndex] as HTMLElement;
-    //
-    // if (!currentLetter) return;
-    // const correct = currentLetter.textContent == input;
-    // currentLetter.classList.add(correct ? styles.correct : styles.incorrect);
-    //
-    // if (!nextLetter) {
-    //   const { right, top } = currentLetter.getBoundingClientRect();
-    //   moveCaret(right, top);
-    //   setLetterIndex(letterIndex + 1);
-    //   return;
-    // }
-    // // go to next word
-    // setLetterIndex(letterIndex + 1);
-    // const { left, top } = nextLetter.getBoundingClientRect();
-    // moveCaret(left, top);
+    const nextWord = nextWords[0];
+    const nextLetter = nextWord[0];
+    if (!nextLetter) return;
+    setCurrentWord(currentWord.concat(nextLetter));
+    setNextWords([nextWord.slice(1), ...nextWords.slice(1)]);
   }
 
   function moveForwardOneWord() {
+    if (!currentWord) return;
     if (previousWords.length <= 3) {
       setPreviousWords([...previousWords, currentWord]);
     } else {
       setPreviousWords([...previousWords.slice(1), currentWord]);
     }
-    setCurrentWord(nextWords[0]);
     setNextWords([...nextWords.slice(1), generateWord()]);
+    setCurrentWord("");
   }
 
   function moveBackOneLetter() {
-    // const currentWord = wordsRef.current[wordIndex];
-    // const letters = currentWord.children;
-    // const previousLetter = letters[letterIndex - 1] as HTMLElement | undefined;
-    //
-    // if (!previousLetter) return;
-    //
-    // previousLetter.classList.remove(styles.correct, styles.incorrect);
-    // setLetterIndex(letterIndex - 1);
-    // const { left, top } = previousLetter.getBoundingClientRect();
-    // moveCaret(left, top);
+    const nextWord = nextWords[0];
+    const currentLetter = currentWord[currentWord.length - 1];
+    if (!currentLetter) return;
+    if (currentWord.length >= 1) setCurrentWord(currentWord.slice(0, currentWord.length - 1));
+    setNextWords([currentLetter.concat(nextWord), ...nextWords.slice(1)]);
   }
 
   function moveBackOneWord() {
-    if (previousWords.length >= 1)
-    setPreviousWords([...previousWords.slice(0, previousWords.length - 1)]);
+    if (!previousWords.length) return;
+    if (previousWords.length >= 1) setPreviousWords([...previousWords.slice(0, previousWords.length - 1)]);
+
     setCurrentWord(previousWords[previousWords.length - 1]);
     setNextWords([currentWord, ...nextWords.slice(0, nextWords.length - 1)]);
   }
 
   function clearWord() {
-    // const currentWord = wordsRef.current[wordIndex];
-    // if (!currentWord) return;
-    // currentWord.classList.remove(styles.correct, styles.incorrect);
-    //
-    // for (const letter of currentWord.children) {
-    //   letter.classList.remove(styles.correct, styles.incorrect);
-    // }
-    //
-    // if (!currentWord) return;
-    //
-    // setLetterIndex(0);
-    // const { left, top } = currentWord.getBoundingClientRect();
-    // moveCaret(left, top);
-  }
-
-  function moveToNextLine() {
-    // const nextWord = wordsRef.current[wordIndex + 1];
-    // if (!nextWord) return;
-    // const currentWord = wordsRef.current[wordIndex];
-    // const { top: currentTop } = currentWord.getBoundingClientRect();
-    // const { top: nextTop } = nextWord.getBoundingClientRect();
-    // let numberOfWordsToAddToPool = 0;
-    // if (nextTop !== currentTop) {
-    //   if (skipLine) {
-    //     setSkipLine(false);
-    //     return;
-    //   }
-    //   for (const word of wordsRef.current) {
-    //     if (word.getBoundingClientRect().top < currentTop) {
-    //       numberOfWordsToAddToPool++;
-    //     }
-    //   }
-    //   const newWordPool = [...wordPool];
-    //   for (let i = numberOfWordsToAddToPool; i < newWordPool.length; i++) {
-    //     newWordPool[i - numberOfWordsToAddToPool] = newWordPool[i];
-    //     // clear the previous row's word and assign the correct class
-    //     wordsRef.current[i - numberOfWordsToAddToPool].classList.remove(styles.correct, styles.incorrect);
-    //     if (wordsRef.current[i].classList.contains(styles.correct)) {
-    //       wordsRef.current[i - numberOfWordsToAddToPool].classList.add(styles.correct);
-    //     } else if (wordsRef.current[i].classList.contains(styles.incorrect)) {
-    //       wordsRef.current[i - numberOfWordsToAddToPool].classList.add(styles.incorrect);
-    //     }
-    //
-    //     wordsRef.current[i].classList.remove(styles.correct, styles.incorrect);
-    //   }
-    //   const newWords = generateWords(numberOfWordsToAddToPool);
-    //   let index = 0;
-    //   for (let i = newWordPool.length - numberOfWordsToAddToPool; i < newWordPool.length; i++) {
-    //     newWordPool[i] = newWords[index++];
-    //   }
-    //   setWordPool(newWordPool);
-    //   setWordIndex(wordIndex + 1 - numberOfWordsToAddToPool);
-    // }
+    const nextWord = nextWords[0];
+    setCurrentWord("");
+    setNextWords([currentWord.concat(nextWord), ...nextWords.slice(1)]);
   }
 
   function handleKeyDown(e: globalThis.KeyboardEvent) {
@@ -197,20 +118,34 @@ export function TestHorizontal({ active, running, finished, handleStart }: Props
         }
       } else {
         if (e.key == "Backspace") {
-          moveBackOneWord();
+          if (e.ctrlKey) {
+            if (currentWord) {
+              clearWord();
+            } else {
+              moveBackOneWord();
+            }
+          } else {
+            moveBackOneLetter();
+          }
         }
       }
     }
   }
   return (
     <>
-      <div className={styles.words}>
+      <div className={styles.main}>
         <div className={`${styles.words} ${styles.previous}`}>
-        {previousWords.map((word, index) => (<Word word={word} key={index} />))}
+          {previousWords.map((word, index) => (
+            <Word word={word} key={index} />
+          ))}
         </div>
-        {<Word word={currentWord} ref={currentWordRef} />}
+        <div className={`${styles.words} ${styles.current}`}>
+          <Word word={currentWord} ref={currentWordRef} />
+        </div>
         <div className={`${styles.words} ${styles.next}`}>
-        {nextWords.map((word, index) => (<Word word={word} key={index} />))}
+          {nextWords.map((word, index) => (
+            <Word word={word} key={index} />
+          ))}
         </div>
       </div>
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
