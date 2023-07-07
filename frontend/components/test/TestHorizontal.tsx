@@ -1,55 +1,54 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import { useEffect, useRef, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import { Caret } from "@/components/test/Caret";
 import styles from "./Test.module.css";
 import { generateWord, generateWords } from "@/utils/generateWords";
 import { useMutation } from "@apollo/client";
 import { CreateScoreDocument } from "@/graphql/generated/graphql";
 import { useRouter } from "next/navigation";
-import { nextStart } from "next/dist/cli/next-start";
+import { Letter } from "@/components/test/Letter";
+import { TimeSettingButton } from "@/components/test/TimeSettingButton";
+import { Timer } from "@/components/test/Timer";
+import { ResetButton } from "@/components/test/ResetButton";
 
 interface Props {
   active: boolean;
-  running: boolean;
-  finished: boolean;
-  handleStart: () => void;
 }
 
-export function TestHorizontal({ active, running, finished, handleStart }: Props) {
+export function TestHorizontal({ active }: Props) {
   const [createScore] = useMutation(CreateScoreDocument);
   const router = useRouter();
 
-  // TODO: CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP CLEAN UP
-  const [wordIndex, setWordIndex] = useState(0);
-  const [letterIndex, setLetterIndex] = useState(0);
-  // does not account for the funny situation if someone goes down and then back up
-  // const [timeRemaining, setTimeRemaining] = useState(5);
   const [caretPosition, setCaretPosition] = useState({ x: -999, y: -999 });
+  const [timeRemaining, setTimeRemaining] = useState(5);
+  const [running, setRunning] = useState(true);
+  const [timeSetting, setTimeSetting] = useState(0);
+  const [correct, setCorrect] = useState(true);
+  const [correctWords, setCorrectWords] = useState(0);
 
   const [previousWords, setPreviousWords] = useState<Array<string>>([""]);
   const [currentWord, setCurrentWord] = useState("");
   const [nextWords, setNextWords] = useState<Array<string>>([""]);
 
-  const wordsRef = useRef<Array<HTMLDivElement>>([]);
   const currentWordRef = useRef<HTMLDivElement | null>(null);
   const caretRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
 
   useEffect(() => {
     setNextWords(generateWords(4));
+    const { left, top } = currentWordRef.current!.getBoundingClientRect();
+    moveCaret(left, top);
   }, []);
 
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
+  useEffect(() => {}, [currentWord]);
 
   useEffect(() => {
-    if (finished) {
+    // We finished
+    if (timeRemaining <= 0) {
+      setRunning(false);
+      clearInterval(intervalRef.current!);
       // submit score and redirect to the url of created score
       // (async () => {
       //   const response = await createScore({ variables: { input: { time: 5, averageWpm: 200, rawWpm: 200 } } });
@@ -58,7 +57,7 @@ export function TestHorizontal({ active, running, finished, handleStart }: Props
       //   if (id) await router.push(`/score/${id}`);
       // })();
     }
-  }, [finished]);
+  }, [timeRemaining]);
 
   // maybe no need for this function
   function moveCaret(x: number, y: number) {
@@ -69,20 +68,32 @@ export function TestHorizontal({ active, running, finished, handleStart }: Props
     const nextWord = nextWords[0];
     const nextLetter = nextWord[0];
     if (!nextLetter) return;
+    if (input != nextLetter) {
+      setCorrect(false);
+    }
     setCurrentWord(currentWord.concat(nextLetter));
     setNextWords([nextWord.slice(1), ...nextWords.slice(1)]);
   }
 
   function moveForwardOneWord() {
     if (!currentWord) return;
+    const word = currentWord.concat(nextWords[0]);
     if (previousWords.length <= 3) {
-      setPreviousWords([...previousWords, currentWord]);
+      setPreviousWords([...previousWords, word]);
     } else {
-      setPreviousWords([...previousWords.slice(1), currentWord]);
+      setPreviousWords([...previousWords.slice(1), word]);
+    }
+    if (correct) {
+      setCorrectWords((cw) => cw + 1);
     }
     setNextWords([...nextWords.slice(1), generateWord()]);
+    setCorrect(true);
     setCurrentWord("");
   }
+
+  useEffect(() => {
+    console.log("Correct words:", correctWords);
+  }, [correctWords]);
 
   function moveBackOneLetter() {
     const nextWord = nextWords[0];
@@ -131,8 +142,39 @@ export function TestHorizontal({ active, running, finished, handleStart }: Props
       }
     }
   }
+
+  function handleTimeSettingSelection(time: number) {
+    return (e: MouseEvent<HTMLButtonElement>) => {
+      localStorage.setItem("time-setting", time.toString());
+      setTimeSetting(time);
+      setTimeRemaining(time);
+    };
+  }
+
+  function handleReset(e: MouseEvent<HTMLButtonElement>) {
+    setRunning(false);
+    setTimeRemaining(timeSetting);
+    clearInterval(intervalRef.current!);
+  }
+
+  function handleStart() {
+    setRunning(true);
+    clearInterval(intervalRef.current!);
+    intervalRef.current = setInterval(() => {
+      setTimeRemaining((t) => t - 1);
+    }, 1000);
+  }
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
   return (
     <>
+      <Timer time={timeRemaining} />
       <div className={styles.main}>
         <div className={`${styles.words} ${styles.previous}`}>
           {previousWords.map((word, index) => (
@@ -148,7 +190,13 @@ export function TestHorizontal({ active, running, finished, handleStart }: Props
           ))}
         </div>
       </div>
-      <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
+      {[1, 5, 10].map((number) => (
+        <TimeSettingButton handleTimeSettingSelection={handleTimeSettingSelection(number)} key={number}>
+          {number}
+        </TimeSettingButton>
+      ))}
+      <ResetButton handleReset={handleReset} />
+      <Caret x={caretPosition.x} y={caretPosition.y} ref={caretRef} />
     </>
   );
 }
