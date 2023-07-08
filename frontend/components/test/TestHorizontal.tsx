@@ -180,8 +180,6 @@ export function TestHorizontal({ active }: Props) {
           {previousWords.map((word, index) => (
             <Word word={word} key={index} />
           ))}
-        </div>
-        <div className={`${styles.words} ${styles.current}`}>
           <Word word={currentWord} ref={currentWordRef} />
         </div>
         <div className={`${styles.words} ${styles.next}`}>
