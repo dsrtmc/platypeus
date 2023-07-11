@@ -11,7 +11,12 @@ export default async function User({ params }: { params: { username: string } })
   if (!data.userByUsername) return <div>no such user</div>;
   return (
     <div>
-      hello you are on <code>{data.userByUsername?.username}</code> page
+      <p>
+        hello you are on <code>{data.userByUsername.username}</code> page
+      </p>
+      <p>
+        this account has been created on<code>{JSON.stringify(new Date(data.userByUsername.createdAt))}</code>
+      </p>
     </div>
   );
 }
