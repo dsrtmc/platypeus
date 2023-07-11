@@ -17,6 +17,16 @@ public static class UserQueries
         
         return db.Users.Find(new Guid(claim.Value));
     }
+
+    public static User? GetUserByUsername(string username, DatabaseContext db)
+    {
+        return db.Users.FirstOrDefault(u => u.Username == username);
+    }
+    
+    public static User? GetUserById(Guid id, DatabaseContext db)
+    {
+        return db.Users.Find(id);
+    }
     
     // a test resolver for making sure authorization works
     [Authorize]

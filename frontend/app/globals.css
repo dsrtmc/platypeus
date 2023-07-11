@@ -1,0 +1,15 @@
+:root {
+    --nav-size: 75px;
+}
+
+html, body {
+    margin: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: calc(100% - var(--nav-size));
+}
