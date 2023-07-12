@@ -12,6 +12,7 @@ import { Letter } from "@/components/test/Letter";
 import { TimeSettingButton } from "@/components/test/TimeSettingButton";
 import { Timer } from "@/components/test/Timer";
 import { ResetButton } from "@/components/test/ResetButton";
+import { TimeSettingSelection } from "@/components/test/TimeSettingSelection";
 
 interface Props {
   active: boolean;
@@ -143,7 +144,7 @@ export function TestHorizontal({ active }: Props) {
     }
   }
 
-  function handleTimeSettingSelection(time: number) {
+  function handleSelect(time: number) {
     return (e: MouseEvent<HTMLButtonElement>) => {
       localStorage.setItem("time-setting", time.toString());
       setTimeSetting(time);
@@ -174,7 +175,10 @@ export function TestHorizontal({ active }: Props) {
 
   return (
     <>
-      <Timer time={timeRemaining} />
+      <div className={styles.top}>
+        <Timer time={timeRemaining} />
+        <TimeSettingSelection settings={[1, 5, 10]} handleSelect={handleSelect} />
+      </div>
       <div className={styles.main}>
         <div className={`${styles.words} ${styles.previous}`}>
           {previousWords.map((word, index) => (
@@ -182,19 +186,14 @@ export function TestHorizontal({ active }: Props) {
           ))}
           <Word word={currentWord} ref={currentWordRef} />
         </div>
+        <Caret x={caretPosition.x} y={caretPosition.y} ref={caretRef} />
         <div className={`${styles.words} ${styles.next}`}>
           {nextWords.map((word, index) => (
             <Word word={word} key={index} />
           ))}
         </div>
       </div>
-      {[1, 5, 10].map((number) => (
-        <TimeSettingButton handleTimeSettingSelection={handleTimeSettingSelection(number)} key={number}>
-          {number}
-        </TimeSettingButton>
-      ))}
       <ResetButton handleReset={handleReset} />
-      <Caret x={caretPosition.x} y={caretPosition.y} ref={caretRef} />
     </>
   );
 }

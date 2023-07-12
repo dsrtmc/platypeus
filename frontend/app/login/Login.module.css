@@ -1,0 +1,30 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    gap: 1rem;
+    width: 25%;
+    background-color: gray;
+    padding: 24px 36px;
+    border-radius: 10px;
+}
+
+.field {
+    color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: dimgray;
+}
+
+.button {
+    color: lightgray;
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(lightseagreen, #b4b4ed);
+    border-radius: 5px;
+    width: 10rem;
+    margin: auto;
+}

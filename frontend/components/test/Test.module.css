@@ -3,7 +3,6 @@
     align-items: center;
     flex-direction: column;
     width: 600px;
-    height: 100px;
     background-color: #b4b4ed;
     margin: auto;
 }
@@ -13,6 +12,17 @@
     justify-content: flex-end;
     flex-basis: 0;
     gap: 0;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.selection {
+    display: flex;
+    gap: 1rem;
 }
 
 .words {

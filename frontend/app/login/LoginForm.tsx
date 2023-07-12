@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent } from "react";
 import { useMutation } from "@apollo/client";
-import { LoginDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
+import { LoginDocument } from "@/graphql/generated/graphql";
 import { Field, Form, Formik } from "formik";
+import styles from "./Login.module.css";
 
 export default function LoginForm() {
   const [login] = useMutation(LoginDocument);
@@ -33,10 +33,10 @@ export default function LoginForm() {
       }}
     >
       {() => (
-        <Form>
-          <Field type="text" name="username" placeholder="username" />
-          <Field type="password" name="password" placeholder="password" />
-          <button type="submit" disabled={false}>
+        <Form className={styles.form}>
+          <Field type="text" name="username" placeholder="username" className={styles.field} />
+          <Field type="password" name="password" placeholder="password" className={styles.field} />
+          <button type="submit" disabled={false} className={styles.button}>
             login
           </button>
         </Form>
