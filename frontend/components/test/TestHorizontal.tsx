@@ -50,7 +50,7 @@ export function TestHorizontal({ active }: Props) {
     if (timeRemaining <= 0) {
       setRunning(false);
       clearInterval(intervalRef.current!);
-      // submit score and redirect to the url of created score
+      // Submit score and redirect to the url of created score
       // (async () => {
       //   const response = await createScore({ variables: { input: { time: 5, averageWpm: 200, rawWpm: 200 } } });
       //   console.log("data:", response);
@@ -177,6 +177,7 @@ export function TestHorizontal({ active }: Props) {
     <>
       <div className={styles.top}>
         <Timer time={timeRemaining} />
+        correct: {correct ? "true" : "false"}
         <TimeSettingSelection settings={[1, 5, 10]} handleSelect={handleSelect} />
       </div>
       <div className={styles.main}>

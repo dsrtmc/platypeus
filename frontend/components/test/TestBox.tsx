@@ -3,6 +3,7 @@
 import styles from "./Test.module.css";
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import { TestHorizontal } from "@/components/test/TestHorizontal";
+import { Test } from "@/components/test/Test";
 
 // it might actually be really useless idk
 export function TestBox() {
@@ -20,10 +21,15 @@ export function TestBox() {
     };
   }, [handleClick]);
 
+  function handleStart() {
+    setActive(active);
+  }
+
   return (
     <div className={styles.box} ref={ref}>
       <p>{active ? "ACTIVE" : "INACTIVE"}</p>
-      <TestHorizontal active={active} />
+      {/*<TestHorizontal active={active} />*/}
+      <Test active={active} running={true} finished={false} handleStart={handleStart} />
     </div>
   );
 }

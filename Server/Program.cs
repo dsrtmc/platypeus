@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using HotChocolate.Execution;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
@@ -58,7 +59,8 @@ builder.Services
         options.Cookie.Name = Environment.GetEnvironmentVariable("AUTHENTICATION_COOKIE_NAME");
         // Only in development, change in prod; TODO: debug/prod .env variables
         options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-        options.Cookie.SameSite = SameSiteMode.None;
+        // Apparently Chrome does not allow SameSite: None unless you're using the Secure flag with it
+        options.Cookie.SameSite = SameSiteMode.Lax;
     });
 
 builder.Services.AddAuthorization();

@@ -27,11 +27,11 @@
 
 .words {
     display: flex;
+    flex-wrap: wrap;
     background-color: #ccc;
     gap: 1rem;
     font-family: monospace;
     font-size: 36px;
-    overflow: hidden;
 }
 
 .current {
