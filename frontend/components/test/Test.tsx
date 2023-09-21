@@ -56,38 +56,90 @@ export function Test({ active, running, finished, handleStart }: Props) {
     console.log("nig:", wordsRef.current);
   }, []);
 
+  const [wordIndex, setWordIndex] = useState(0);
+  const [letterIndex, setLetterIndex] = useState(0);
+
   function moveCaret(x: number, y: number) {
     setCaretPosition({ x, y });
   }
 
-  const [index, setIndex] = useState(0);
+  function moveForwardOneWord() {
+    if (!wordsRef.current[wordIndex] || !wordsRef.current[wordIndex + 1]) return;
+    const { left, top } = wordsRef.current[wordIndex + 1].getBoundingClientRect();
+    moveCaret(left, top);
+    setWordIndex(wordIndex + 1);
+    setLetterIndex(0);
+  }
+
+  function moveForwardOneLetter(key: string) {
+    const currentWord = wordsRef.current[wordIndex];
+    if (!currentWord) return;
+    const currentLetter = currentWord.children[letterIndex];
+    if (!currentLetter) return;
+    const nextLetter = currentWord.children[letterIndex + 1];
+    if (!nextLetter) {
+      // Shouldn't ever be undefined; if it is, it means we increased the letter index
+      // where we shouldn't have or forgot to reset it while changing words.
+      const { right, top } = currentLetter.getBoundingClientRect();
+      moveCaret(right, top);
+      setLetterIndex(letterIndex + 1);
+    } else {
+      const { left, top } = nextLetter.getBoundingClientRect();
+      moveCaret(left, top);
+      setLetterIndex(letterIndex + 1);
+    }
+  }
+
+  function moveBackOneWord() {
+    const previousWord = wordsRef.current[wordIndex - 1];
+    if (!previousWord) return;
+    const { right, top } = previousWord.getBoundingClientRect();
+    moveCaret(right, top);
+    setWordIndex(wordIndex - 1);
+    setLetterIndex(previousWord.children.length - 1);
+  }
+
+  function moveBackOneLetter() {
+    const currentWord = wordsRef.current[wordIndex];
+    const previousLetter = currentWord.children[letterIndex - 1];
+    if (!previousLetter) return;
+    const { left, top } = previousLetter.getBoundingClientRect();
+    moveCaret(left, top);
+    setLetterIndex(letterIndex - 1);
+  }
+
+  function clearWord() {
+    const currentWord = wordsRef.current[wordIndex];
+    const firstLetter = currentWord.children[0];
+    if (!firstLetter) return; // not sure if that ever happens
+    const { left, top } = firstLetter.getBoundingClientRect();
+    moveCaret(left, top);
+    setLetterIndex(0);
+  }
+
   function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (active) {
       if (!running) handleStart();
       if (e.key.length == 1) {
         e.preventDefault();
-        moveCaret(wordsRef.current[index].getBoundingClientRect().x, wordsRef.current[index].getBoundingClientRect().y);
-        setIndex(index + 1);
-        console.log("word:", wordsRef.current[index]);
-        console.log("uwu");
-        // if (e.key == " ") {
-        //   moveForwardOneWord();
-        //   moveToNextLine();
-        // } else {
-        //   moveForwardOneLetter(e.key);
-        // }
+        if (e.key == " ") {
+          moveForwardOneWord();
+          // moveToNextLine();
+        } else {
+          moveForwardOneLetter(e.key);
+        }
       } else {
         if (e.key == "Backspace") {
-          // if (!letterIndex) {
-          //   clearWord();
-          //   moveBackOneWord();
-          // } else {
-          //   if (e.ctrlKey) {
-          //     clearWord();
-          //   } else {
-          //     moveBackOneLetter();
-          //   }
-          // }
+          if (!letterIndex) {
+            // clearWord(); // unnecessary as of rn since I'm not using css
+            moveBackOneWord();
+          } else {
+            if (e.ctrlKey) {
+              clearWord();
+            } else {
+              moveBackOneLetter();
+            }
+          }
         }
       }
     }
@@ -96,7 +148,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [index]);
+  }, [wordIndex, letterIndex]);
 
   return (
     <>
@@ -105,7 +157,11 @@ export function Test({ active, running, finished, handleStart }: Props) {
         onClick={() => {
           setWordPool([
             ...wordPool,
-            createElement(Word as FunctionComponent<Word>, { word: generateWord(), ref: addToRefs }),
+            createElement(Word as FunctionComponent<Word>, {
+              word: generateWord(),
+              ref: addToRefs,
+              key: `word-${generateRandomString(5)}`,
+            }),
           ]);
         }}
       >
@@ -113,7 +169,9 @@ export function Test({ active, running, finished, handleStart }: Props) {
       </button>
       <button
         onClick={() => {
+          console.log("pre:", wordsRef.current);
           wordsRef.current.shift();
+          console.log("post:", wordsRef.current);
           setWordPool(wordPool.slice(1, wordPool.length));
         }}
       >
