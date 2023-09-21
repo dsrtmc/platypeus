@@ -22,50 +22,32 @@ interface Props {
   handleStart: () => void;
 }
 
-// IGNORE EVERY CHANGE IN THIS FILE IT'S ONLY FOR FUN, TESTING AND "LEGACY" PURPOSES
 export function Test({ active, running, finished, handleStart }: Props) {
+  const [wordIndex, setWordIndex] = useState(0);
+  const [letterIndex, setLetterIndex] = useState(0);
+
   // A funny type, but I think correct nonetheless
   const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
   const [caretPosition, setCaretPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  // useful for skipping the first line during our line change
+  // Useful for skipping the first line during our line change
   const [lineSkip, setLineSkip] = useState(true);
 
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
+
+  // likely very unnecessary
   function addToRefs(el: (typeof wordsRef.current)[number]) {
     wordsRef.current.push(el);
   }
-
-  useEffect(() => {
-    let words = [];
-    for (let i = 0; i < 15; i++) {
-      words.push(
-        // again, a very funny type but lol maybe it's correct
-        createElement(Word as FunctionComponent<Word>, {
-          word: generateWord(),
-          ref: addToRefs,
-          key: `word-${generateRandomString(5)}`,
-        })
-      );
-    }
-    setWordPool([...wordPool, ...words]);
-  }, []);
-
-  useEffect(() => {
-    console.log("nig:", wordsRef.current);
-  }, []);
-
-  const [wordIndex, setWordIndex] = useState(0);
-  const [letterIndex, setLetterIndex] = useState(0);
 
   function moveCaret(x: number, y: number) {
     setCaretPosition({ x, y });
   }
 
   function moveForwardOneWord() {
-    if (!wordsRef.current[wordIndex]) return;
-    // Should be impossible to ever be undefined now that we've implemented a pool
+    // `wordsRef.current[wordIndex + 1]` can be undefined because our refs array is fucked and has nulls for some reason
+    if (!wordsRef.current[wordIndex] || !wordsRef.current[wordIndex + 1]) return;
     const { left, top } = wordsRef.current[wordIndex + 1].getBoundingClientRect();
     moveCaret(left, top);
     setWordIndex(wordIndex + 1);
@@ -79,7 +61,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
     if (!currentLetter) return;
     const nextLetter = currentWord.children[letterIndex + 1];
 
-    // coloring
+    // coloring TODO: a function for coloring?
     if (key == currentLetter.textContent) {
       currentLetter.classList.add(styles.correct);
     } else {
@@ -91,12 +73,11 @@ export function Test({ active, running, finished, handleStart }: Props) {
       // where we shouldn't have or forgot to reset it while changing words.
       const { right, top } = currentLetter.getBoundingClientRect();
       moveCaret(right, top);
-      setLetterIndex(letterIndex + 1);
     } else {
       const { left, top } = nextLetter.getBoundingClientRect();
       moveCaret(left, top);
-      setLetterIndex(letterIndex + 1);
     }
+    setLetterIndex(letterIndex + 1);
   }
 
   function moveBackOneWord() {
@@ -124,11 +105,11 @@ export function Test({ active, running, finished, handleStart }: Props) {
     const letters = currentWord.children;
     const firstLetter = letters[0];
     if (!firstLetter) return; // not sure if that ever happens
-    const { left, top } = firstLetter.getBoundingClientRect();
-    moveCaret(left, top);
     for (const child of letters) {
       clearLetter(child);
     }
+    const { left, top } = firstLetter.getBoundingClientRect();
+    moveCaret(left, top);
     setLetterIndex(0);
   }
 
@@ -139,18 +120,18 @@ export function Test({ active, running, finished, handleStart }: Props) {
   function handleLineChange() {
     const currentWord = wordsRef.current[wordIndex];
     const nextWord = wordsRef.current[wordIndex + 1];
-    if (!nextWord) return; // should never happen once pool is implemented
-    // we should change the line
+    if (!nextWord) return; // happens because the array of refs has nulls for a funny reason
     if (currentWord.getBoundingClientRect().y < nextWord.getBoundingClientRect().y) {
+      // There might be a better way to do this line skip but oh well
       if (lineSkip) {
         setLineSkip(false);
         return;
       }
       let numberOfWordsToAddToPool = 0;
-      for (let i = 0; i < wordIndex; i++) {
-        if (wordsRef.current[i].getBoundingClientRect().y < currentWord.getBoundingClientRect().y) {
-          numberOfWordsToAddToPool++;
-        }
+      let i = 0;
+      while (wordsRef.current[i].getBoundingClientRect().y < currentWord.getBoundingClientRect().y && i < wordIndex) {
+        numberOfWordsToAddToPool++;
+        i++;
       }
       const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
       for (let i = 0; i < numberOfWordsToAddToPool; i++) {
@@ -187,7 +168,6 @@ export function Test({ active, running, finished, handleStart }: Props) {
       } else {
         if (e.key == "Backspace") {
           if (!letterIndex) {
-            // clearWord(); // unnecessary as of rn since I'm not using css
             moveBackOneWord();
           } else {
             if (e.ctrlKey) {
@@ -200,6 +180,21 @@ export function Test({ active, running, finished, handleStart }: Props) {
       }
     }
   }
+
+  useEffect(() => {
+    let words = [];
+    for (let i = 0; i < 20; i++) {
+      words.push(
+        // Again, a very funny type but lol maybe it's correct
+        createElement(Word as FunctionComponent<Word>, {
+          word: generateWord(),
+          ref: addToRefs,
+          key: `word-${generateRandomString(5)}`,
+        })
+      );
+    }
+    setWordPool(words);
+  }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
