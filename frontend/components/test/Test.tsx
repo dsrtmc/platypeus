@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import styles from "./Test.module.css";
-import { generateWord } from "@/utils/generateWords";
+import { generateWord, generateWords } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 
@@ -22,23 +22,24 @@ interface Props {
   handleStart: () => void;
 }
 
-// IGNORE EVERY CHANGES IN THIS FILE IT'S ONLY FOR FUN, TESTING AND "LEGACY" PURPOSES
+// IGNORE EVERY CHANGE IN THIS FILE IT'S ONLY FOR FUN, TESTING AND "LEGACY" PURPOSES
 export function Test({ active, running, finished, handleStart }: Props) {
   // A funny type, but I think correct nonetheless
   const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
   const [caretPosition, setCaretPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  const wordsRef = useRef<any>([]);
-  const caretRef = useRef<any>(null);
-  function addToRefs(el: any) {
-    // if (el && !wordsRef.current.includes(el)) {
+  // useful for skipping the first line during our line change
+  const [lineSkip, setLineSkip] = useState(true);
+
+  const caretRef = useRef<HTMLDivElement | null>(null);
+  const wordsRef = useRef<Array<HTMLDivElement>>([]);
+  function addToRefs(el: (typeof wordsRef.current)[number]) {
     wordsRef.current.push(el);
-    // }
   }
 
   useEffect(() => {
     let words = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 15; i++) {
       words.push(
         // again, a very funny type but lol maybe it's correct
         createElement(Word as FunctionComponent<Word>, {
@@ -49,7 +50,6 @@ export function Test({ active, running, finished, handleStart }: Props) {
       );
     }
     setWordPool([...wordPool, ...words]);
-    //moveCaret(wordsRef.current[0].getBoundingClientRect().x, wordsRef.current[0].getBoundingClientRect().y);
   }, []);
 
   useEffect(() => {
@@ -64,7 +64,8 @@ export function Test({ active, running, finished, handleStart }: Props) {
   }
 
   function moveForwardOneWord() {
-    if (!wordsRef.current[wordIndex] || !wordsRef.current[wordIndex + 1]) return;
+    if (!wordsRef.current[wordIndex]) return;
+    // Should be impossible to ever be undefined now that we've implemented a pool
     const { left, top } = wordsRef.current[wordIndex + 1].getBoundingClientRect();
     moveCaret(left, top);
     setWordIndex(wordIndex + 1);
@@ -77,6 +78,14 @@ export function Test({ active, running, finished, handleStart }: Props) {
     const currentLetter = currentWord.children[letterIndex];
     if (!currentLetter) return;
     const nextLetter = currentWord.children[letterIndex + 1];
+
+    // coloring
+    if (key == currentLetter.textContent) {
+      currentLetter.classList.add(styles.correct);
+    } else {
+      currentLetter.classList.add(styles.incorrect);
+    }
+
     if (!nextLetter) {
       // Shouldn't ever be undefined; if it is, it means we increased the letter index
       // where we shouldn't have or forgot to reset it while changing words.
@@ -96,7 +105,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
     const { right, top } = previousWord.getBoundingClientRect();
     moveCaret(right, top);
     setWordIndex(wordIndex - 1);
-    setLetterIndex(previousWord.children.length - 1);
+    setLetterIndex(previousWord.children.length);
   }
 
   function moveBackOneLetter() {
@@ -105,16 +114,61 @@ export function Test({ active, running, finished, handleStart }: Props) {
     if (!previousLetter) return;
     const { left, top } = previousLetter.getBoundingClientRect();
     moveCaret(left, top);
+    clearLetter(previousLetter);
     setLetterIndex(letterIndex - 1);
   }
 
+  // Not too great of a function considering it deals with more than just "clearing" the word per se, but it's fine for now.
   function clearWord() {
     const currentWord = wordsRef.current[wordIndex];
-    const firstLetter = currentWord.children[0];
+    const letters = currentWord.children;
+    const firstLetter = letters[0];
     if (!firstLetter) return; // not sure if that ever happens
     const { left, top } = firstLetter.getBoundingClientRect();
     moveCaret(left, top);
+    for (const child of letters) {
+      clearLetter(child);
+    }
     setLetterIndex(0);
+  }
+
+  function clearLetter(el: Element) {
+    el.classList.remove(styles.correct, styles.incorrect);
+  }
+
+  function handleLineChange() {
+    const currentWord = wordsRef.current[wordIndex];
+    const nextWord = wordsRef.current[wordIndex + 1];
+    if (!nextWord) return; // should never happen once pool is implemented
+    // we should change the line
+    if (currentWord.getBoundingClientRect().y < nextWord.getBoundingClientRect().y) {
+      if (lineSkip) {
+        setLineSkip(false);
+        return;
+      }
+      let numberOfWordsToAddToPool = 0;
+      for (let i = 0; i < wordIndex; i++) {
+        if (wordsRef.current[i].getBoundingClientRect().y < currentWord.getBoundingClientRect().y) {
+          numberOfWordsToAddToPool++;
+        }
+      }
+      const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
+      for (let i = 0; i < numberOfWordsToAddToPool; i++) {
+        wordsRef.current.shift();
+        newWordPool.push(
+          createElement(Word as FunctionComponent<Word>, {
+            word: generateWord(),
+            ref: addToRefs,
+            key: `word-${generateRandomString(5)}`,
+          })
+        );
+      }
+      setWordPool(newWordPool);
+      const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
+      setWordIndex(newIndex);
+      const { left, top } = wordsRef.current[newIndex].getBoundingClientRect();
+      moveCaret(left, top);
+    }
   }
 
   function handleKeyDown(e: globalThis.KeyboardEvent) {
@@ -123,8 +177,10 @@ export function Test({ active, running, finished, handleStart }: Props) {
       if (e.key.length == 1) {
         e.preventDefault();
         if (e.key == " ") {
-          moveForwardOneWord();
-          // moveToNextLine();
+          if (letterIndex) {
+            moveForwardOneWord();
+          }
+          handleLineChange();
         } else {
           moveForwardOneLetter(e.key);
         }
@@ -192,6 +248,13 @@ export function Test({ active, running, finished, handleStart }: Props) {
         }}
       >
         log elements
+      </button>
+      <button
+        onClick={() => {
+          console.log("Current word:", wordsRef.current[wordIndex]);
+        }}
+      >
+        log current button
       </button>
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
     </>
