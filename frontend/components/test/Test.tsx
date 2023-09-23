@@ -36,25 +36,11 @@ export function Test({ active, running, finished, handleStart }: Props) {
 
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
-  const testRef = useRef<Array<HTMLDivElement>>([]);
-  const [testPool, setTestPool] = useState<Array<ReactElement>>([]);
 
-  // useEffect(() => {
-  //   createElement(Word as FunctionComponent<Word>, {
-  //     word: generateWord(),
-  //     ref: (el) => testRef.current.push(el),
-  //     key: `test-${generateRandomString(5)}`,
-  //   });
-  //   createElement(Word as FunctionComponent<Word>, {
-  //     word: generateWord(),
-  //     ref: (el) => testRef.current.push(el),
-  //     key: `test-${generateRandomString(5)}`,
-  //   });
-  // }, []);
-
-  // likely very unnecessary
   function addToRefs(el: (typeof wordsRef.current)[number]) {
-    wordsRef.current.push(el);
+    if (el) {
+      wordsRef.current.push(el);
+    }
   }
 
   function moveCaret(x: number, y: number) {
@@ -62,8 +48,8 @@ export function Test({ active, running, finished, handleStart }: Props) {
   }
 
   function moveForwardOneWord() {
-    // `wordsRef.current[wordIndex + 1]` can be undefined because our refs array is fucked and has nulls for some reason
-    if (!wordsRef.current[wordIndex] || !wordsRef.current[wordIndex + 1]) return;
+    if (!wordsRef.current[wordIndex]) return;
+    // if `wordsRef.current[wordIndex + 1]` is undefined then we're in trouble, so I keep it in for now to find bugs
     const { left, top } = wordsRef.current[wordIndex + 1].getBoundingClientRect();
     moveCaret(left, top);
     setWordIndex(wordIndex + 1);
@@ -85,8 +71,6 @@ export function Test({ active, running, finished, handleStart }: Props) {
     }
 
     if (!nextLetter) {
-      // Shouldn't ever be undefined; if it is, it means we increased the letter index
-      // where we shouldn't have or forgot to reset it while changing words.
       const { right, top } = currentLetter.getBoundingClientRect();
       moveCaret(right, top);
     } else {
@@ -152,13 +136,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
       const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
       for (let i = 0; i < numberOfWordsToAddToPool; i++) {
         wordsRef.current.shift();
-        newWordPool.push(
-          createElement(Word as FunctionComponent<Word>, {
-            word: generateWord(),
-            ref: addToRefs,
-            key: `word-${generateRandomString(5)}`,
-          })
-        );
+        newWordPool.push(createWordElement());
       }
       setWordPool(newWordPool);
       const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
@@ -166,6 +144,15 @@ export function Test({ active, running, finished, handleStart }: Props) {
       const { left, top } = wordsRef.current[newIndex].getBoundingClientRect();
       moveCaret(left, top);
     }
+  }
+
+  function createWordElement() {
+    // funny type idk if correct
+    return createElement(Word as FunctionComponent<Word>, {
+      word: generateWord(),
+      ref: addToRefs,
+      key: `word-${generateRandomString(5)}`,
+    });
   }
 
   // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
@@ -201,19 +188,19 @@ export function Test({ active, running, finished, handleStart }: Props) {
     [wordIndex, letterIndex]
   );
 
+  const removeFirstWordFromPool = () => {
+    wordsRef.current.shift();
+    setWordPool(wordPool.slice(1));
+  };
+
+  // Initialize the pool
   useEffect(() => {
     let words = [];
     for (let i = 0; i < 20; i++) {
-      words.push(
-        // Again, a very funny type but lol maybe it's correct
-        createElement(Word as FunctionComponent<Word>, {
-          word: generateWord(),
-          ref: addToRefs,
-          key: `word-${generateRandomString(5)}`,
-        })
-      );
+      words.push(createWordElement());
     }
     setWordPool(words);
+    // TODO: move caret
   }, []);
 
   useEffect(() => {
@@ -221,38 +208,18 @@ export function Test({ active, running, finished, handleStart }: Props) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // funny workaround to deal with `wordsRef.current` having null values for some reason
-  useEffect(() => {
-    wordsRef.current = wordsRef.current.filter((el) => el);
-  }, [wordPool]);
-
+  // TODO: fix active/inactive funny thing; can't type if inactive -> active
   return (
     <>
       <div className={styles.words}>{wordPool.map((word) => word)}</div>
       <button
         onClick={() => {
-          setWordPool([
-            ...wordPool,
-            createElement(Word as FunctionComponent<Word>, {
-              word: generateWord(),
-              ref: (el) => wordsRef.current.push(el),
-              key: `word-${generateRandomString(5)}`,
-            }),
-          ]);
+          setWordPool([...wordPool, createWordElement()]);
         }}
       >
         add random word
       </button>
-      <button
-        onClick={() => {
-          console.log("pre:", wordsRef.current);
-          wordsRef.current.shift();
-          console.log("post:", wordsRef.current);
-          setWordPool(wordPool.slice(1, wordPool.length));
-        }}
-      >
-        remove first word
-      </button>
+      <button onClick={removeFirstWordFromPool}>remove first word</button>
       <button
         onClick={() => {
           console.log(wordsRef.current);
@@ -260,52 +227,6 @@ export function Test({ active, running, finished, handleStart }: Props) {
       >
         log refs
       </button>
-      <button
-        onClick={() => {
-          for (const el of wordPool) {
-            console.log(el);
-          }
-        }}
-      >
-        log elements
-      </button>
-      <button
-        onClick={() => {
-          console.log("Current word:", wordsRef.current[wordIndex]);
-        }}
-      >
-        log current button
-      </button>
-      <button
-        onClick={() => {
-          setTestPool([
-            ...testPool,
-            createElement(Word as FunctionComponent<Word>, {
-              word: generateWord(),
-              ref: (el) => testRef.current.push(el),
-              key: `test-${generateRandomString(5)}`,
-            }),
-          ]);
-        }}
-      >
-        test ref "add element"
-      </button>
-      <button
-        onClick={() => {
-          testRef.current.pop();
-          setTestPool(testPool.slice(0, testPool.length - 1));
-        }}
-      >
-        test ref "remove element"
-      </button>
-      <button
-        onClick={() => {
-          console.log(testRef.current);
-        }}
-      >
-        test ref "log elements"
-      </button>
-      {testPool.map((div) => div)}
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
     </>
   );
