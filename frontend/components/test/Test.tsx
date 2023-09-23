@@ -6,6 +6,7 @@ import {
   FunctionComponent,
   FunctionComponentElement,
   ReactElement,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -35,6 +36,21 @@ export function Test({ active, running, finished, handleStart }: Props) {
 
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
+  const testRef = useRef<Array<HTMLDivElement>>([]);
+  const [testPool, setTestPool] = useState<Array<ReactElement>>([]);
+
+  // useEffect(() => {
+  //   createElement(Word as FunctionComponent<Word>, {
+  //     word: generateWord(),
+  //     ref: (el) => testRef.current.push(el),
+  //     key: `test-${generateRandomString(5)}`,
+  //   });
+  //   createElement(Word as FunctionComponent<Word>, {
+  //     word: generateWord(),
+  //     ref: (el) => testRef.current.push(el),
+  //     key: `test-${generateRandomString(5)}`,
+  //   });
+  // }, []);
 
   // likely very unnecessary
   function addToRefs(el: (typeof wordsRef.current)[number]) {
@@ -152,34 +168,38 @@ export function Test({ active, running, finished, handleStart }: Props) {
     }
   }
 
-  function handleKeyDown(e: globalThis.KeyboardEvent) {
-    if (active) {
-      if (!running) handleStart();
-      if (e.key.length == 1) {
-        e.preventDefault();
-        if (e.key == " ") {
-          if (letterIndex) {
-            moveForwardOneWord();
-          }
-          handleLineChange();
-        } else {
-          moveForwardOneLetter(e.key);
-        }
-      } else {
-        if (e.key == "Backspace") {
-          if (!letterIndex) {
-            moveBackOneWord();
+  // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
+  const handleKeyDown = useCallback(
+    (e: globalThis.KeyboardEvent) => {
+      if (active) {
+        if (!running) handleStart();
+        if (e.key.length == 1) {
+          e.preventDefault();
+          if (e.key == " ") {
+            if (letterIndex) {
+              moveForwardOneWord();
+            }
+            handleLineChange();
           } else {
-            if (e.ctrlKey) {
-              clearWord();
+            moveForwardOneLetter(e.key);
+          }
+        } else {
+          if (e.key == "Backspace") {
+            if (!letterIndex) {
+              moveBackOneWord();
             } else {
-              moveBackOneLetter();
+              if (e.ctrlKey) {
+                clearWord();
+              } else {
+                moveBackOneLetter();
+              }
             }
           }
         }
       }
-    }
-  }
+    },
+    [wordIndex, letterIndex]
+  );
 
   useEffect(() => {
     let words = [];
@@ -199,7 +219,12 @@ export function Test({ active, running, finished, handleStart }: Props) {
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [wordIndex, letterIndex]);
+  }, [handleKeyDown]);
+
+  // funny workaround to deal with `wordsRef.current` having null values for some reason
+  useEffect(() => {
+    wordsRef.current = wordsRef.current.filter((el) => el);
+  }, [wordPool]);
 
   return (
     <>
@@ -210,7 +235,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
             ...wordPool,
             createElement(Word as FunctionComponent<Word>, {
               word: generateWord(),
-              ref: addToRefs,
+              ref: (el) => wordsRef.current.push(el),
               key: `word-${generateRandomString(5)}`,
             }),
           ]);
@@ -251,6 +276,36 @@ export function Test({ active, running, finished, handleStart }: Props) {
       >
         log current button
       </button>
+      <button
+        onClick={() => {
+          setTestPool([
+            ...testPool,
+            createElement(Word as FunctionComponent<Word>, {
+              word: generateWord(),
+              ref: (el) => testRef.current.push(el),
+              key: `test-${generateRandomString(5)}`,
+            }),
+          ]);
+        }}
+      >
+        test ref "add element"
+      </button>
+      <button
+        onClick={() => {
+          testRef.current.pop();
+          setTestPool(testPool.slice(0, testPool.length - 1));
+        }}
+      >
+        test ref "remove element"
+      </button>
+      <button
+        onClick={() => {
+          console.log(testRef.current);
+        }}
+      >
+        test ref "log elements"
+      </button>
+      {testPool.map((div) => div)}
       <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
     </>
   );
