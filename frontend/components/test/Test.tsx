@@ -12,11 +12,9 @@ import {
   useState,
 } from "react";
 import styles from "./Test.module.css";
-import { generateWord, generateWords } from "@/utils/generateWords";
+import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
-import { Letter } from "@/components/test/Letter";
-import { Lexend_Tera } from "next/dist/compiled/@next/font/dist/google";
 
 interface Props {
   active: boolean;
@@ -53,6 +51,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
   function moveForwardOneWord() {
     // if `wordsRef.current[wordIndex + 1]` is undefined then we're in trouble, so I keep it in for now to find bugs
     if (!wordsRef.current[wordIndex]) return;
+
     setWordIndex(wordIndex + 1);
     setLetterIndex(0);
   }
@@ -62,7 +61,6 @@ export function Test({ active, running, finished, handleStart }: Props) {
     if (!currentWord) return;
     const currentLetter = currentWord.children[letterIndex];
     if (!currentLetter) return;
-    const nextLetter = currentWord.children[letterIndex + 1];
 
     // coloring TODO: a function for coloring?
     if (key == currentLetter.textContent) {
@@ -77,6 +75,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
   function moveBackOneWord() {
     const previousWord = wordsRef.current[wordIndex - 1];
     if (!previousWord) return;
+
     setWordIndex(wordIndex - 1);
     setLetterIndex(previousWord.children.length);
   }
@@ -85,6 +84,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
     const currentWord = wordsRef.current[wordIndex];
     const previousLetter = currentWord.children[letterIndex - 1];
     if (!previousLetter) return;
+
     clearLetter(previousLetter);
     setLetterIndex(letterIndex - 1);
   }
@@ -99,6 +99,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
     for (const child of letters) {
       clearLetter(child);
     }
+
     setWordIndex(newWordIndex);
     setLetterIndex(0);
   }
@@ -128,6 +129,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
         wordsRef.current.shift();
         newWordPool.push(createWordElement());
       }
+
       setWordPool(newWordPool);
       const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
       setWordIndex(newIndex);
@@ -160,15 +162,11 @@ export function Test({ active, running, finished, handleStart }: Props) {
           }
         } else {
           if (e.key == "Backspace") {
-            if (!letterIndex) {
-              if (e.ctrlKey) {
-                clearWord();
-              } else {
-                moveBackOneWord();
-              }
+            if (e.ctrlKey) {
+              clearWord();
             } else {
-              if (e.ctrlKey) {
-                clearWord();
+              if (!letterIndex) {
+                moveBackOneWord();
               } else {
                 moveBackOneLetter();
               }
@@ -180,26 +178,21 @@ export function Test({ active, running, finished, handleStart }: Props) {
     [wordIndex, letterIndex]
   );
 
-  const removeFirstWordFromPool = () => {
-    wordsRef.current.shift();
-    setWordPool(wordPool.slice(1));
-  };
-
   // Caret movement
   useEffect(() => {
     const currentWord = wordsRef.current[wordIndex];
     if (!currentWord) return;
+
     const currentLetter = currentWord.children[letterIndex];
-    // We are past the boundary of a word, thus we move it to the "end" of the word
-    if (!currentLetter) {
+    if (currentLetter) {
+      const { left, top } = currentLetter.getBoundingClientRect();
+      moveCaret(left, top);
+    } else {
       const previousLetter = currentWord.children[letterIndex - 1];
       if (!previousLetter) return;
       const { right, top } = previousLetter.getBoundingClientRect();
       moveCaret(right, top);
-      return;
     }
-    const { left, top } = currentLetter.getBoundingClientRect();
-    moveCaret(left, top);
   }, [wordIndex, letterIndex]);
 
   // Initialize the pool
@@ -222,21 +215,6 @@ export function Test({ active, running, finished, handleStart }: Props) {
   return (
     <>
       <div className={styles.words}>{wordPool.map((word) => word)}</div>
-      <button
-        onClick={() => {
-          setWordPool([...wordPool, createWordElement()]);
-        }}
-      >
-        add random word
-      </button>
-      <button onClick={removeFirstWordFromPool}>remove first word</button>
-      <button
-        onClick={() => {
-          console.log(wordsRef.current);
-        }}
-      >
-        log refs
-      </button>
       {/* not sure if it's good but it makes sure that we don't draw the caret at { x: 0, y: 0 } before word/letter indices are initialized */}
       {wordIndex >= 0 && (
         <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
