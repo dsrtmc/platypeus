@@ -1,29 +1,20 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import {
-  createElement,
-  FunctionComponent,
-  FunctionComponentElement,
-  ReactElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { createElement, FunctionComponent, ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Test.module.css";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 
 interface Props {
-  active: boolean;
+  focused: boolean;
   running: boolean;
   finished: boolean;
   handleStart: () => void;
 }
 
-export function Test({ active, running, finished, handleStart }: Props) {
+export function Test({ focused, running, finished, handleStart }: Props) {
   const [wordIndex, setWordIndex] = useState(-1);
   const [letterIndex, setLetterIndex] = useState(-1);
 
@@ -148,7 +139,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
   // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
   const handleKeyDown = useCallback(
     (e: globalThis.KeyboardEvent) => {
-      if (active) {
+      if (focused) {
         if (!running) handleStart();
         if (e.key.length == 1) {
           e.preventDefault();
@@ -175,7 +166,7 @@ export function Test({ active, running, finished, handleStart }: Props) {
         }
       }
     },
-    [wordIndex, letterIndex]
+    [wordIndex, letterIndex, focused, running]
   );
 
   // Caret movement
@@ -211,7 +202,6 @@ export function Test({ active, running, finished, handleStart }: Props) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // TODO: fix active/inactive funny thing; can't type if inactive -> active
   return (
     <>
       <div className={styles.words}>{wordPool.map((word) => word)}</div>
