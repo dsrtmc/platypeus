@@ -94,3 +94,8 @@
 .incorrect > * {
     color: palevioletred;
 }
+
+.error {
+    text-decoration: underline;
+    text-decoration-color: palevioletred;
+}

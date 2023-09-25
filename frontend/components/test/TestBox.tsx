@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { Test } from "@/components/test/Test";
 import { Timer } from "@/components/test/Timer";
 
-// it might actually be really useless idk
 export function TestBox() {
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);

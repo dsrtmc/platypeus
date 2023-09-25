@@ -6,6 +6,7 @@ import styles from "./Test.module.css";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
+import { Letter } from "@/components/test/Letter";
 
 interface Props {
   focused: boolean;
@@ -17,13 +18,11 @@ interface Props {
 export function Test({ focused, running, finished, handleStart }: Props) {
   const [wordIndex, setWordIndex] = useState(-1);
   const [letterIndex, setLetterIndex] = useState(-1);
+  const [lineSkip, setLineSkip] = useState(true);
 
   // A funny type, but I think correct nonetheless
   const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
   const [caretPosition, setCaretPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-
-  // Useful for skipping the first line during our line change
-  const [lineSkip, setLineSkip] = useState(true);
 
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
@@ -39,9 +38,30 @@ export function Test({ focused, running, finished, handleStart }: Props) {
     setCaretPosition({ x, y });
   }
 
+  function isCorrect(letter: Element) {
+    return letter.classList.contains(styles.correct);
+  }
+
+  function isIncorrect(letter: Element) {
+    return letter.classList.contains(styles.incorrect);
+  }
+
+  function isEmpty(letter: Element) {
+    return !isCorrect(letter) && !isIncorrect(letter);
+  }
+
   function moveForwardOneWord() {
     // if `wordsRef.current[wordIndex + 1]` is undefined then we're in trouble, so I keep it in for now to find bugs
-    if (!wordsRef.current[wordIndex]) return;
+    // NOTE: good to check assuming i have a test that doesnt involve a pool, like just a simple sentence
+    const currentWord = wordsRef.current[wordIndex];
+    if (!currentWord) return;
+    const letters = wordsRef.current[wordIndex].children;
+    for (const letter of letters) {
+      if (isEmpty(letter) || isIncorrect(letter)) {
+        currentWord.classList.add(styles.error);
+        break;
+      }
+    }
 
     setWordIndex(wordIndex + 1);
     setLetterIndex(0);
@@ -67,7 +87,17 @@ export function Test({ focused, running, finished, handleStart }: Props) {
     const previousWord = wordsRef.current[wordIndex - 1];
     if (!previousWord) return;
 
+    previousWord.classList.remove(styles.error);
+
     setWordIndex(wordIndex - 1);
+    const letters = previousWord.children;
+    for (let i = 0; i < letters.length; i++) {
+      const letter = letters[i];
+      if (!letter.classList.contains(styles.incorrect) && !letter.classList.contains(styles.correct)) {
+        setLetterIndex(i);
+        return;
+      }
+    }
     setLetterIndex(previousWord.children.length);
   }
 
@@ -80,19 +110,24 @@ export function Test({ focused, running, finished, handleStart }: Props) {
     setLetterIndex(letterIndex - 1);
   }
 
-  // Not too great of a function considering it deals with more than just "clearing" the word per se, but it's fine for now.
-  function clearWord() {
+  // figure out a better name for the function that reflects its purpose more clearly
+  function deletePreviousWord() {
     // if we're at letter index 0, then we clear all the way back to the previous word's front
     let newWordIndex = !letterIndex ? wordIndex - 1 : wordIndex;
     let word = wordsRef.current[newWordIndex];
     if (!word) return;
-    const letters = word.children;
-    for (const child of letters) {
-      clearLetter(child);
-    }
+    clearWord(word);
 
     setWordIndex(newWordIndex);
     setLetterIndex(0);
+  }
+
+  function clearWord(el: Element) {
+    el.classList.remove(styles.error);
+    const letters = el.children;
+    for (const child of letters) {
+      clearLetter(child);
+    }
   }
 
   function clearLetter(el: Element) {
@@ -102,7 +137,7 @@ export function Test({ focused, running, finished, handleStart }: Props) {
   function handleLineChange() {
     const currentWord = wordsRef.current[wordIndex];
     const nextWord = wordsRef.current[wordIndex + 1];
-    if (!nextWord) return; // happens because the array of refs has nulls for a funny reason
+    if (!nextWord) return;
     if (currentWord.getBoundingClientRect().y < nextWord.getBoundingClientRect().y) {
       // There might be a better way to do this line skip but oh well
       if (lineSkip) {
@@ -154,7 +189,7 @@ export function Test({ focused, running, finished, handleStart }: Props) {
         } else {
           if (e.key == "Backspace") {
             if (e.ctrlKey) {
-              clearWord();
+              deletePreviousWord();
             } else {
               if (!letterIndex) {
                 moveBackOneWord();
