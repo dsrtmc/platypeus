@@ -10,7 +10,7 @@ export function TestBox() {
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
   const [visible, setVisible] = useState(true);
-  const [time, setTime] = useState(5);
+  const [time, setTime] = useState(15);
 
   const ref = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -61,7 +61,9 @@ export function TestBox() {
       {/*<TestHorizontal active={active} />*/}
       <Timer time={time} />
       {/* just for development, generally i think it works very ok right now */}
-      {visible && <Test focused={focused} running={running} finished={finished} handleStart={handleStart} />}
+      {visible && (
+        <Test focused={focused} running={running} finished={finished} time={time} handleStart={handleStart} />
+      )}
     </div>
   );
 }

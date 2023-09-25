@@ -1,21 +1,57 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import { createElement, FunctionComponent, ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import {
+  createElement,
+  FunctionComponent,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import styles from "./Test.module.css";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
-import { Letter } from "@/components/test/Letter";
 
 interface Props {
   focused: boolean;
   running: boolean;
   finished: boolean;
+  time: number;
   handleStart: () => void;
 }
 
-export function Test({ focused, running, finished, handleStart }: Props) {
+type State = {
+  words: number;
+};
+
+type Action = { type: "ADD-WORD" } | { type: "SUBTRACT-WORD" };
+
+function reducer(state: State, action: Action) {
+  switch (action.type) {
+    case "ADD-WORD":
+      return { words: state.words + 1 };
+    case "SUBTRACT-WORD":
+      return { words: state.words - 1 };
+    default:
+      return state;
+  }
+}
+
+export function Test({ focused, running, finished, time, handleStart }: Props) {
+  // --------- danger zone ----------
+  const [wpm, setWpm] = useState(0);
+  const [{ words }, dispatch] = useReducer(reducer, { words: 0 });
+  const startingTime = useMemo(() => time, []);
+  function addWordToCount() {
+    dispatch({ type: "ADD-WORD" });
+  }
+  // --------- danger zone ----------
+
   const [wordIndex, setWordIndex] = useState(-1);
   const [letterIndex, setLetterIndex] = useState(-1);
   const [lineSkip, setLineSkip] = useState(true);
@@ -63,6 +99,7 @@ export function Test({ focused, running, finished, handleStart }: Props) {
       }
     }
 
+    dispatch({ type: "ADD-WORD" });
     setWordIndex(wordIndex + 1);
     setLetterIndex(0);
   }
@@ -233,6 +270,15 @@ export function Test({ focused, running, finished, handleStart }: Props) {
   }, []);
 
   useEffect(() => {
+    console.log("Words:", words);
+    console.log("startign time:", startingTime);
+    const delta = startingTime - time;
+    if (delta > 0) {
+      setWpm(words * (60 / delta));
+    }
+  }, [time]);
+
+  useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
@@ -244,6 +290,7 @@ export function Test({ focused, running, finished, handleStart }: Props) {
       {wordIndex >= 0 && (
         <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
       )}
+      <h5>current wpm: {wpm}</h5>
     </>
   );
 }
