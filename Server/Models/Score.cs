@@ -7,6 +7,8 @@ public class Score : BaseEntity
     public int AverageWpm { get; init; }
 
     public int RawWpm { get; init; }
-    
+
+    // public string Mode { get; init; } = null!;
+
     public int Time { get; init; }
 }

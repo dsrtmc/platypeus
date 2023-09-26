@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using System.Text;
+using Konscious.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Server.Models;

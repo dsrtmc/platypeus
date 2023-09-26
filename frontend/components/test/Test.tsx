@@ -23,43 +23,51 @@ interface Props {
   running: boolean;
   finished: boolean;
   time: number;
+  timeSetting: number;
   handleStart: () => void;
 }
 
 type State = {
-  characters: number;
+  correctCharacters: number;
+  nonEmptyCharacters: number; // correct && incorrect, used for calculating raw
+  allWordsLength: number;
+  // type: string; // test type TODO
 };
 
 type Action =
-  | { type: "ADD-CHARACTERS"; payload: { count: number } }
-  | { type: "SUBTRACT-CHARACTERS"; payload: { count: number } };
+  | { type: "ADD-CORRECT-CHARACTERS"; payload: { count: number } }
+  | { type: "ADD-NON-EMPTY-CHARACTERS"; payload: { count: number } }
+  | { type: "SUBTRACT-CORRECT-CHARACTERS"; payload: { count: number } }
+  | { type: "SUBTRACT-NON-EMPTY-CHARACTERS"; payload: { count: number } }
+  | { type: "INCREMENT-WORDS-LENGTH"; payload: { count: number } }
+  | { type: "DECREMENT-WORDS-LENGTH"; payload: { count: number } };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD-CHARACTERS":
-      return { characters: state.characters + action.payload.count };
-    case "SUBTRACT-CHARACTERS":
-      return { characters: state.characters - action.payload.count };
+    case "ADD-CORRECT-CHARACTERS":
+      return { ...state, correctCharacters: state.correctCharacters + action.payload.count };
+    case "SUBTRACT-CORRECT-CHARACTERS":
+      return { ...state, correctCharacters: state.correctCharacters - action.payload.count };
+    case "ADD-NON-EMPTY-CHARACTERS":
+      return { ...state, nonEmptyCharacters: state.nonEmptyCharacters + action.payload.count };
+    case "SUBTRACT-NON-EMPTY-CHARACTERS":
+      return { ...state, nonEmptyCharacters: state.nonEmptyCharacters - action.payload.count };
+    case "INCREMENT-WORDS-LENGTH":
+      return { ...state, allWordsLength: state.allWordsLength + action.payload.count };
+    case "DECREMENT-WORDS-LENGTH":
+      return { ...state, allWordsLength: state.allWordsLength - action.payload.count };
     default:
       return state;
   }
 };
 
-const initialState: State = { characters: 0 };
+const initialState: State = {
+  correctCharacters: 0,
+  nonEmptyCharacters: 0,
+  allWordsLength: 0,
+};
 
-export function Test({ focused, running, finished, time, handleStart }: Props) {
-  // --------- danger zone ----------
-  const [wpm, setWpm] = useState(0);
-  const [{ characters }, dispatch] = useReducer(reducer, initialState as ReducerState<State>);
-  const startingTime = useMemo(() => time, []);
-  function addCharactersToCount(count: number) {
-    dispatch({ type: "ADD-CHARACTERS", payload: { count } });
-  }
-  function subtractCharactersFromCount(count: number) {
-    dispatch({ type: "SUBTRACT-CHARACTERS", payload: { count } });
-  }
-  // --------- danger zone ----------
-
+export function Test({ focused, running, finished, time, timeSetting, handleStart }: Props) {
   const [wordIndex, setWordIndex] = useState(-1);
   const [letterIndex, setLetterIndex] = useState(-1);
   const [lineSkip, setLineSkip] = useState(true);
@@ -67,6 +75,12 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
   // A funny type, but I think correct nonetheless
   const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
   const [caretPosition, setCaretPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const [wpm, setWpm] = useState(0);
+  const [{ correctCharacters, nonEmptyCharacters, allWordsLength }, dispatch] = useReducer(
+    reducer,
+    initialState as ReducerState<State>
+  );
 
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
@@ -101,19 +115,24 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
     if (!currentWord) return;
 
     let correct = true;
+    let nonEmptyCount = 0;
     const letters = wordsRef.current[wordIndex].children;
+    // TODO: my head hurts I can't be thinking about improving this if right now but it can be better
     for (const letter of letters) {
+      if (!isEmpty(letter)) nonEmptyCount++;
       if (isEmpty(letter) || isIncorrect(letter)) {
         currentWord.classList.add(styles.error);
         correct = false;
-        break;
       }
     }
 
+    console.log("NON EMPTY COUNT:", nonEmptyCount);
     // danger zone
     if (correct) {
-      addCharactersToCount(letters.length);
+      dispatch({ type: "ADD-CORRECT-CHARACTERS", payload: { count: letters.length } });
     }
+    dispatch({ type: "ADD-NON-EMPTY-CHARACTERS", payload: { count: nonEmptyCount } });
+    dispatch({ type: "INCREMENT-WORDS-LENGTH", payload: { count: letters.length } });
     // danger zone
 
     setWordIndex(wordIndex + 1);
@@ -142,16 +161,31 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
 
     previousWord.classList.remove(styles.error);
 
-    setWordIndex(wordIndex - 1);
     const letters = previousWord.children;
-    for (let i = 0; i < letters.length; i++) {
+    let correct = true;
+    let nonEmptyCount = 0;
+    let index = previousWord.children.length;
+    for (let i = letters.length - 1; i >= 0; i--) {
       const letter = letters[i];
-      if (!letter.classList.contains(styles.incorrect) && !letter.classList.contains(styles.correct)) {
-        setLetterIndex(i);
-        return;
+      // TODO: again, think about this if lol
+      if (isIncorrect(letter)) {
+        correct = false;
+      }
+      if (isEmpty(letter)) {
+        correct = false;
+        index = i;
+      } else {
+        nonEmptyCount++;
       }
     }
-    setLetterIndex(previousWord.children.length);
+    if (correct) {
+      dispatch({ type: "SUBTRACT-CORRECT-CHARACTERS", payload: { count: letters.length } });
+    }
+    dispatch({ type: "SUBTRACT-NON-EMPTY-CHARACTERS", payload: { count: nonEmptyCount } });
+    dispatch({ type: "DECREMENT-WORDS-LENGTH", payload: { count: letters.length } });
+
+    setWordIndex(wordIndex - 1);
+    setLetterIndex(index);
   }
 
   function moveBackOneLetter() {
@@ -297,19 +331,37 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
         }
         if (isCorrect(letter)) correct++;
       }
-      addCharactersToCount(correct);
+      dispatch({ type: "ADD-CORRECT-CHARACTERS", payload: { count: correct } });
       console.log("The correct letters we were supposed to add to count:", correct);
       console.info("ENDING WPM", wpm);
     }
   }, [finished]);
 
   useEffect(() => {
-    console.log("Characters:", characters);
-    console.log("starting time:", startingTime);
+    console.log("Characters:", correctCharacters);
     // TODO: something's funky with the formula idk
-    const delta = startingTime - time;
+    const delta = timeSetting - time;
     if (delta > 0) {
-      setWpm((characters / 5) * (60 / delta));
+      // XDD
+      const currentWord = wordsRef.current[wordIndex];
+      const letters = currentWord.children;
+      let correct = true;
+      let correctCount = 0;
+      for (const letter of letters) {
+        if (isIncorrect(letter)) {
+          correct = false;
+          break;
+        } else if (isCorrect(letter)) {
+          correctCount++;
+        }
+      }
+      let n = correctCharacters;
+      if (correct) {
+        n += correctCount;
+      }
+      console.log("Current word is correct:", correct);
+      console.log("Current word's correct letters:", correctCount);
+      setWpm((n / 5) * (60 / delta));
     }
   }, [time]);
   // danger zone

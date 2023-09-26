@@ -74,7 +74,7 @@ public static class PasswordHasher
         argon2.Iterations = options.Iterations;
         argon2.DegreeOfParallelism = options.Parallelism;
 
-        /* For some reason,this causes an absurd memory leak that fixes itself from time to time.
+        /* For some reason, this causes an absurd memory leak that fixes itself from time to time.
          * I have absolutely no idea what causes it and there's likely no way for me to fix that. */
         var hash = await argon2.GetBytesAsync(options.HashLength);
 

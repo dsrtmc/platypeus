@@ -10,7 +10,8 @@ export function TestBox() {
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
   const [visible, setVisible] = useState(true);
-  const [time, setTime] = useState(5);
+  const [timeSetting, setTimeSetting] = useState(30);
+  const [time, setTime] = useState(timeSetting);
 
   const ref = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -58,11 +59,17 @@ export function TestBox() {
   return (
     <div className={styles.box} ref={ref}>
       <p>{focused ? "FOCUSED" : "UNFOCUSED"}</p>
-      {/*<TestHorizontal active={active} />*/}
       <Timer time={time} />
-      {/* just for development, generally i think it works very ok right now */}
+      {/* `visible` just for development, generally i think it works very ok right now */}
       {visible && (
-        <Test focused={focused} running={running} finished={finished} time={time} handleStart={handleStart} />
+        <Test
+          focused={focused}
+          running={running}
+          finished={finished}
+          time={time}
+          timeSetting={timeSetting}
+          handleStart={handleStart}
+        />
       )}
     </div>
   );

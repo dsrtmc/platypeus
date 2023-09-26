@@ -8,5 +8,6 @@ public class User : BaseEntity
     
     public string Password { get; set; } = null!;
 
+    // LEGACY; leftover after JWT // TODO: remove it
     public int TokenVersion { get; set; }
 }
