@@ -5,6 +5,7 @@ import {
   createElement,
   FunctionComponent,
   ReactElement,
+  ReducerState,
   useCallback,
   useEffect,
   useMemo,
@@ -26,29 +27,36 @@ interface Props {
 }
 
 type State = {
-  words: number;
+  characters: number;
 };
 
-type Action = { type: "ADD-WORD" } | { type: "SUBTRACT-WORD" };
+type Action =
+  | { type: "ADD-CHARACTERS"; payload: { count: number } }
+  | { type: "SUBTRACT-CHARACTERS"; payload: { count: number } };
 
-function reducer(state: State, action: Action) {
+const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD-WORD":
-      return { words: state.words + 1 };
-    case "SUBTRACT-WORD":
-      return { words: state.words - 1 };
+    case "ADD-CHARACTERS":
+      return { characters: state.characters + action.payload.count };
+    case "SUBTRACT-CHARACTERS":
+      return { characters: state.characters - action.payload.count };
     default:
       return state;
   }
-}
+};
+
+const initialState: State = { characters: 0 };
 
 export function Test({ focused, running, finished, time, handleStart }: Props) {
   // --------- danger zone ----------
   const [wpm, setWpm] = useState(0);
-  const [{ words }, dispatch] = useReducer(reducer, { words: 0 });
+  const [{ characters }, dispatch] = useReducer(reducer, initialState as ReducerState<State>);
   const startingTime = useMemo(() => time, []);
-  function addWordToCount() {
-    dispatch({ type: "ADD-WORD" });
+  function addCharactersToCount(count: number) {
+    dispatch({ type: "ADD-CHARACTERS", payload: { count } });
+  }
+  function subtractCharactersFromCount(count: number) {
+    dispatch({ type: "SUBTRACT-CHARACTERS", payload: { count } });
   }
   // --------- danger zone ----------
 
@@ -91,15 +99,23 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
     // NOTE: good to check assuming i have a test that doesnt involve a pool, like just a simple sentence
     const currentWord = wordsRef.current[wordIndex];
     if (!currentWord) return;
+
+    let correct = true;
     const letters = wordsRef.current[wordIndex].children;
     for (const letter of letters) {
       if (isEmpty(letter) || isIncorrect(letter)) {
         currentWord.classList.add(styles.error);
+        correct = false;
         break;
       }
     }
 
-    dispatch({ type: "ADD-WORD" });
+    // danger zone
+    if (correct) {
+      addCharactersToCount(letters.length);
+    }
+    // danger zone
+
     setWordIndex(wordIndex + 1);
     setLetterIndex(0);
   }
@@ -211,28 +227,27 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
   // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
   const handleKeyDown = useCallback(
     (e: globalThis.KeyboardEvent) => {
-      if (focused) {
-        if (!running) handleStart();
-        if (e.key.length == 1) {
-          e.preventDefault();
-          if (e.key == " ") {
-            if (letterIndex) {
-              moveForwardOneWord();
-            }
-            handleLineChange();
-          } else {
-            moveForwardOneLetter(e.key);
+      if (!focused) return;
+      if (!running) handleStart();
+      if (e.key.length == 1) {
+        e.preventDefault();
+        if (e.key == " ") {
+          if (letterIndex) {
+            moveForwardOneWord();
           }
+          handleLineChange();
         } else {
-          if (e.key == "Backspace") {
-            if (e.ctrlKey) {
-              deletePreviousWord();
+          moveForwardOneLetter(e.key);
+        }
+      } else {
+        if (e.key == "Backspace") {
+          if (e.ctrlKey) {
+            deletePreviousWord();
+          } else {
+            if (!letterIndex) {
+              moveBackOneWord();
             } else {
-              if (!letterIndex) {
-                moveBackOneWord();
-              } else {
-                moveBackOneLetter();
-              }
+              moveBackOneLetter();
             }
           }
         }
@@ -240,6 +255,17 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
     },
     [wordIndex, letterIndex, focused, running]
   );
+
+  // Initialize the pool
+  useEffect(() => {
+    let words = [];
+    for (let i = 0; i < 20; i++) {
+      words.push(createWordElement());
+    }
+    setWordPool(words);
+    setWordIndex(0);
+    setLetterIndex(0);
+  }, []);
 
   // Caret movement
   useEffect(() => {
@@ -258,25 +284,35 @@ export function Test({ focused, running, finished, time, handleStart }: Props) {
     }
   }, [wordIndex, letterIndex]);
 
-  // Initialize the pool
+  // danger zone
+  // THIS ONE DOESN'T EVEN WORK IT'S RNG WHETHER IT LOGS IT BEFORE UNMOUNTING OR NOT
   useEffect(() => {
-    let words = [];
-    for (let i = 0; i < 20; i++) {
-      words.push(createWordElement());
+    if (finished) {
+      const currentWord = wordsRef.current[wordIndex];
+      const letters = currentWord.children;
+      let correct = 0;
+      for (const letter of letters) {
+        if (isIncorrect(letter)) {
+          return;
+        }
+        if (isCorrect(letter)) correct++;
+      }
+      addCharactersToCount(correct);
+      console.log("The correct letters we were supposed to add to count:", correct);
+      console.info("ENDING WPM", wpm);
     }
-    setWordPool(words);
-    setWordIndex(0);
-    setLetterIndex(0);
-  }, []);
+  }, [finished]);
 
   useEffect(() => {
-    console.log("Words:", words);
-    console.log("startign time:", startingTime);
+    console.log("Characters:", characters);
+    console.log("starting time:", startingTime);
+    // TODO: something's funky with the formula idk
     const delta = startingTime - time;
     if (delta > 0) {
-      setWpm(words * (60 / delta));
+      setWpm((characters / 5) * (60 / delta));
     }
   }, [time]);
+  // danger zone
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);

@@ -10,7 +10,7 @@ export function TestBox() {
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
   const [visible, setVisible] = useState(true);
-  const [time, setTime] = useState(15);
+  const [time, setTime] = useState(5);
 
   const ref = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
