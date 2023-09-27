@@ -3,8 +3,8 @@
     align-items: center;
     flex-direction: column;
     width: 600px;
-    background-color: #b4b4ed;
     margin: auto;
+    color: white;
 }
 
 .main {
@@ -16,41 +16,34 @@
 
 .top {
     display: flex;
+    gap: 1rem;
     justify-content: space-between;
     width: 100%;
 }
 
-.selection {
+.middle {
     display: flex;
     gap: 1rem;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
 }
 
 .words {
     display: flex;
     flex-wrap: wrap;
-    background-color: #ccc;
     gap: 1rem;
+    border: 2px solid var(--gray);
+    border-radius: 5px;
     font-family: monospace;
     font-size: 36px;
-}
-
-.current {
-    margin: auto;
-    overflow: visible;
-}
-
-.current * {
-    color: paleturquoise !important;
-}
-
-.previous {
-    justify-content: flex-end;
-    /*background-color: red;*/
-    width: 100%;
-}
-
-.previous * {
-    color: dimgray !important;
 }
 
 .next {
@@ -68,7 +61,7 @@
 }
 
 .letter {
-    color: dodgerblue;
+    color: var(--light-gray);
 }
 
 .caret {
@@ -77,6 +70,7 @@
     border-radius: 25%;
     width: 4px;
     height: 48px;
+    transition: all ease 100ms;
 }
 
 .correct {
@@ -98,4 +92,23 @@
 .error {
     text-decoration: underline;
     text-decoration-color: palevioletred;
+}
+
+.selection {
+    display: flex;
+    gap: 1rem;
+}
+
+.setting {
+    all: unset;
+    color: var(--gray);
+    font-size: 1.5rem;
+}
+
+.selected {
+    color: lightgreen;
+}
+
+.setting:hover {
+    cursor: pointer;
 }

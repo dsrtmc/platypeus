@@ -1,5 +1,23 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font: inherit;
+}
+
+svg {
+    display: block;
+    max-width: 100%;
+}
+
 :root {
     --nav-size: 75px;
+    --dark-gray: #222;
+    --gray: #444;
+    --light-gray: #666;
 }
 
 html, body {

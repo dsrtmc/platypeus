@@ -12,12 +12,14 @@ export function TestBox() {
   const [running, setRunning] = useState(false);
   const [timeSetting, setTimeSetting] = useState(5);
   const [time, setTime] = useState(timeSetting);
+  const [wpm, setWpm] = useState(0);
 
+  const testRef = useRef<any>(null);
   const ref = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   function handleClick(e: globalThis.MouseEvent) {
-    setFocused(ref.current?.contains(e.target));
+    setFocused(ref.current!.contains(e.target));
   }
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export function TestBox() {
   }, [time]);
 
   useEffect(() => {
-    if (!running) {
+    if (!running && !finished) {
       setTime(timeSetting);
     }
   }, [timeSetting]);
@@ -62,19 +64,45 @@ export function TestBox() {
     };
   }
 
+  function handleChangeWpm(wpm: number) {
+    setWpm(wpm);
+  }
+
+  function handleReset() {
+    setFocused(true);
+    setFinished(false);
+    setRunning(false);
+    setTime(timeSetting);
+    setWpm(0);
+    testRef.current.reset();
+  }
+
   return (
     <div className={styles.box} ref={ref}>
-      <p>{focused ? "FOCUSED" : "UNFOCUSED"}</p>
-      <Timer time={time} />
-      <TimeSettingSelection timeSettings={[5, 15, 30]} handleSelect={handleTimeSettingSelection} />
+      <div className={styles.top}>
+        <Timer time={time} />
+        <p style={{ marginRight: "auto" }}>wpm: {wpm}</p>
+        <TimeSettingSelection
+          timeSettings={[5, 15, 30]}
+          currentTimeSetting={timeSetting}
+          handleSelect={handleTimeSettingSelection}
+        />
+      </div>
+      <div className={styles.middle}></div>
       <Test
         focused={focused}
         running={running}
         finished={finished}
         time={time}
         timeSetting={timeSetting}
+        handleChangeWpm={handleChangeWpm}
         handleStart={handleStart}
+        ref={testRef}
       />
+      <div className={styles.bottom}>
+        <button onClick={handleReset}>RESTART</button>
+        <p>{focused ? "FOCUSED" : "UNFOCUSED"}</p>
+      </div>
     </div>
   );
 }
