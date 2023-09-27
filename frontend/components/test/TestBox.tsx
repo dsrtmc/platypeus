@@ -4,13 +4,13 @@ import styles from "./Test.module.css";
 import { useEffect, useRef, useState } from "react";
 import { Test } from "@/components/test/Test";
 import { Timer } from "@/components/test/Timer";
+import { TimeSettingSelection } from "@/components/test/TimeSettingSelection";
 
 export function TestBox() {
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [timeSetting, setTimeSetting] = useState(30);
+  const [timeSetting, setTimeSetting] = useState(5);
   const [time, setTime] = useState(timeSetting);
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -32,12 +32,6 @@ export function TestBox() {
   }
 
   useEffect(() => {
-    if (finished) {
-      setVisible(false);
-    }
-  }, [finished]);
-
-  useEffect(() => {
     if (running) {
       intervalRef.current = setInterval(() => {
         setTime((time) => time - 1);
@@ -56,21 +50,31 @@ export function TestBox() {
     }
   }, [time]);
 
+  useEffect(() => {
+    if (!running) {
+      setTime(timeSetting);
+    }
+  }, [timeSetting]);
+
+  function handleTimeSettingSelection(time: number) {
+    return () => {
+      setTimeSetting(time);
+    };
+  }
+
   return (
     <div className={styles.box} ref={ref}>
       <p>{focused ? "FOCUSED" : "UNFOCUSED"}</p>
       <Timer time={time} />
-      {/* `visible` just for development, generally i think it works very ok right now */}
-      {visible && (
-        <Test
-          focused={focused}
-          running={running}
-          finished={finished}
-          time={time}
-          timeSetting={timeSetting}
-          handleStart={handleStart}
-        />
-      )}
+      <TimeSettingSelection timeSettings={[5, 15, 30]} handleSelect={handleTimeSettingSelection} />
+      <Test
+        focused={focused}
+        running={running}
+        finished={finished}
+        time={time}
+        timeSetting={timeSetting}
+        handleStart={handleStart}
+      />
     </div>
   );
 }

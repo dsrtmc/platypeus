@@ -178,7 +178,7 @@ export function TestHorizontal({ active }: Props) {
       <div className={styles.top}>
         <Timer time={timeRemaining} />
         correct: {correct ? "true" : "false"}
-        <TimeSettingSelection settings={[1, 5, 10]} handleSelect={handleSelect} />
+        <TimeSettingSelection timeSettings={[1, 5, 10]} handleSelect={handleSelect} />
       </div>
       <div className={styles.main}>
         <div className={`${styles.words} ${styles.previous}`}>

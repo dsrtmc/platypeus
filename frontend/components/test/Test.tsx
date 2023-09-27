@@ -108,32 +108,60 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
     return !isCorrect(letter) && !isIncorrect(letter);
   }
 
-  function moveForwardOneWord() {
-    // if `wordsRef.current[wordIndex + 1]` is undefined then we're in trouble, so I keep it in for now to find bugs
-    // NOTE: good to check assuming i have a test that doesnt involve a pool, like just a simple sentence
-    const currentWord = wordsRef.current[wordIndex];
-    if (!currentWord) return;
-
+  function addWordToCount(word: Element) {
+    const letters = word.children;
     let correct = true;
     let nonEmptyCount = 0;
-    const letters = wordsRef.current[wordIndex].children;
     // TODO: my head hurts I can't be thinking about improving this if right now but it can be better
     for (const letter of letters) {
       if (!isEmpty(letter)) nonEmptyCount++;
       if (isEmpty(letter) || isIncorrect(letter)) {
-        currentWord.classList.add(styles.error);
+        word.classList.add(styles.error);
         correct = false;
       }
     }
 
-    console.log("NON EMPTY COUNT:", nonEmptyCount);
-    // danger zone
     if (correct) {
       dispatch({ type: "ADD-CORRECT-CHARACTERS", payload: { count: letters.length } });
     }
     dispatch({ type: "ADD-NON-EMPTY-CHARACTERS", payload: { count: nonEmptyCount } });
     dispatch({ type: "INCREMENT-WORDS-LENGTH", payload: { count: letters.length } });
-    // danger zone
+  }
+
+  /* Returns the index which the cursor should be moved to.
+   * Not a good idea to have it here I think, but can't think of any other way
+   * to avoid duplicating the loop. */
+  function subtractWordFromCount(word: Element): number {
+    const letters = word.children;
+    let correct = true;
+    let nonEmptyCount = 0;
+    let index = letters.length;
+    for (let i = letters.length - 1; i >= 0; i--) {
+      if (isEmpty(letters[i])) {
+        correct = false;
+        index = i;
+      } else {
+        if (isIncorrect(letters[i])) {
+          correct = false;
+        }
+        nonEmptyCount++;
+      }
+    }
+    if (correct) {
+      dispatch({ type: "SUBTRACT-CORRECT-CHARACTERS", payload: { count: letters.length } });
+    }
+    dispatch({ type: "SUBTRACT-NON-EMPTY-CHARACTERS", payload: { count: nonEmptyCount } });
+    dispatch({ type: "DECREMENT-WORDS-LENGTH", payload: { count: letters.length } });
+    return index;
+  }
+
+  function moveForwardOneWord() {
+    // if `wordsRef.current[wordIndex + 1]` is undefined then we're in trouble, so I keep it in for now to find bugs
+    // TODO: good to check assuming i have a test that doesnt involve a pool, like just a simple sentence
+    const currentWord = wordsRef.current[wordIndex];
+    if (!currentWord) return;
+
+    addWordToCount(currentWord);
 
     setWordIndex(wordIndex + 1);
     setLetterIndex(0);
@@ -161,28 +189,7 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
 
     previousWord.classList.remove(styles.error);
 
-    const letters = previousWord.children;
-    let correct = true;
-    let nonEmptyCount = 0;
-    let index = previousWord.children.length;
-    for (let i = letters.length - 1; i >= 0; i--) {
-      const letter = letters[i];
-      // TODO: again, think about this if lol
-      if (isIncorrect(letter)) {
-        correct = false;
-      }
-      if (isEmpty(letter)) {
-        correct = false;
-        index = i;
-      } else {
-        nonEmptyCount++;
-      }
-    }
-    if (correct) {
-      dispatch({ type: "SUBTRACT-CORRECT-CHARACTERS", payload: { count: letters.length } });
-    }
-    dispatch({ type: "SUBTRACT-NON-EMPTY-CHARACTERS", payload: { count: nonEmptyCount } });
-    dispatch({ type: "DECREMENT-WORDS-LENGTH", payload: { count: letters.length } });
+    let index = subtractWordFromCount(previousWord);
 
     setWordIndex(wordIndex - 1);
     setLetterIndex(index);
@@ -197,7 +204,7 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
     setLetterIndex(letterIndex - 1);
   }
 
-  // figure out a better name for the function that reflects its purpose more clearly
+  // TODO: Figure out a better name for the function that reflects its purpose more clearly
   function deletePreviousWord() {
     // if we're at letter index 0, then we clear all the way back to the previous word's front
     let newWordIndex = !letterIndex ? wordIndex - 1 : wordIndex;
@@ -261,6 +268,7 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
   // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
   const handleKeyDown = useCallback(
     (e: globalThis.KeyboardEvent) => {
+      if (finished) return;
       if (!focused) return;
       if (!running) handleStart();
       if (e.key.length == 1) {
@@ -318,8 +326,6 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
     }
   }, [wordIndex, letterIndex]);
 
-  // danger zone
-  // THIS ONE DOESN'T EVEN WORK IT'S RNG WHETHER IT LOGS IT BEFORE UNMOUNTING OR NOT
   useEffect(() => {
     if (finished) {
       const currentWord = wordsRef.current[wordIndex];
@@ -332,17 +338,14 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
         if (isCorrect(letter)) correct++;
       }
       dispatch({ type: "ADD-CORRECT-CHARACTERS", payload: { count: correct } });
-      console.log("The correct letters we were supposed to add to count:", correct);
-      console.info("ENDING WPM", wpm);
     }
   }, [finished]);
 
   useEffect(() => {
-    console.log("Characters:", correctCharacters);
     // TODO: something's funky with the formula idk
     const delta = timeSetting - time;
+    // Every time tick, we re-measure the WPM accounting for the current word (which has not been counted yet)
     if (delta > 0) {
-      // XDD
       const currentWord = wordsRef.current[wordIndex];
       const letters = currentWord.children;
       let correct = true;
@@ -359,8 +362,6 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
       if (correct) {
         n += correctCount;
       }
-      console.log("Current word is correct:", correct);
-      console.log("Current word's correct letters:", correctCount);
       setWpm((n / 5) * (60 / delta));
     }
   }, [time]);
@@ -379,6 +380,7 @@ export function Test({ focused, running, finished, time, timeSetting, handleStar
         <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
       )}
       <h5>current wpm: {wpm}</h5>
+      {finished && <h1>FINISHED</h1>}
     </>
   );
 }
