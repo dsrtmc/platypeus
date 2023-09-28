@@ -46,16 +46,6 @@
     font-size: 36px;
 }
 
-.next {
-    float: right;
-    /*background-color: red;*/
-    width: 100%;
-}
-
-.next * {
-    color: yellow !important;
-}
-
 .word {
     display: flex;
 }
@@ -68,7 +58,7 @@
     position: absolute;
     background-color: lightcyan;
     border-radius: 25%;
-    width: 4px;
+    width: 5px;
     height: 48px;
     transition: all ease 100ms;
 }
@@ -77,16 +67,8 @@
     color: mediumspringgreen !important;
 }
 
-.correct > * {
-    color: mediumspringgreen;
-}
-
 .incorrect {
     color: palevioletred !important;
-}
-
-.incorrect > * {
-    color: palevioletred;
 }
 
 .error {
@@ -111,4 +93,28 @@
 
 .setting:hover {
     cursor: pointer;
+}
+
+.timer {
+    font-size: 2rem;
+}
+
+.counter {
+    font-size: 2rem;
+}
+
+.restart {
+    all: unset;
+    background-image: linear-gradient(lightcyan, #444444);
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+
+.restart:focus {
+    border: 3px solid palevioletred;
+}
+
+.score {
+    color: white;
+    background-color: darkslateblue;
 }

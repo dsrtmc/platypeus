@@ -1,6 +1,7 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
+import { Score } from "@/graphql/generated/graphql";
 import {
   createElement,
   forwardRef,
@@ -10,7 +11,6 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useReducer,
   useRef,
   useState,
@@ -19,7 +19,6 @@ import styles from "./Test.module.css";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
-import { Letter } from "@/components/test/Letter";
 
 interface Props {
   focused: boolean;
@@ -29,9 +28,10 @@ interface Props {
   timeSetting: number;
   handleChangeWpm: (wpm: number) => void;
   handleStart: () => void;
+  onDataUpdate: (score: Score) => void; // danger zone
 }
 
-interface ChildMethods {
+interface TestMethods {
   reset: () => void;
 }
 
@@ -50,9 +50,8 @@ const initialState: State = {
   allWordsLength: 0,
 };
 
-// export const Word = forwardRef<HTMLDivElement, Props>(({ word }, ref) => {
-export const Test = forwardRef<ChildMethods, Props>(
-  ({ focused, running, finished, time, timeSetting, handleChangeWpm, handleStart }: Props, ref) => {
+export const Test = forwardRef<TestMethods, Props>(
+  ({ focused, running, finished, time, timeSetting, handleChangeWpm, handleStart, onDataUpdate }: Props, ref) => {
     const [wordIndex, setWordIndex] = useState(-1);
     const [letterIndex, setLetterIndex] = useState(-1);
     const [lineSkip, setLineSkip] = useState(true);
@@ -75,7 +74,6 @@ export const Test = forwardRef<ChildMethods, Props>(
       }
     }
 
-    // TODO: maybe move caret in a separate useEffect? basically just move caret based on word/letter indices?
     function moveCaret(x: number, y: number) {
       setCaretPosition({ x, y });
     }
@@ -96,7 +94,6 @@ export const Test = forwardRef<ChildMethods, Props>(
       const letters = word.children;
       let correct = true;
       let nonEmptyCount = 0;
-      // TODO: my head hurts I can't be thinking about improving this if right now but it can be better
       for (const letter of letters) {
         if (!isEmpty(letter)) nonEmptyCount++;
         if (isEmpty(letter) || isIncorrect(letter)) {
@@ -157,7 +154,6 @@ export const Test = forwardRef<ChildMethods, Props>(
       const currentLetter = currentWord.children[letterIndex];
       if (!currentLetter) return;
 
-      // coloring TODO: a function for coloring?
       if (key == currentLetter.textContent) {
         currentLetter.classList.add(styles.correct);
       } else {
@@ -249,11 +245,26 @@ export const Test = forwardRef<ChildMethods, Props>(
       });
     }
 
+    function reset() {
+      setWordIndex(0);
+      setLetterIndex(0);
+      setLineSkip(true);
+      let words = [];
+      wordsRef.current = [];
+      for (let i = 0; i < 20; i++) {
+        words.push(createWordElement());
+      }
+      setWordPool(words);
+      // TODO: i likely dont need to do n lines like that
+      dispatch({ correctCharacters: 0 });
+      dispatch({ nonEmptyCharacters: 0 });
+      dispatch({ allWordsLength: 0 });
+    }
+
     // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
     const handleKeyDown = useCallback(
       (e: globalThis.KeyboardEvent) => {
-        if (finished) return;
-        if (!focused) return;
+        if (finished || !focused) return;
         if (!running) handleStart();
         if (e.key.length == 1) {
           e.preventDefault();
@@ -310,18 +321,29 @@ export const Test = forwardRef<ChildMethods, Props>(
       }
     }, [wordIndex, letterIndex]);
 
+    function handleUpdateData(data: any) {
+      onDataUpdate(data);
+    }
+
     useEffect(() => {
       if (finished) {
         const currentWord = wordsRef.current[wordIndex];
         const letters = currentWord.children;
         let correct = 0;
         for (const letter of letters) {
-          if (isIncorrect(letter)) {
-            return;
-          }
+          if (isEmpty(letter)) break;
+          if (isIncorrect(letter)) return;
           if (isCorrect(letter)) correct++;
         }
         dispatch({ correctCharacters: correctCharacters + correct });
+        // cant believe this shit actually works lol TODO: CLEAN THIS CODE UP IT'S TRAGIC AND TEMPORARY
+        // danger zone
+        const score: Partial<Score> = {
+          time: timeSetting,
+          rawWpm: (nonEmptyCharacters / 5) * (60 / timeSetting),
+          averageWpm: (correctCharacters / 5) * (60 / timeSetting),
+        };
+        handleUpdateData(score);
       }
     }, [finished]);
 
@@ -349,28 +371,11 @@ export const Test = forwardRef<ChildMethods, Props>(
         handleChangeWpm((n / 5) * (60 / delta));
       }
     }, [time]);
-    // danger zone
 
     useEffect(() => {
       document.addEventListener("keydown", handleKeyDown);
       return () => document.removeEventListener("keydown", handleKeyDown);
     }, [handleKeyDown]);
-
-    function reset() {
-      setWordIndex(0);
-      setLetterIndex(0);
-      setLineSkip(true);
-      let words = [];
-      wordsRef.current = [];
-      for (let i = 0; i < 20; i++) {
-        words.push(createWordElement());
-      }
-      setWordPool(words);
-      // TODO: i likely dont need to do n lines like that
-      dispatch({ correctCharacters: 0 });
-      dispatch({ nonEmptyCharacters: 0 });
-      dispatch({ allWordsLength: 0 });
-    }
 
     useImperativeHandle(ref, () => ({
       reset,
@@ -379,10 +384,7 @@ export const Test = forwardRef<ChildMethods, Props>(
     return (
       <>
         <div className={styles.words}>{wordPool.map((word) => word)}</div>
-        {/* not sure if it's good but it makes sure that we don't draw the caret at { x: 0, y: 0 } before word/letter indices are initialized */}
-        {wordIndex >= 0 && (
-          <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
-        )}
+        <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
         {finished && <h1>FINISHED</h1>}
       </>
     );

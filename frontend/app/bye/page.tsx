@@ -1,7 +1,7 @@
 import { ByeDocument } from "@/graphql/generated/graphql";
 import { getClient } from "@/lib/client";
 
-export default async function Bye() {
+export default async function ByePage() {
   const { data, loading, error } = await getClient().query({ query: ByeDocument, fetchPolicy: "network-only" });
   if (loading) return <div>loading</div>;
   if (error) return <div>error</div>;

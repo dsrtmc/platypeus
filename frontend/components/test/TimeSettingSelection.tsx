@@ -12,7 +12,11 @@ export function TimeSettingSelection({ timeSettings, currentTimeSetting, handleS
   return (
     <div className={styles.selection}>
       {timeSettings.map((timeSetting) => (
-        <TimeSettingButton handleSelect={handleSelect(timeSetting)} selected={timeSetting == currentTimeSetting}>
+        <TimeSettingButton
+          handleSelect={handleSelect(timeSetting)}
+          selected={timeSetting == currentTimeSetting}
+          key={timeSetting}
+        >
           {timeSetting}
         </TimeSettingButton>
       ))}

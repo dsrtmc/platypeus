@@ -1,6 +1,6 @@
 import LoginForm from "@/app/login/LoginForm";
 
-export default async function Login() {
+export default async function LoginPage() {
   return (
     <div>
       <h1>

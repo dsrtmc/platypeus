@@ -1,7 +1,7 @@
 import { getClient } from "@/lib/client";
 import { GetUserByUsernameDocument } from "@/graphql/generated/graphql";
 
-export default async function User({ params }: { params: { username: string } }) {
+export default async function UserPage({ params }: { params: { username: string } }) {
   const { data } = await getClient().query({
     query: GetUserByUsernameDocument,
     variables: {

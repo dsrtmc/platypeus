@@ -1,7 +1,7 @@
 import { getClient } from "@/lib/client";
 import { GetScoreDocument } from "@/graphql/generated/graphql";
 
-export default async function Score({ params }: { params: { id: string } }) {
+export default async function ScorePage({ params }: { params: { id: string } }) {
   const { data } = await getClient().query({
     query: GetScoreDocument,
     variables: {
