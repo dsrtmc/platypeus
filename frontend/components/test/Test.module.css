@@ -64,6 +64,22 @@
     transition: all ease 100ms;
 }
 
+.blinking {
+    animation: 1.25s ease infinite blink;
+}
+
+@keyframes blink {
+    20% {
+        opacity: 100%;
+    }
+    50% {
+        opacity: 0;
+    }
+    80% {
+        opacity: 100%;
+    }
+}
+
 .correct {
     color: mediumspringgreen !important;
 }

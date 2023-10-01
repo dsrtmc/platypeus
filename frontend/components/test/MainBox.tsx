@@ -8,8 +8,17 @@ import { TestBox } from "@/components/test/TestBox";
 
 interface Props {}
 
+const initialScore: ScoreType = {
+  averageWpm: 0,
+  createdAt: undefined,
+  id: undefined,
+  rawWpm: 0,
+  time: 0,
+  updatedAt: undefined,
+};
+
 export const MainBox: FC<Props> = ({}) => {
-  const [scoreData, setScoreData] = useState<ScoreType | null>(null);
+  const [scoreData, setScoreData] = useState<ScoreType>(initialScore);
   const [showScore, setShowScore] = useState(false);
 
   function handleSaveScore(score: ScoreType) {

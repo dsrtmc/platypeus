@@ -50,6 +50,7 @@ export function TestBox({ handleSaveScore }: Props) {
     setRunning(false);
     setTime(timeSetting);
     setWpm(0);
+    // gonna keep it in for now but i have this thought - couldn't i just force unmount Test and that would work as a reset?
     if (testRef && testRef.current) testRef.current!.reset();
   }
 

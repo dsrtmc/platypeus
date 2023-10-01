@@ -137,10 +137,8 @@ export const Test = forwardRef<TestMethods, Props>(
     }
 
     function moveForwardOneWord() {
-      // if `wordsRef.current[wordIndex + 1]` is undefined then we're in trouble, so I keep it in for now to find bugs
-      // TODO: good to check assuming i have a test that doesnt involve a pool, like just a simple sentence
       const currentWord = wordsRef.current[wordIndex];
-      if (!currentWord) return;
+      if (!currentWord || !wordsRef.current[wordIndex + 1]) return;
 
       addWordToCount(currentWord);
 
@@ -330,17 +328,15 @@ export const Test = forwardRef<TestMethods, Props>(
         const currentWord = wordsRef.current[wordIndex];
         const letters = currentWord.children;
         let correct = 0;
+        let nonEmpty = 0;
         for (const letter of letters) {
-          if (isEmpty(letter)) break;
-          if (isIncorrect(letter)) {
-            correct = 0;
-            break;
-          }
+          if (isIncorrect(letter)) nonEmpty++;
           if (isCorrect(letter)) correct++;
         }
         dispatch({ correctCharacters: correctCharacters + correct });
-        // cant believe this shit actually works lol TODO: CLEAN THIS CODE UP IT'S TRAGIC AND TEMPORARY
-        // danger zone
+        dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmpty });
+
+        // TODO: calculateWpm function(s)
         const score: Partial<ScoreType> = {
           time: timeSetting,
           rawWpm: (nonEmptyCharacters / 5) * (60 / timeSetting),
@@ -387,7 +383,12 @@ export const Test = forwardRef<TestMethods, Props>(
     return (
       <>
         <div className={styles.words}>{wordPool.map((word) => word)}</div>
-        <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
+        <Caret
+          x={caretPosition.x}
+          y={caretPosition.y}
+          running={running}
+          ref={(el: HTMLDivElement) => el && (caretRef.current = el)}
+        />
       </>
     );
   }
