@@ -13,6 +13,8 @@ export const Score: FC<Props> = ({ score }) => {
       <h3>time: {score.time}</h3>
       <h3>average wpm: {score.averageWpm}</h3>
       <h3>raw wpm: {score.rawWpm}</h3>
+      <h3>mode: {score.mode}</h3>
+      <h3>language: {score.language}</h3>
     </div>
   );
 };

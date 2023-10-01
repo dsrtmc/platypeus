@@ -15,6 +15,8 @@ const initialScore: ScoreType = {
   rawWpm: 0,
   time: 0,
   updatedAt: undefined,
+  language: "",
+  mode: "",
 };
 
 export const MainBox: FC<Props> = ({}) => {

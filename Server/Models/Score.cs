@@ -8,7 +8,9 @@ public class Score : BaseEntity
 
     public int RawWpm { get; init; }
 
-    // public string Mode { get; init; } = null!;
+    public string Mode { get; init; } = null!; // "time", "words", "quote"
+
+    public string Language { get; init; } = null!; // "english" 🥸
 
     public int Time { get; init; }
 }

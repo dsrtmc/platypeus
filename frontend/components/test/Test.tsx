@@ -39,7 +39,6 @@ type State = {
   correctCharacters: number;
   nonEmptyCharacters: number; // correct && incorrect, used for calculating raw
   allWordsLength: number;
-  // type: string; // test type TODO
 };
 
 const reducer = (current: State, update: Partial<State>) => ({ ...current, ...update });
@@ -324,29 +323,6 @@ export const Test = forwardRef<TestMethods, Props>(
     }
 
     useEffect(() => {
-      if (finished) {
-        const currentWord = wordsRef.current[wordIndex];
-        const letters = currentWord.children;
-        let correct = 0;
-        let nonEmpty = 0;
-        for (const letter of letters) {
-          if (isIncorrect(letter)) nonEmpty++;
-          if (isCorrect(letter)) correct++;
-        }
-        dispatch({ correctCharacters: correctCharacters + correct });
-        dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmpty });
-
-        // TODO: calculateWpm function(s)
-        const score: Partial<ScoreType> = {
-          time: timeSetting,
-          rawWpm: (nonEmptyCharacters / 5) * (60 / timeSetting),
-          averageWpm: (correctCharacters / 5) * (60 / timeSetting),
-        };
-        handleSaveScore(score);
-      }
-    }, [finished]);
-
-    useEffect(() => {
       // TODO: something's funky with the formula idk
       const delta = timeSetting - time;
       // Every time tick, we re-measure the WPM accounting for the current word (which has not been counted yet)
@@ -370,6 +346,31 @@ export const Test = forwardRef<TestMethods, Props>(
         handleChangeWpm((n / 5) * (60 / delta));
       }
     }, [time]);
+
+    useEffect(() => {
+      if (finished) {
+        const currentWord = wordsRef.current[wordIndex];
+        const letters = currentWord.children;
+        let correct = 0;
+        let nonEmpty = 0;
+        for (const letter of letters) {
+          if (isIncorrect(letter)) nonEmpty++;
+          if (isCorrect(letter)) correct++;
+        }
+        dispatch({ correctCharacters: correctCharacters + correct });
+        dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmpty });
+
+        // TODO: calculateWpm function(s)
+        const score: Partial<ScoreType> = {
+          time: timeSetting,
+          rawWpm: (nonEmptyCharacters / 5) * (60 / timeSetting),
+          averageWpm: (correctCharacters / 5) * (60 / timeSetting),
+          mode: "time",
+          language: "english",
+        };
+        handleSaveScore(score);
+      }
+    }, [finished]);
 
     useEffect(() => {
       document.addEventListener("keydown", handleKeyDown);
