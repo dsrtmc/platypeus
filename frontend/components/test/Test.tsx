@@ -1,7 +1,7 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import { Score } from "@/graphql/generated/graphql";
+import { Score as ScoreType } from "@/graphql/generated/graphql";
 import {
   createElement,
   forwardRef,
@@ -28,10 +28,10 @@ interface Props {
   timeSetting: number;
   handleChangeWpm: (wpm: number) => void;
   handleStart: () => void;
-  onDataUpdate: (score: Score) => void; // danger zone
+  onSaveScore: (score: Partial<ScoreType>) => void; // danger zone
 }
 
-interface TestMethods {
+export interface TestMethods {
   reset: () => void;
 }
 
@@ -51,7 +51,7 @@ const initialState: State = {
 };
 
 export const Test = forwardRef<TestMethods, Props>(
-  ({ focused, running, finished, time, timeSetting, handleChangeWpm, handleStart, onDataUpdate }: Props, ref) => {
+  ({ focused, running, finished, time, timeSetting, handleChangeWpm, handleStart, onSaveScore }: Props, ref) => {
     const [wordIndex, setWordIndex] = useState(-1);
     const [letterIndex, setLetterIndex] = useState(-1);
     const [lineSkip, setLineSkip] = useState(true);
@@ -321,8 +321,8 @@ export const Test = forwardRef<TestMethods, Props>(
       }
     }, [wordIndex, letterIndex]);
 
-    function handleUpdateData(data: any) {
-      onDataUpdate(data);
+    function handleSaveScore(data: Partial<ScoreType>) {
+      onSaveScore(data);
     }
 
     useEffect(() => {
@@ -332,18 +332,21 @@ export const Test = forwardRef<TestMethods, Props>(
         let correct = 0;
         for (const letter of letters) {
           if (isEmpty(letter)) break;
-          if (isIncorrect(letter)) return;
+          if (isIncorrect(letter)) {
+            correct = 0;
+            break;
+          }
           if (isCorrect(letter)) correct++;
         }
         dispatch({ correctCharacters: correctCharacters + correct });
         // cant believe this shit actually works lol TODO: CLEAN THIS CODE UP IT'S TRAGIC AND TEMPORARY
         // danger zone
-        const score: Partial<Score> = {
+        const score: Partial<ScoreType> = {
           time: timeSetting,
           rawWpm: (nonEmptyCharacters / 5) * (60 / timeSetting),
           averageWpm: (correctCharacters / 5) * (60 / timeSetting),
         };
-        handleUpdateData(score);
+        handleSaveScore(score);
       }
     }, [finished]);
 
@@ -385,7 +388,6 @@ export const Test = forwardRef<TestMethods, Props>(
       <>
         <div className={styles.words}>{wordPool.map((word) => word)}</div>
         <Caret x={caretPosition.x} y={caretPosition.y} ref={(el: HTMLDivElement) => el && (caretRef.current = el)} />
-        {finished && <h1>FINISHED</h1>}
       </>
     );
   }

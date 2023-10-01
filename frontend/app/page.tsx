@@ -1,13 +1,11 @@
 import styles from "./page.module.css";
-import { getClient } from "@/lib/client";
-import { GetAllUsersDocument } from "@/graphql/generated/graphql";
-import { TestBox } from "@/components/test/TestBox";
+import { MainBox } from "@/components/test/MainBox";
 
 export default async function HomePage() {
-  const { data } = await getClient().query({ query: GetAllUsersDocument });
   return (
     <main className={styles.main}>
-      <TestBox />
+      <MainBox />
+      {/*<TestBox />*/}
     </main>
   );
 }
