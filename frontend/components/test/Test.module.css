@@ -25,7 +25,7 @@
 .middle {
     display: flex;
     gap: 1rem;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
 }
 
@@ -96,6 +96,7 @@
 .selection {
     display: flex;
     gap: 1rem;
+    margin-left: auto;
 }
 
 .setting {
@@ -118,17 +119,22 @@
 
 .counter {
     font-size: 2rem;
+    margin-right: auto;
+}
+
+.mode {
+    color: crimson;
 }
 
 .restart {
     all: unset;
     background-image: linear-gradient(lightcyan, #444444);
     padding: 6px 10px;
-    border-radius: 5px;
+    transition: all 100ms ease;
 }
 
 .restart:focus {
-    border: 3px solid palevioletred;
+    color: red;
 }
 
 .score {

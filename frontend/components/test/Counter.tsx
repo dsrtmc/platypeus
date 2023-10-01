@@ -6,9 +6,5 @@ interface Props {
 }
 
 export const Counter: React.FC<Props> = ({ count }) => {
-  return (
-    <p style={{ marginRight: "auto" }} className={styles.counter}>
-      {count}
-    </p>
-  );
+  return <div className={styles.counter}>{count}</div>;
 };

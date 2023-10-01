@@ -28,6 +28,7 @@ interface Props {
   timeSetting: number;
   handleChangeWpm: (wpm: number) => void;
   handleStart: () => void;
+  onKeyDown: (e: globalThis.MouseEvent) => void;
   onSaveScore: (score: Partial<ScoreType>) => void; // danger zone
 }
 
@@ -50,7 +51,10 @@ const initialState: State = {
 };
 
 export const Test = forwardRef<TestMethods, Props>(
-  ({ focused, running, finished, time, timeSetting, handleChangeWpm, handleStart, onSaveScore }: Props, ref) => {
+  (
+    { focused, running, finished, time, timeSetting, handleChangeWpm, handleStart, onKeyDown, onSaveScore }: Props,
+    ref
+  ) => {
     const [wordIndex, setWordIndex] = useState(-1);
     const [letterIndex, setLetterIndex] = useState(-1);
     const [lineSkip, setLineSkip] = useState(true);
@@ -261,9 +265,10 @@ export const Test = forwardRef<TestMethods, Props>(
     // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
     const handleKeyDown = useCallback(
       (e: globalThis.KeyboardEvent) => {
+        onKeyDown(e);
         if (finished || !focused) return;
-        if (!running) handleStart();
         if (e.key.length == 1) {
+          if (!running) handleStart();
           e.preventDefault();
           if (e.key == " ") {
             if (letterIndex) {

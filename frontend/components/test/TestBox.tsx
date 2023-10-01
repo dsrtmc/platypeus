@@ -8,6 +8,7 @@ import { TimeSettingSelection } from "@/components/test/TimeSettingSelection";
 import { Counter } from "@/components/test/Counter";
 import { RestartButton } from "@/components/test/RestartButton";
 import { Score as ScoreType } from "@/graphql/generated/graphql";
+import { Mode } from "@/components/test/Mode";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -25,6 +26,21 @@ export function TestBox({ handleSaveScore }: Props) {
   const testRef = useRef<TestMethods | null>(null);
   const ref = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const restartButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // Not sure whether it's a great idea to have a function like that here and in `Test.tsx` itself
+  function handleKeyDown(e: globalThis.MouseEvent) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      if (restartButtonRef && restartButtonRef.current) {
+        restartButtonRef.current!.focus();
+      }
+    } else if (e.key !== "Enter") {
+      if (restartButtonRef && restartButtonRef.current) {
+        restartButtonRef.current!.blur();
+      }
+    }
+  }
 
   function handleClick(e: globalThis.MouseEvent) {
     if (ref && ref.current) setFocused(ref.current!.contains(e.target));
@@ -61,6 +77,7 @@ export function TestBox({ handleSaveScore }: Props) {
 
   useEffect(() => {
     document.addEventListener("click", handleClick);
+
     return () => {
       document.removeEventListener("click", handleClick);
     };
@@ -97,6 +114,8 @@ export function TestBox({ handleSaveScore }: Props) {
         <div className={styles.top}>
           <Timer time={time} />
           <Counter count={wpm} />
+          {/* that should actually be called Language lol */}
+          <Mode>english</Mode>
           <TimeSettingSelection
             timeSettings={[5, 15, 30]}
             currentTimeSetting={timeSetting}
@@ -112,12 +131,13 @@ export function TestBox({ handleSaveScore }: Props) {
             timeSetting={timeSetting}
             handleChangeWpm={handleChangeWpm}
             handleStart={handleStart}
+            onKeyDown={handleKeyDown}
             ref={testRef}
             onSaveScore={handleSaveScore}
           />
         </div>
         <div className={styles.bottom}>
-          <RestartButton handleReset={handleReset} />
+          <RestartButton onReset={handleReset} ref={restartButtonRef} />
           <p>{focused ? "FOCUSED" : "UNFOCUSED"}</p>
         </div>
       </div>

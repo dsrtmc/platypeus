@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./Test.module.css";
 import { Score as ScoreType } from "@/graphql/generated/graphql";
 import { ScoreBox } from "@/components/test/ScoreBox";
