@@ -10,14 +10,14 @@ import { useMutation } from "@apollo/client";
 interface Props {}
 
 const initialScore: ScoreType = {
-  averageWpm: 0,
-  createdAt: undefined,
   id: undefined,
+  averageWpm: 0,
   rawWpm: 0,
-  time: 0,
-  updatedAt: undefined,
-  language: "",
   mode: "",
+  modeSetting: 0,
+  language: "",
+  createdAt: undefined,
+  updatedAt: undefined,
 };
 
 export const MainBox: FC<Props> = ({}) => {
@@ -35,11 +35,11 @@ export const MainBox: FC<Props> = ({}) => {
     const result = await createScore({
       variables: {
         input: {
-          time: score.time,
+          averageWpm: Math.round(score.averageWpm), // since there's no way to enforce `int`, we round here just to be sure
+          rawWpm: Math.round(score.rawWpm), // up
           mode: score.mode,
-          averageWpm: score.averageWpm,
+          modeSetting: score.modeSetting,
           language: score.language,
-          rawWpm: score.rawWpm,
         },
       },
     });

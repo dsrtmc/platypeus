@@ -7,7 +7,6 @@ public class User : BaseEntity
     public string Email { get; set; } = null!;
     
     public string Password { get; set; } = null!;
-
-    // LEGACY; leftover after JWT // TODO: remove it
-    public int TokenVersion { get; set; }
+    
+    public List<Score> Scores { get; set; }
 }

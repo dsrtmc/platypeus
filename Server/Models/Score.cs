@@ -10,7 +10,12 @@ public class Score : BaseEntity
 
     public string Mode { get; init; } = null!; // "time", "words", "quote"
 
+    public int ModeSetting { get; init; } // "time" -> 15; "words" -> 25 etc.
+
     public string Language { get; init; } = null!; // "english" 🥸
 
-    public int Time { get; init; }
+    public User? User { get; set; }
+    
+    [GraphQLIgnore]
+    public Guid? UserID { get; set; }
 }

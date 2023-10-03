@@ -9,8 +9,6 @@ using Server.Utilities;
 
 namespace Server.Schema.Mutations;
 
-public record LoginPayload(User? User, string AccessToken);
-
 [MutationType]
 public static class UserMutations
 {
@@ -58,19 +56,6 @@ public static class UserMutations
     public static async Task<bool> Logout(DatabaseContext db, IHttpContextAccessor accessor)
     {
         await accessor.HttpContext!.SignOutAsync();
-        return true;
-    }
-    
-    // Only for development purposes // TODO: create some funny internal function that'll do the same
-    public static async Task<bool> RevokeRefreshToken(Guid userId, DatabaseContext db, IHttpContextAccessor accessor)
-    {
-        var user = await db.Users.FindAsync(userId);
-        if (user is null)
-            return false;
-
-        user.TokenVersion++;
-        await db.SaveChangesAsync();
-        
         return true;
     }
 }

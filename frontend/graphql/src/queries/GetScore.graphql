@@ -3,6 +3,5 @@ query GetScore($id: UUID!) {
         id
         averageWpm
         rawWpm
-        time
     }
 }

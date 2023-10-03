@@ -12,6 +12,9 @@ export default async function Navbar() {
         <Link href={"/"} className={styles.item}>
           Home
         </Link>
+        <Link href={"/leaderboards"} className={styles.item}>
+          Leaderboards
+        </Link>
         <Link href={"/register"} className={styles.item}>
           Register
         </Link>

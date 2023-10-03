@@ -4,9 +4,12 @@ mutation CreateScore($input: CreateScoreInput!) {
             id
             averageWpm
             rawWpm
-            time
             mode
+            modeSetting
             language
+            user {
+                username
+            }
         }
     }
 }

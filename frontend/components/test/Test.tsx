@@ -381,10 +381,10 @@ export const Test = forwardRef<TestMethods, Props>(
 
         // TODO: calculateWpm function(s)
         const score: Partial<ScoreType> = {
-          time: timeSetting,
-          rawWpm: ((nonEmptyCharacters + nonEmptyCount) / 5) * (60 / timeSetting),
-          averageWpm: ((correctCharacters + correctCount) / 5) * (60 / timeSetting),
+          rawWpm: Math.round(((nonEmptyCharacters + nonEmptyCount) / 5) * (60 / timeSetting)),
+          averageWpm: Math.round(((correctCharacters + correctCount) / 5) * (60 / timeSetting)),
           mode: "time",
+          modeSetting: 15,
           language: "english",
         };
         handleSaveScore(score);
