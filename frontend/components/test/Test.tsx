@@ -105,11 +105,12 @@ export const Test = forwardRef<TestMethods, Props>(
         }
       }
 
+      // We add 1 everywhere because our formula is supposed to account for spaces
       if (correct) {
-        dispatch({ correctCharacters: correctCharacters + letters.length });
+        dispatch({ correctCharacters: correctCharacters + letters.length + 1 });
       }
-      dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmptyCount });
-      dispatch({ allWordsLength: allWordsLength + letters.length });
+      dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmptyCount + 1 });
+      dispatch({ allWordsLength: allWordsLength + letters.length + 1 });
     }
 
     /* Returns the index which the cursor should be moved to.
@@ -131,11 +132,13 @@ export const Test = forwardRef<TestMethods, Props>(
           nonEmptyCount++;
         }
       }
+
+      // Analogically to our addition logic, we subtract 1 everywhere to account for spaces
       if (correct) {
-        dispatch({ correctCharacters: correctCharacters - letters.length });
+        dispatch({ correctCharacters: correctCharacters - letters.length - 1 });
       }
-      dispatch({ nonEmptyCharacters: nonEmptyCharacters - nonEmptyCount });
-      dispatch({ allWordsLength: allWordsLength - letters.length });
+      dispatch({ nonEmptyCharacters: nonEmptyCharacters - nonEmptyCount - 1 });
+      dispatch({ allWordsLength: allWordsLength - letters.length - 1 });
       return index;
     }
 
@@ -331,6 +334,7 @@ export const Test = forwardRef<TestMethods, Props>(
       // TODO: something's funky with the formula idk
       const delta = timeSetting - time;
       // Every time tick, we re-measure the WPM accounting for the current word (which has not been counted yet)
+      // JUST VISUAL DOES NOT ACTUALLY AFFECT OUR STATE
       if (delta > 0) {
         const currentWord = wordsRef.current[wordIndex];
         const letters = currentWord.children;
@@ -354,22 +358,43 @@ export const Test = forwardRef<TestMethods, Props>(
 
     useEffect(() => {
       if (finished) {
+        console.log("Correct characters before calculating last word:", correctCharacters);
         const currentWord = wordsRef.current[wordIndex];
         const letters = currentWord.children;
-        let correct = 0;
-        let nonEmpty = 0;
-        for (const letter of letters) {
-          if (isIncorrect(letter)) nonEmpty++;
-          if (isCorrect(letter)) correct++;
+        let correct = true;
+        let correctCount = 0;
+        let nonEmptyCount = 0;
+        let wordLength = 0;
+        // TODO: clean this shit up lol also scroll up and rename these stuff like `correct` to `correctCount` for consistency
+        for (let i = 0; i < letters.length; i++) {
+          const letter = letters[i];
+          if (isIncorrect(letter)) {
+            correct = false;
+            nonEmptyCount++;
+          }
+          if (isCorrect(letter)) {
+            correctCount++;
+            nonEmptyCount++;
+          }
+          if (isEmpty(letter)) {
+            wordLength = i;
+            break;
+          }
         }
-        dispatch({ correctCharacters: correctCharacters + correct });
-        dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmpty });
+        if (correct) {
+          dispatch({ correctCharacters: correctCharacters + correctCount });
+          console.log("Correct characters after calculating last word:", correctCharacters + correctCount);
+        }
+
+        dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmptyCount });
+        console.log("Non empty characters after calculating last word:", nonEmptyCharacters + nonEmptyCount);
+        dispatch({ nonEmptyCharacters: allWordsLength + nonEmptyCount });
 
         // TODO: calculateWpm function(s)
         const score: Partial<ScoreType> = {
           time: timeSetting,
-          rawWpm: (nonEmptyCharacters / 5) * (60 / timeSetting),
-          averageWpm: (correctCharacters / 5) * (60 / timeSetting),
+          rawWpm: ((nonEmptyCharacters + nonEmptyCount) / 5) * (60 / timeSetting),
+          averageWpm: ((correctCharacters + correctCount) / 5) * (60 / timeSetting),
           mode: "time",
           language: "english",
         };
