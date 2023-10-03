@@ -139,7 +139,34 @@ export const Test = forwardRef<TestMethods, Props>(
       }
       dispatch({ nonEmptyCharacters: nonEmptyCharacters - nonEmptyCount - 1 });
       dispatch({ allWordsLength: allWordsLength - letters.length - 1 });
+
       return index;
+    }
+
+    // If the word is incorrect, the `correctCount` will return 0
+    function calculateCurrentWord(word: Element) {
+      let correctCount = 0;
+      let nonEmptyCount = 0;
+      let wordLength = 0;
+      const letters = word.children;
+      let correct = true;
+      for (let i = 0; i < letters.length; i++) {
+        const letter = letters[i];
+        if (isIncorrect(letter)) {
+          correct = false;
+          nonEmptyCount++;
+        }
+        if (isCorrect(letter)) {
+          correctCount++;
+          nonEmptyCount++;
+        }
+        if (isEmpty(letter)) {
+          wordLength = i;
+          break;
+        }
+      }
+      if (!correct) correctCount = 0;
+      return { correctCount, nonEmptyCount, wordLength };
     }
 
     function moveForwardOneWord() {
@@ -330,64 +357,26 @@ export const Test = forwardRef<TestMethods, Props>(
       onSaveScore(data);
     }
 
+    // NOTE: it only affects the visual real-time WPM counter, does not really change our state
     useEffect(() => {
-      // TODO: something's funky with the formula idk
       const delta = timeSetting - time;
-      // Every time tick, we re-measure the WPM accounting for the current word (which has not been counted yet)
-      // JUST VISUAL DOES NOT ACTUALLY AFFECT OUR STATE
+      if (delta == timeSetting) return; // no need to recalculate here because the component will near-immediately unmount
       if (delta > 0) {
         const currentWord = wordsRef.current[wordIndex];
-        const letters = currentWord.children;
-        let correct = true;
-        let correctCount = 0;
-        for (const letter of letters) {
-          if (isIncorrect(letter)) {
-            correct = false;
-            break;
-          } else if (isCorrect(letter)) {
-            correctCount++;
-          }
-        }
-        let n = correctCharacters;
-        if (correct) {
-          n += correctCount;
-        }
-        handleChangeWpm((n / 5) * (60 / delta));
+        const { correctCount } = calculateCurrentWord(currentWord);
+        let chars = correctCharacters + correctCount;
+        handleChangeWpm((chars / 5) * (60 / delta));
       }
     }, [time]);
 
     useEffect(() => {
       if (finished) {
-        console.log("Correct characters before calculating last word:", correctCharacters);
-        const currentWord = wordsRef.current[wordIndex];
-        const letters = currentWord.children;
-        let correct = true;
-        let correctCount = 0;
-        let nonEmptyCount = 0;
-        let wordLength = 0;
         // TODO: clean this shit up lol also scroll up and rename these stuff like `correct` to `correctCount` for consistency
-        for (let i = 0; i < letters.length; i++) {
-          const letter = letters[i];
-          if (isIncorrect(letter)) {
-            correct = false;
-            nonEmptyCount++;
-          }
-          if (isCorrect(letter)) {
-            correctCount++;
-            nonEmptyCount++;
-          }
-          if (isEmpty(letter)) {
-            wordLength = i;
-            break;
-          }
-        }
-        if (correct) {
-          dispatch({ correctCharacters: correctCharacters + correctCount });
-          console.log("Correct characters after calculating last word:", correctCharacters + correctCount);
-        }
+        const currentWord = wordsRef.current[wordIndex];
+        const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 
+        dispatch({ correctCharacters: correctCharacters + correctCount });
         dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmptyCount });
-        console.log("Non empty characters after calculating last word:", nonEmptyCharacters + nonEmptyCount);
         dispatch({ nonEmptyCharacters: allWordsLength + nonEmptyCount });
 
         // TODO: calculateWpm function(s)
@@ -414,12 +403,7 @@ export const Test = forwardRef<TestMethods, Props>(
     return (
       <>
         <div className={styles.words}>{wordPool.map((word) => word)}</div>
-        <Caret
-          x={caretPosition.x}
-          y={caretPosition.y}
-          running={running}
-          ref={(el: HTMLDivElement) => el && (caretRef.current = el)}
-        />
+        <Caret x={caretPosition.x} y={caretPosition.y} running={running} ref={caretRef} />
       </>
     );
   }
