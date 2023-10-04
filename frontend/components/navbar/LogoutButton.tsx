@@ -2,16 +2,22 @@
 
 import { useMutation } from "@apollo/client";
 import { LogoutDocument } from "@/graphql/generated/graphql";
+import { BiLogOut } from "react-icons/bi";
+import styles from "./Navbar.module.css";
 
 export function LogoutButton() {
   const [logout, { client }] = useMutation(LogoutDocument);
   async function handleLogout() {
     await logout();
     try {
-      await client.resetStore(); // for some reason it errors out and doesn't work
+      await client.resetStore();
     } catch (err) {
-      console.log("error:", err);
+      console.error("Error:", err);
     }
   }
-  return <button onClick={handleLogout}>logout</button>;
+  return (
+    <button onClick={handleLogout} className={`${styles.logout} ${styles.icon}`}>
+      <BiLogOut />
+    </button>
+  );
 }

@@ -13,6 +13,21 @@
     gap: 1rem;
 }
 
-.item {
-    background-color: cadetblue;
+.spacer {
+    width: 400px;
+}
+
+.logout {
+    all: unset;
+}
+
+.logout:hover {
+    cursor: pointer;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    color: lightseagreen;
 }

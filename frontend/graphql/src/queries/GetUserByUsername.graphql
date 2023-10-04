@@ -1,6 +1,10 @@
 query GetUserByUsername($username: String!) {
     userByUsername(username: $username) {
         username
+        scores {
+            id
+            averageWpm
+        }
         createdAt
         updatedAt
     }

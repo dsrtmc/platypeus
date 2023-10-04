@@ -32,4 +32,20 @@ html {
 
 body {
     height: calc(100% - var(--nav-size));
+    background-color: var(--dark-gray);
+}
+
+#contentWrapper {
+    align-items: center;
+    display: grid;
+    gap: 2rem;
+    grid-auto-flow: row;
+    grid-template-rows: auto 1fr auto;
+    max-width: 1000px;
+    min-height: 100vh;
+    padding: 2rem;
+    transition: padding-top .125s;
+    width: 100%;
+    z-index: 999;
+    margin: auto;
 }

@@ -5,7 +5,6 @@ export default async function HomePage() {
   return (
     <main className={styles.main}>
       <MainBox />
-      {/*<TestBox />*/}
     </main>
   );
 }

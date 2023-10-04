@@ -1,3 +1,11 @@
+import { Leaderboard } from "@/components/leaderboards/Leaderboard";
+
 export default async function LeaderboardsPage() {
-  return <div>hello you are on the leadebords page</div>;
+  return (
+    <div>
+      <Leaderboard />
+      hello you are on the leadebords page
+      <Leaderboard />
+    </div>
+  );
 }
