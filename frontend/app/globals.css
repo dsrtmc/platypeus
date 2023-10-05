@@ -35,6 +35,14 @@ body {
     background-color: var(--dark-gray);
 }
 
+a {
+    all: unset;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
 #contentWrapper {
     align-items: center;
     display: grid;

@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { ApolloWrapper } from "@/lib/apollo-provider";
 import Navbar from "@/components/navbar/Navbar";
 import { ContentWrapper } from "@/components/ContentWrapper";
@@ -19,7 +19,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={inter.className}>
         <ApolloWrapper>
           <ContentWrapper>
-            <Navbar />
+            <Suspense fallback={"no navbar xd"}>
+              <Navbar />
+            </Suspense>
             {children}
           </ContentWrapper>
         </ApolloWrapper>
