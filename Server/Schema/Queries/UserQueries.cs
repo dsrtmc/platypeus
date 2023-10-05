@@ -13,7 +13,10 @@ public static class UserQueries
         var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
 
         if (claim is null)
+        {
+            Console.WriteLine("WE ARE RETURNING NULL, THEREFORE ONE COULD DEDUCE WE HAVE NO COOKIE LOL");
             return null;
+        }
         
         return db.Users.Find(new Guid(claim.Value));
     }

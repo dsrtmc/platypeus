@@ -4,18 +4,20 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/navbar/LogoutButton";
 import { MeDocument } from "@/graphql/generated/graphql";
 import styles from "./Navbar.module.css";
-import { useSuspenseQuery } from "@apollo/client";
 import { BsBarChartFill, BsInfoLg, BsKeyboardFill } from "react-icons/bs";
 import { GiPuppet } from "react-icons/gi";
 import { BiLogIn, BiLogOut, BiSolidUser, BiUser } from "react-icons/bi";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { RightSideBox } from "@/components/navbar/RightSideBox";
 
 export default function Navbar() {
-  // const { data, loading, error } = useSuspenseQuery(MeDocument);
-
+  // const [test, setTest] = useState(false);
+  // useEffect(() => {
+  //   setTest(true);
+  // }, []);
   return (
     <nav className={styles.navbar}>
+      {/*<p>hitler {test && " is active"}</p>*/}
       <div className={styles.box}>
         <Link href={"/"} className={styles.icon}>
           <GiPuppet />
@@ -36,9 +38,7 @@ export default function Navbar() {
       <div className={styles.spacer}></div>
       {/* TODO: fix xd Suspense? */}
       {/* TODO: make styling better */}
-      <Suspense fallback={"LOADING XD"}>
-        <RightSideBox />
-      </Suspense>
+      {/*<RightSideBox />*/}
       {/*<div className={styles.box}>*/}
       {/*  {data?.me ? (*/}
       {/*    // logged in*/}
