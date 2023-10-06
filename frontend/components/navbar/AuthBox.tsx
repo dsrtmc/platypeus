@@ -15,7 +15,13 @@ interface Props {
 
 export const AuthBox: React.FC<Props> = ({ initial }) => {
   const { data } = useSuspenseQuery(MeDocument);
-  const [user, _] = useState(data?.me ? data.me : initial);
+  const [user, setUser] = useState(data?.me ? data.me : initial);
+
+  // not sure if that's correct but hey, it works :)
+  useEffect(() => {
+    if (data) setUser(data.me);
+  }, [data]);
+
   return (
     <div className={styles.box}>
       {user ? (
