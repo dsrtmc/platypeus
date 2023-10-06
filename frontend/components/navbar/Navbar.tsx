@@ -1,23 +1,22 @@
-"use client";
-
 import Link from "next/link";
-import { LogoutButton } from "@/components/navbar/LogoutButton";
 import { MeDocument } from "@/graphql/generated/graphql";
 import styles from "./Navbar.module.css";
 import { BsBarChartFill, BsInfoLg, BsKeyboardFill } from "react-icons/bs";
 import { GiPuppet } from "react-icons/gi";
-import { BiLogIn, BiLogOut, BiSolidUser, BiUser } from "react-icons/bi";
-import { Suspense, useEffect, useState } from "react";
-import { RightSideBox } from "@/components/navbar/RightSideBox";
+import { AuthBox } from "@/components/navbar/AuthBox";
+import { getClient } from "@/lib/client";
 
-export default function Navbar() {
-  // const [test, setTest] = useState(false);
-  // useEffect(() => {
-  //   setTest(true);
-  // }, []);
+/*
+ * Next.js 13 is really funny and I can't seem to figure out a way to get `AuthBox` to work as expected as a client component.
+ * Instead, the solution I've gone with, is we fetch the user on the server on the initial render (RSC + client components instructions),
+ * and only initially send it to `AuthBox`. Then, on subsequent renders, the data fetching is done on the client as it should be.
+ * A really smart workaround that I attribute to `user:4345841` on https://stackoverflow.com/.
+ */
+export default async function Navbar() {
+  // oh lol but now the cache update doesnt work XD XDXDXDD
+  const response = await getClient().query({ query: MeDocument });
   return (
     <nav className={styles.navbar}>
-      {/*<p>hitler {test && " is active"}</p>*/}
       <div className={styles.box}>
         <Link href={"/"} className={styles.icon}>
           <GiPuppet />
@@ -36,33 +35,8 @@ export default function Navbar() {
         </Link>
       </div>
       <div className={styles.spacer}></div>
-      {/* TODO: fix xd Suspense? */}
       {/* TODO: make styling better */}
-      {/*<RightSideBox />*/}
-      {/*<div className={styles.box}>*/}
-      {/*  {data?.me ? (*/}
-      {/*    // logged in*/}
-      {/*    <>*/}
-      {/*      <Link href={`/user/${data.me.username}`} className={styles.icon}>*/}
-      {/*        {data.me.username}*/}
-      {/*        <BiSolidUser />*/}
-      {/*      </Link>*/}
-      {/*      /!* TODO: maybe just keep the logout here, no need for abstraction *!/*/}
-      {/*      <LogoutButton />*/}
-      {/*    </>*/}
-      {/*  ) : (*/}
-      {/*    // logged out*/}
-      {/*    <>*/}
-      {/*      <Link href={"/register"} className={styles.icon}>*/}
-      {/*        register*/}
-      {/*        <BiUser />*/}
-      {/*      </Link>*/}
-      {/*      <Link href={"/login"} className={styles.icon}>*/}
-      {/*        <BiLogIn />*/}
-      {/*      </Link>*/}
-      {/*    </>*/}
-      {/*  )}*/}
-      {/*</div>*/}
+      <AuthBox initial={response.data.me} />
     </nav>
   );
 }
