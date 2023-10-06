@@ -2,7 +2,6 @@ import Link from "next/link";
 import { MeDocument } from "@/graphql/generated/graphql";
 import styles from "./Navbar.module.css";
 import { BsBarChartFill, BsInfoLg, BsKeyboardFill } from "react-icons/bs";
-import { GiPuppet } from "react-icons/gi";
 import { AuthBox } from "@/components/navbar/AuthBox";
 import { getClient } from "@/lib/client";
 
@@ -13,11 +12,12 @@ import { getClient } from "@/lib/client";
  */
 export default async function Navbar() {
   const response = await getClient().query({ query: MeDocument });
+  // TODO: make styling better
   return (
     <nav className={styles.navbar}>
       <div className={styles.box}>
         <Link href={"/"} className={styles.icon}>
-          <GiPuppet />
+          platypeus
         </Link>
         <Link href={"/"} className={styles.icon}>
           <BsKeyboardFill />
@@ -32,8 +32,7 @@ export default async function Navbar() {
           Bye
         </Link>
       </div>
-      <div className={styles.spacer}></div>
-      {/* TODO: make styling better */}
+      <div className={styles.spacer} />
       <AuthBox initial={response.data.me} />
     </nav>
   );

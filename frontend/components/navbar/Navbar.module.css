@@ -1,11 +1,13 @@
 .navbar {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    grid-auto-flow: column;
     gap: 1rem;
     height: var(--nav-size);
-    justify-content: space-between;
-    align-items: center;
     margin: auto;
     background-color: var(--gray);
+    width: 100%;
 }
 
 .box {
@@ -14,7 +16,7 @@
 }
 
 .spacer {
-    width: 400px;
+    background-color: #b4b4ed;
 }
 
 .logout {

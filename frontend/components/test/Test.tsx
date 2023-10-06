@@ -58,10 +58,11 @@ export const Test = forwardRef<TestMethods, Props>(
     const [wordIndex, setWordIndex] = useState(-1);
     const [letterIndex, setLetterIndex] = useState(-1);
     const [lineSkip, setLineSkip] = useState(true);
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
     // A funny type, but I think correct nonetheless
     const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
-    const [caretPosition, setCaretPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
 
     const [{ correctCharacters, nonEmptyCharacters, allWordsLength }, dispatch] = useReducer(
       reducer,
@@ -351,7 +352,7 @@ export const Test = forwardRef<TestMethods, Props>(
         const { right, top } = previousLetter.getBoundingClientRect();
         moveCaret(right, top);
       }
-    }, [wordIndex, letterIndex]);
+    }, [wordIndex, letterIndex, windowSize]);
 
     function handleSaveScore(data: Partial<ScoreType>) {
       onSaveScore(data);
@@ -360,7 +361,7 @@ export const Test = forwardRef<TestMethods, Props>(
     // NOTE: it only affects the visual real-time WPM counter, does not really change our state
     useEffect(() => {
       const delta = timeSetting - time;
-      if (delta == timeSetting) return; // no need to recalculate here because the component will near-immediately unmount
+      if (delta === timeSetting) return; // no need to recalculate here because the component will near-immediately unmount
       if (delta > 0) {
         const currentWord = wordsRef.current[wordIndex];
         const { correctCount } = calculateCurrentWord(currentWord);
@@ -391,10 +392,18 @@ export const Test = forwardRef<TestMethods, Props>(
       }
     }, [finished]);
 
+    const handleResize = useCallback(() => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    }, [windowSize]);
+
     useEffect(() => {
       document.addEventListener("keydown", handleKeyDown);
-      return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [handleKeyDown]);
+      window.addEventListener("resize", handleResize);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("resize", handleResize);
+      };
+    }, [handleKeyDown, handleResize]);
 
     useImperativeHandle(ref, () => ({
       reset,

@@ -1,0 +1,13 @@
+query GetScores {
+    scores {
+        edges {
+            node {
+                averageWpm
+            }
+            cursor
+        }
+        pageInfo {
+            endCursor
+        }
+    }
+}

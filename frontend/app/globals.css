@@ -16,6 +16,10 @@ svg {
 
 :root {
     --nav-size: 75px;
+    --color-bg: #222;
+    --color-main: white;
+    
+    /* Temporary, remove it in the future */
     --dark-gray: #222;
     --gray: #444;
     --light-gray: #666;
@@ -32,7 +36,8 @@ html {
 
 body {
     height: calc(100% - var(--nav-size));
-    background-color: var(--dark-gray);
+    background-color: var(--color-bg);
+    color: var(--color-main);
 }
 
 a {
@@ -49,7 +54,7 @@ a:hover {
     gap: 2rem;
     grid-auto-flow: row;
     grid-template-rows: auto 1fr auto;
-    max-width: 1000px;
+    max-width: 900px;
     min-height: 100vh;
     padding: 2rem;
     transition: padding-top .125s;

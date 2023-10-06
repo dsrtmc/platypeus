@@ -17,6 +17,7 @@ export const AuthBox: React.FC<Props> = ({ initial }) => {
   const { data } = useSuspenseQuery(MeDocument);
   const [user, setUser] = useState(data?.me ? data.me : initial);
 
+  // NOTE: We are making a lot of requests for no reason, TODO: investigate this funny issue
   // not sure if that's correct but hey, it works :)
   useEffect(() => {
     if (data) setUser(data.me);

@@ -1,7 +1,6 @@
 import { getClient } from "@/lib/client";
 import { GetUserByUsernameDocument } from "@/graphql/generated/graphql";
 
-// ? "Cannot return null for non-nullable field" for some reason
 export default async function UserPage({ params }: { params: { username: string } }) {
   const { data } = await getClient().query({
     query: GetUserByUsernameDocument,

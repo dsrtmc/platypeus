@@ -72,7 +72,8 @@ builder.Services.AddGraphQLServer()
     .AddAuthorization()
     .AddMutationConventions()
     .RegisterDbContext<DatabaseContext>()
-    .RegisterService<IHttpContextAccessor>();
+    .RegisterService<IHttpContextAccessor>()
+    .AddProjections();
 
 var app = builder.Build();
 
@@ -93,63 +94,6 @@ await File.WriteAllTextAsync("schema.graphql", executor.Schema.ToString());
 // REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE
 app.MapGet("/", () => "><((((*>");
 app.MapGet("/secret", () => $"top secret").RequireAuthorization();
-
-// TODO: make POST later, GET for easier development
-// app.MapGet("/refresh-token", (IHttpContextAccessor accessor, DatabaseContext db) =>
-// {
-//     var resultJson = new JsonObject
-//     {
-//         ["accessToken"] = "",
-//         ["error"] = "",
-//     };
-//     
-//     // TODO: make better validation and error handling
-//     var token = accessor.HttpContext!.Request.Cookies[Environment.GetEnvironmentVariable("REFRESH_TOKEN_COOKIE_NAME")!];
-//     if (token is null)
-//     {
-//         resultJson["error"] = "token is null";
-//         return resultJson;
-//     }
-//
-//     var result = Authentication.ValidateToken(token, Environment.GetEnvironmentVariable("REFRESH_TOKEN_SECRET")!);
-//     if (result is null)
-//     {
-//         resultJson["error"] = "token validation result is null";
-//         return resultJson;
-//     }
-//     
-//     if (!result.IsValid)
-//     {
-//         resultJson["error"] = "token validation result is invalid";
-//         if (result.Exception is not null)
-//             Console.WriteLine($"Token validation exception: {result.Exception.Message}");
-//         
-//         return resultJson;
-//     }
-//     
-//     // The claims should never be empty and should always be strings
-//     var userIdClaim = (string)result.Claims[ClaimTypes.NameIdentifier];
-//     var tokenVersionClaim = (int)result.Claims[ClaimTypes.Version];
-//     
-//     var user = db.Users.Find(new Guid(userIdClaim!));
-//     if (user is null)
-//     {
-//         resultJson["error"] = "cannot find user with such an id";
-//         return resultJson;
-//     }
-//
-//     if (user.TokenVersion != tokenVersionClaim)
-//     {
-//         resultJson["error"] = "incorrect token version";
-//         return resultJson;
-//     }
-//
-//     // refresh the refresh token
-//     Authentication.SendRefreshToken(Authentication.CreateRefreshToken(user), accessor.HttpContext!);
-//
-//     resultJson["accessToken"] = Authentication.CreateAccessToken(user);
-//     return resultJson;
-// });
 
 app.MapGraphQL();
 
