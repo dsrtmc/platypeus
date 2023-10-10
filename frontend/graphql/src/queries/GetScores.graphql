@@ -1,8 +1,12 @@
-query GetScores {
-    scores {
+query GetScores($after: String, $before: String, $first: Int, $last: Int) {
+    scores(after: $after, before: $before, first: $first, last: $last) {
         edges {
             node {
+                id
                 averageWpm
+                user {
+                    username
+                }
             }
             cursor
         }

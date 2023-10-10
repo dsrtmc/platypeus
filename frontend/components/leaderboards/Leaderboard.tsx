@@ -1,36 +1,40 @@
-import React from "react";
-import { getClient } from "@/lib/client";
+"use client";
+
+import React, { startTransition, useEffect, useState } from "react";
 import { GetScoresDocument } from "@/graphql/generated/graphql";
+import { useLazyQuery, useSuspenseQuery } from "@apollo/client";
 
 interface Props {}
 
-export const Leaderboard: React.FC<Props> = ({}) => {
-  // ??????????? why is it null
-  const { data } = getClient().query({ query: GetScoresDocument });
+export function Leaderboard({}) {
+  // no idea why funny types cause funny squiggly types if everything's correct
+  const { data, fetchMore } = useSuspenseQuery(GetScoresDocument, { variables: { first: 1 } });
+  async function handleRefetch() {
+    startTransition(() => {
+      const a = fetchMore({
+        query: GetScoresDocument,
+        variables: { first: 1, after: data?.scores?.pageInfo?.endCursor },
+        updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+          return {
+            scores: {
+              pageInfo: fetchMoreResult?.scores?.pageInfo,
+              edges: [...previousQueryResult?.scores?.edges, ...fetchMoreResult?.scores?.edges],
+            },
+          };
+        },
+      });
+      a.then((x) => console.log(x));
+    });
+  }
   return (
     <>
-      <table>
-        <thead>
-          <tr>
-            <th>THIS WILL BE</th>
-            <th>a leaderboard :)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>this</td>
-            <td>will</td>
-            <td>be a</td>
-            <td>leaderboard</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <th>one day! this will become a leaderboard \(^o^)/</th>
-          </tr>
-        </tfoot>
-      </table>
+      {data?.scores?.edges.map((edge) => (
+        <div key={edge.node.id}>
+          {edge.node.averageWpm} by {edge.node.user?.username}
+        </div>
+      ))}
       <p>data: {JSON.stringify(data)}</p>
+      <button onClick={handleRefetch}> fetch more </button>
     </>
   );
-};
+}
