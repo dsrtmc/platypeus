@@ -26,8 +26,13 @@
     cursor: pointer;
 }
 
-.icon {
+.item {
     display: flex;
     align-items: center;
     font-size: 1.8rem;
+    transition: all 150ms ease;
+}
+
+.item:hover {
+    color: azure;
 }

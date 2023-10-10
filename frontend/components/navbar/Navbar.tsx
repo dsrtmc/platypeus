@@ -16,19 +16,19 @@ export default async function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={styles.box}>
-        <Link href={"/"} className={styles.icon}>
+        <Link href={"/"} className={styles.item}>
           platypeus
         </Link>
-        <Link href={"/"} className={styles.icon}>
+        <Link href={"/"} className={styles.item}>
           <BsKeyboardFill />
         </Link>
-        <Link href={"/leaderboards"} className={styles.icon}>
+        <Link href={"/leaderboards"} className={styles.item}>
           <BsBarChartFill />
         </Link>
-        <Link href={"/about"} className={styles.icon}>
+        <Link href={"/about"} className={styles.item}>
           <BsInfoLg />
         </Link>
-        <Link href={"/bye"} className={styles.icon}>
+        <Link href={"/bye"} className={styles.item}>
           Bye
         </Link>
       </div>

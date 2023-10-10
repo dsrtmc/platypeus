@@ -18,6 +18,7 @@ svg {
     --nav-size: 75px;
     --color-bg: #1a1a1a;
     --color-fg: #999;
+    --color-accent-1: palegoldenrod;
     
     /* Temporary, remove it in the future */
     --dark-gray: #222;

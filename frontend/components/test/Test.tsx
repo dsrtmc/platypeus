@@ -352,7 +352,7 @@ export const Test = forwardRef<TestMethods, Props>(
         const { right, top } = previousLetter.getBoundingClientRect();
         moveCaret(right, top);
       }
-    }, [wordIndex, letterIndex, windowSize]);
+    }, [wordIndex, letterIndex, windowSize, wordPool]);
 
     function handleSaveScore(data: Partial<ScoreType>) {
       onSaveScore(data);

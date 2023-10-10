@@ -19,7 +19,7 @@ export function LogoutButton() {
     }
   }
   return (
-    <button onClick={handleLogout} className={`${styles.logout} ${styles.icon}`}>
+    <button onClick={handleLogout} className={`${styles.logout} ${styles.item}`}>
       <BiLogOut />
     </button>
   );

@@ -28,7 +28,7 @@ export const AuthBox: React.FC<Props> = ({ initial }) => {
       {user ? (
         // logged in
         <>
-          <Link href={`/user/${user.username}`} className={styles.icon}>
+          <Link href={`/user/${user.username}`} className={styles.item}>
             {user.username}
             <BiSolidUser />
           </Link>
@@ -38,11 +38,11 @@ export const AuthBox: React.FC<Props> = ({ initial }) => {
       ) : (
         // logged out
         <>
-          <Link href={"/register"} className={styles.icon}>
+          <Link href={"/register"} className={styles.item}>
             register
             <BiUser />
           </Link>
-          <Link href={"/login"} className={styles.icon}>
+          <Link href={"/login"} className={styles.item}>
             <BiLogIn />
           </Link>
         </>
