@@ -16,8 +16,8 @@ svg {
 
 :root {
     --nav-size: 75px;
-    --color-bg: #222;
-    --color-main: white;
+    --color-bg: #1a1a1a;
+    --color-fg: #999;
     
     /* Temporary, remove it in the future */
     --dark-gray: #222;
@@ -36,8 +36,12 @@ html {
 
 body {
     height: calc(100% - var(--nav-size));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     background-color: var(--color-bg);
-    color: var(--color-main);
+    color: var(--color-fg);
 }
 
 a {

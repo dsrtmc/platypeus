@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Server.Models;
 using Server.Services;
 
@@ -15,9 +16,10 @@ public static class ScoreQueries
     [UsePaging]
     [UseProjection]
     // filtering /<- correct order
-    // sorting
+    [UseSorting]
     public static IQueryable<Score> GetScores(DatabaseContext db)
     {
+        // TODO: Distinct on User, not necessarily here or make it opt-in
         return db.Scores.Include(s => s.User);
     }
     

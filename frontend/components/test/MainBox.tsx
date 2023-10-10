@@ -29,10 +29,9 @@ export const MainBox: FC<Props> = ({}) => {
   async function handleSaveScore(score: ScoreType) {
     setShowScore(true);
     setScoreData(score);
-    // TODO: some validation of course
+    // TODO: some validation of course, anti-cheat (LONG SHOT)
     // TODO: Probably use a GraphQL fragment so I can do { input: { ...score } } or something alike
-    // for some reason after changing that my graphql server doesnt work through http lol sick
-    const result = await createScore({
+    await createScore({
       variables: {
         input: {
           averageWpm: Math.round(score.averageWpm), // since there's no way to enforce `int`, we round here just to be sure
@@ -43,7 +42,6 @@ export const MainBox: FC<Props> = ({}) => {
         },
       },
     });
-    console.log("Result:", result);
   }
 
   function handleStartNextTest() {

@@ -73,7 +73,8 @@ builder.Services.AddGraphQLServer()
     .AddMutationConventions()
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>()
-    .AddProjections();
+    .AddProjections()
+    .AddSorting();
 
 var app = builder.Build();
 

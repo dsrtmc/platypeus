@@ -30,18 +30,15 @@
 .box {
     display: flex;
     align-items: center;
+    gap: 2rem;
     flex-direction: column;
     width: 100%;
-    margin: auto;
-    color: white;
-    border: solid 1px cadetblue;
 }
 
 .words {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    border: 2px solid var(--gray);
     border-radius: 5px;
     font-size: 36px;
 }
@@ -51,14 +48,14 @@
 }
 
 .letter {
-    color: var(--light-gray);
+    color: var(--color-fg);
 }
 
 .caret {
     position: absolute;
     background-color: lightcyan;
-    border-radius: 25%;
-    width: 5px;
+    border-radius: 10%;
+    width: 3px;
     height: 48px;
     transition: all ease 100ms;
 }

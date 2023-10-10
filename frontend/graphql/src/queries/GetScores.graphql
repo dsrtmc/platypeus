@@ -1,5 +1,5 @@
-query GetScores($after: String, $before: String, $first: Int, $last: Int) {
-    scores(after: $after, before: $before, first: $first, last: $last) {
+query GetScores($after: String, $before: String, $first: Int, $last: Int, $order: [ScoreSortInput!]) {
+    scores(after: $after, before: $before, first: $first, last: $last, order: $order) {
         edges {
             node {
                 id
@@ -11,6 +11,7 @@ query GetScores($after: String, $before: String, $first: Int, $last: Int) {
             cursor
         }
         pageInfo {
+            hasNextPage
             endCursor
         }
     }

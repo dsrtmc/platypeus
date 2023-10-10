@@ -298,10 +298,10 @@ export const Test = forwardRef<TestMethods, Props>(
       (e: globalThis.KeyboardEvent) => {
         onKeyDown(e);
         if (finished || !focused) return;
-        if (e.key.length == 1) {
+        if (e.key.length === 1) {
           if (!running) handleStart();
           e.preventDefault();
-          if (e.key == " ") {
+          if (e.key === " ") {
             if (letterIndex) {
               moveForwardOneWord();
             }
@@ -310,7 +310,7 @@ export const Test = forwardRef<TestMethods, Props>(
             moveForwardOneLetter(e.key);
           }
         } else {
-          if (e.key == "Backspace") {
+          if (e.key === "Backspace") {
             if (e.ctrlKey) {
               deletePreviousWord();
             } else {

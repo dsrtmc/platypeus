@@ -35,7 +35,7 @@ export function TestBox({ handleSaveScore }: Props) {
       if (restartButtonRef && restartButtonRef.current) {
         restartButtonRef.current!.focus();
       }
-    } else if (e.key !== "Enter") {
+    } else if (e.key.length === 1) {
       if (restartButtonRef && restartButtonRef.current) {
         restartButtonRef.current!.blur();
       }

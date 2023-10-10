@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using HotChocolate.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Server.Models;
 using Server.Services;
 
@@ -14,7 +15,7 @@ public static class UserQueries
 
         if (claim is null)
         {
-            Console.WriteLine("WE ARE RETURNING NULL, THEREFORE ONE COULD DEDUCE WE HAVE NO COOKIE LOL");
+            Console.WriteLine("Me query has been called without an authentication cookie present.");
             return null;
         }
         
@@ -23,7 +24,7 @@ public static class UserQueries
 
     public static User? GetUserByUsername(string username, DatabaseContext db)
     {
-        return db.Users.FirstOrDefault(u => u.Username == username);
+        return db.Users.Include(u => u.Scores).FirstOrDefault(u => u.Username == username);
     }
     
     public static User? GetUserById(Guid id, DatabaseContext db)
