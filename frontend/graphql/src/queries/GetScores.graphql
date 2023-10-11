@@ -7,6 +7,9 @@ query GetScores($after: String, $before: String, $first: Int, $last: Int, $order
                 user {
                     username
                 }
+                mode
+                modeSetting
+                createdAt
             }
             cursor
         }

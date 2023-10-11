@@ -2,49 +2,53 @@
 
 import styles from "@/components/navbar/Navbar.module.css";
 import React, { useEffect, useState } from "react";
-import { useSuspenseQuery } from "@apollo/client";
-import { MeDocument } from "@/graphql/generated/graphql";
-import Link from "next/link";
-import { BiLogIn, BiSolidUser, BiUser } from "react-icons/bi";
+import { useMutation, useSuspenseQuery } from "@apollo/client";
+import { LogoutDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
+import { BiLogIn, BiLogOut, BiSolidUser, BiUser } from "react-icons/bi";
 import { LogoutButton } from "@/components/navbar/LogoutButton";
+import { NavLink } from "@/components/navbar/NavLink";
+import { NavButton } from "@/components/navbar/NavButton";
+import { useRouter } from "next/navigation";
 
 interface Props {
-  // make it a better type TODO
-  initial: { __typename?: "User"; id: any; username: string } | null | undefined;
+  initial: MeQuery["me"];
 }
 
 export const AuthBox: React.FC<Props> = ({ initial }) => {
   const { data } = useSuspenseQuery(MeDocument);
   const [user, setUser] = useState(data?.me ? data.me : initial);
+  const [logout, { client }] = useMutation(LogoutDocument);
+  const router = useRouter();
 
-  // NOTE: We are making a lot of requests for no reason, TODO: investigate this funny issue
-  // not sure if that's correct but hey, it works :)
   useEffect(() => {
     if (data) setUser(data.me);
   }, [data]);
 
+  async function handleLogout() {
+    await logout();
+    router.push("/login");
+    try {
+      await client.resetStore();
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  }
+
   return (
     <div className={styles.box}>
       {user ? (
-        // logged in
         <>
-          <Link href={`/user/${user.username}`} className={styles.item}>
+          <NavLink href={`/user/${user.username}`} Icon={BiSolidUser} textPosition={"left"}>
             {user.username}
-            <BiSolidUser />
-          </Link>
-          {/* TODO: maybe just keep the logout here, no need for abstraction */}
-          <LogoutButton />
+          </NavLink>
+          <NavButton onClick={handleLogout} Icon={BiLogOut} />
         </>
       ) : (
-        // logged out
         <>
-          <Link href={"/register"} className={styles.item}>
+          <NavLink href={"/register"} Icon={BiSolidUser} textPosition={"left"}>
             register
-            <BiUser />
-          </Link>
-          <Link href={"/login"} className={styles.item}>
-            <BiLogIn />
-          </Link>
+          </NavLink>
+          <NavLink href={"/login"} Icon={BiLogIn} />
         </>
       )}
     </div>

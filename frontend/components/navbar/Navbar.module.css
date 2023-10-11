@@ -1,9 +1,7 @@
 .navbar {
-    display: grid;
-    grid-template-columns: auto 1fr;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    grid-auto-flow: column;
-    gap: 1rem;
     height: var(--nav-size);
     margin: auto;
     width: 100%;
@@ -11,11 +9,10 @@
 
 .box {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .spacer {
-    background-color: #b4b4ed;
 }
 
 .logout {
@@ -27,12 +24,17 @@
 }
 
 .item {
+    all: unset;
     display: flex;
+    gap: .5rem;
     align-items: center;
-    font-size: 1.5rem;
     transition: all 150ms ease;
 }
 
 .item:hover {
     color: azure;
+}
+
+.icon {
+    font-size: 1.5rem;
 }

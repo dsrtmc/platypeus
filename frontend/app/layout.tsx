@@ -2,8 +2,8 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import { ApolloWrapper } from "@/lib/apollo-provider";
-import Navbar from "@/components/navbar/Navbar";
 import { ContentWrapper } from "@/components/ContentWrapper";
+import { Header } from "@/components/header/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={inter.className}>
         <ApolloWrapper>
           <ContentWrapper>
-            <Navbar />
+            <Header />
             {children}
           </ContentWrapper>
         </ApolloWrapper>

@@ -1,0 +1,19 @@
+.header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.logo {
+    background-image: linear-gradient(var(--color-accent-1), mediumvioletred, slateblue);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.logo:hover {
+    background-image: linear-gradient(#444, #444);
+}
