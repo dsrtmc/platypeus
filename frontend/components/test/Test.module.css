@@ -6,10 +6,28 @@
 }
 
 .top {
+    position: relative;
     display: flex;
     gap: 1rem;
-    justify-content: center;
+    justify-content: space-between;
     width: 100%;
+}
+
+.left {
+    display: flex;
+    gap: 1rem;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+}
+
+.right {
+    display: flex;
 }
 
 .middle {
@@ -40,7 +58,9 @@
     flex-wrap: wrap;
     gap: 1rem;
     border-radius: 5px;
-    font-size: 36px;
+    font-size: 1.5rem;
+    height: 9rem;
+    overflow: hidden;
 }
 
 .word {
@@ -56,7 +76,7 @@
     background-color: lightcyan;
     border-radius: 10%;
     width: 3px;
-    height: 48px;
+    height: 2em;
     transition: all ease 100ms;
 }
 
@@ -92,7 +112,7 @@
 .selection {
     display: flex;
     gap: 1rem;
-    margin-left: auto;
+    /*margin-left: auto;*/
 }
 
 .setting {
@@ -115,22 +135,33 @@
 
 .counter {
     font-size: 2rem;
-    margin-right: auto;
+    /*margin-right: auto;*/
 }
 
 .mode {
-    color: crimson;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 150ms ease;
+}
+
+.mode:hover {
+    cursor: pointer;
+    color: var(--color-accent-1);
 }
 
 .restart {
     all: unset;
     color: #666;
     transition: color 150ms ease;
-    padding: 6px 8px;
+    padding: .75rem 1.5rem;
+    font-size: 1.25rem;
+    border: 2px solid #fff0;
 }
 
 .restart:hover {
     cursor: pointer;
+    color: white;
 }
 
 .restart:focus {

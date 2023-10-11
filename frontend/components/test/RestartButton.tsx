@@ -1,5 +1,6 @@
 import { FC, forwardRef, MouseEvent } from "react";
 import styles from "./Test.module.css";
+import { VscDebugRestart } from "react-icons/vsc";
 
 interface Props {
   onReset: () => void;
@@ -13,7 +14,7 @@ export const RestartButton: FC<Props> = forwardRef(({ onReset }: Props, ref) => 
 
   return (
     <button onClick={handleReset} className={styles.restart} ref={ref}>
-      RESTART
+      <VscDebugRestart />
     </button>
   );
 });

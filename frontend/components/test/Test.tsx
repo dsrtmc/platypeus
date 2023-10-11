@@ -283,7 +283,7 @@ export const Test = forwardRef<TestMethods, Props>(
       setLineSkip(true);
       let words = [];
       wordsRef.current = [];
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 50; i++) {
         words.push(createWordElement());
       }
       setWordPool(words);
@@ -327,9 +327,10 @@ export const Test = forwardRef<TestMethods, Props>(
     );
 
     // Initialize the pool
+    // TODO: code duplication? initialization is the same as resetting the test
     useEffect(() => {
       let words = [];
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 50; i++) {
         words.push(createWordElement());
       }
       setWordPool(words);

@@ -9,6 +9,7 @@ import { Counter } from "@/components/test/Counter";
 import { RestartButton } from "@/components/test/RestartButton";
 import { Score as ScoreType } from "@/graphql/generated/graphql";
 import { Mode } from "@/components/test/Mode";
+import { HiMiniLanguage } from "react-icons/hi2";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -111,18 +112,27 @@ export function TestBox({ handleSaveScore }: Props) {
   if (visible) {
     return (
       <div className={styles.box} ref={ref}>
-        <div className={styles.top}>
-          <Timer time={time} />
-          <Counter count={wpm} />
+        <section className={styles.top}>
+          <section className={styles.left}>
+            <Timer time={time} />
+            <Counter count={wpm} />
+          </section>
           {/* that should actually be called Language lol */}
-          <Mode>english</Mode>
-          <TimeSettingSelection
-            timeSettings={[5, 15, 30]}
-            currentTimeSetting={timeSetting}
-            handleSelect={handleTimeSettingSelection}
-          />
-        </div>
-        <div className={styles.middle}>
+          {/* HOW CAN I CENTER A DIV LOL */}
+          <section className={styles.center}>
+            <Mode>
+              <HiMiniLanguage /> english
+            </Mode>
+          </section>
+          <section className={styles.right}>
+            <TimeSettingSelection
+              timeSettings={[5, 15, 30]}
+              currentTimeSetting={timeSetting}
+              handleSelect={handleTimeSettingSelection}
+            />
+          </section>
+        </section>
+        <section className={styles.middle}>
           <Test
             focused={focused}
             running={running}
@@ -135,11 +145,11 @@ export function TestBox({ handleSaveScore }: Props) {
             ref={testRef}
             onSaveScore={handleSaveScore}
           />
-        </div>
-        <div className={styles.bottom}>
+        </section>
+        <section className={styles.bottom}>
           <RestartButton onReset={handleReset} ref={restartButtonRef} />
           <p>{focused ? "FOCUSED" : "UNFOCUSED"}</p>
-        </div>
+        </section>
       </div>
     );
   }

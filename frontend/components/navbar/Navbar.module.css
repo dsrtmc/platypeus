@@ -29,7 +29,7 @@
 .item {
     display: flex;
     align-items: center;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     transition: all 150ms ease;
 }
 
