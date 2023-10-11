@@ -10,7 +10,7 @@ interface Props {
 export const NavButton: React.FC<Props> = ({ onClick, Icon }) => {
   return (
     <button onClick={onClick} className={styles.item}>
-      <Icon />
+      <Icon className={styles.icon} />
     </button>
   );
 };

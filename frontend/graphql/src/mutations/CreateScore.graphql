@@ -2,7 +2,7 @@ mutation CreateScore($input: CreateScoreInput!) {
     createScore(input: $input) {
         score {
             id
-            averageWpm
+            wpm
             rawWpm
             mode
             modeSetting

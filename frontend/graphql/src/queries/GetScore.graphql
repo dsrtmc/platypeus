@@ -1,7 +1,7 @@
 query GetScore($id: UUID!) {
     score(id: $id) {
         id
-        averageWpm
+        wpm
         rawWpm
     }
 }

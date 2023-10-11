@@ -11,7 +11,7 @@ export function Leaderboard({}) {
   // TODO: stupid fucking types
   // TODO: also for some reason there's this funny duplication error, I have a hard time believing it's my fault
   const { data, fetchMore } = useSuspenseQuery(GetScoresDocument, {
-    variables: { first: 1, order: [{ averageWpm: "DESC" }] },
+    variables: { first: 1, order: [{ wpm: "DESC" }] },
   });
   async function handleRefetch() {
     if (data?.scores?.pageInfo?.hasNextPage) {
@@ -21,7 +21,7 @@ export function Leaderboard({}) {
           variables: {
             first: 10,
             after: data?.scores?.pageInfo?.endCursor,
-            order: [{ averageWpm: "DESC" }],
+            order: [{ wpm: "DESC" }],
           } as Partial<GetScoresQueryVariables>,
           updateQuery: (previousQueryResult, { fetchMoreResult }) => {
             console.log("Previous query result:", previousQueryResult);
@@ -79,8 +79,8 @@ export function Leaderboard({}) {
                 <p className="secondary-data">{edge.node.user.username}</p>
               </td>
               <td>
-                <p className="main-data numeric">{edge.node.averageWpm}</p>
-                <p className="secondary-data numeric">{edge.node.averageWpm * 5}</p>
+                <p className="main-data numeric">{edge.node.wpm}</p>
+                <p className="secondary-data numeric">{edge.node.wpm * 5}</p>
               </td>
               <td>
                 <p className="main-data numeric">{edge.node.rawWpm}</p>

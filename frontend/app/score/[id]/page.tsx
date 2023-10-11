@@ -11,9 +11,8 @@ export default async function ScorePage({ params }: { params: { id: string } }) 
   return (
     <div>
       this is the <code>score</code> page
-      <h1>avg WPM: {data.score?.averageWpm}</h1>
+      <h1>WPM: {data.score?.wpm}</h1>
       <h2>raw WPM: {data.score?.rawWpm}</h2>
-      <h3>time setting: {data.score?.time}</h3>
     </div>
   );
 }

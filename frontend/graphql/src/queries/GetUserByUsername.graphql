@@ -3,7 +3,7 @@ query GetUserByUsername($username: String!) {
         username
         scores {
             id
-            averageWpm
+            wpm
         }
         createdAt
         updatedAt

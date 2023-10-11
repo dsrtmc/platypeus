@@ -4,7 +4,7 @@ namespace Server.Models;
 // probably some test data like language, setting etc.
 public class Score : BaseEntity
 {
-    public int AverageWpm { get; init; }
+    public int Wpm { get; init; }
 
     public int RawWpm { get; init; }
 
@@ -13,6 +13,12 @@ public class Score : BaseEntity
     public int ModeSetting { get; init; } // "time" -> 15; "words" -> 25 etc.
 
     public string Language { get; init; } = null!; // "english" 🥸
+    
+    public float Accuracy { get; init; }
+
+    public List<int> WpmStats { get; set; } = new();
+
+    public List<int> RawStats { get; set; } = new();
 
     public User? User { get; set; }
     

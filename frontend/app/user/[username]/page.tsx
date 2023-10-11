@@ -17,7 +17,7 @@ export default async function UserPage({ params }: { params: { username: string 
       this account has been created on<code>{JSON.stringify(new Date(data.userByUsername.createdAt))}</code>
       all user's scores:{" "}
       {data.userByUsername.scores.map((score) => (
-        <p key={score.id}>wpm: {score.averageWpm}</p>
+        <p key={score.id}>wpm: {score.wpm}</p>
       ))}
     </div>
   );

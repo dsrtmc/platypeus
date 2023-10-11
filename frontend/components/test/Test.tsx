@@ -40,6 +40,8 @@ type State = {
   correctCharacters: number;
   nonEmptyCharacters: number; // correct && incorrect, used for calculating raw
   allWordsLength: number;
+  wpmStats: number[];
+  rawStats: number[];
 };
 
 const reducer = (current: State, update: Partial<State>) => ({ ...current, ...update });
@@ -48,6 +50,8 @@ const initialState: State = {
   correctCharacters: 0,
   nonEmptyCharacters: 0,
   allWordsLength: 0,
+  wpmStats: [],
+  rawStats: [],
 };
 
 export const Test = forwardRef<TestMethods, Props>(
@@ -64,7 +68,7 @@ export const Test = forwardRef<TestMethods, Props>(
     const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
     const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
 
-    const [{ correctCharacters, nonEmptyCharacters, allWordsLength }, dispatch] = useReducer(
+    const [{ correctCharacters, nonEmptyCharacters, allWordsLength, wpmStats, rawStats }, dispatch] = useReducer(
       reducer,
       initialState as ReducerState<State>
     );
@@ -359,15 +363,24 @@ export const Test = forwardRef<TestMethods, Props>(
       onSaveScore(data);
     }
 
-    // NOTE: it only affects the visual real-time WPM counter, does not really change our state
+    // NOTE: WPM only affects the visual real-time WPM counter, it does not change our state.
+    // WpmStats and RawStats are affected, though - keep that in mind.
+    // TODO: THIS ENTIRE FILE HAS TO BE CLEANED UP ONE DAY HOLY KAPPA CHUNGUS
     useEffect(() => {
       const delta = timeSetting - time;
       if (delta === timeSetting) return; // no need to recalculate here because the component will near-immediately unmount
       if (delta > 0) {
         const currentWord = wordsRef.current[wordIndex];
-        const { correctCount } = calculateCurrentWord(currentWord);
-        let chars = correctCharacters + correctCount;
-        handleChangeWpm((chars / 5) * (60 / delta));
+        const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
+
+        let correctChars = correctCharacters + correctCount;
+        let nonEmptyChars = nonEmptyCharacters + nonEmptyCount;
+        const wpm = (correctChars / 5) * (60 / delta);
+        const rawWpm = (nonEmptyChars / 5) * (60 / delta);
+
+        dispatch({ wpmStats: [...wpmStats, wpm] });
+        dispatch({ rawStats: [...rawStats, rawWpm] });
+        handleChangeWpm(wpm);
       }
     }, [time]);
 
@@ -377,15 +390,25 @@ export const Test = forwardRef<TestMethods, Props>(
         const currentWord = wordsRef.current[wordIndex];
         const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 
-        dispatch({ correctCharacters: correctCharacters + correctCount });
-        dispatch({ nonEmptyCharacters: nonEmptyCharacters + nonEmptyCount });
+        const newCorrectCount = correctCharacters + correctCount;
+        const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
+
+        dispatch({ correctCharacters: newCorrectCount });
+        dispatch({ nonEmptyCharacters: newNonEmptyCount });
         dispatch({ nonEmptyCharacters: allWordsLength + nonEmptyCount });
 
+        const accuracy = (newCorrectCount / 5 / (newNonEmptyCount / 5)) * 100;
+
+        // TODO: Calculate wpmStats and rawStats last input, right now it has (time - 1)
+        // -------------------
         // TODO: calculateWpm function(s)
         const score: Partial<ScoreType> = {
-          rawWpm: Math.round(((nonEmptyCharacters + nonEmptyCount) / 5) * (60 / timeSetting)),
-          averageWpm: Math.round(((correctCharacters + correctCount) / 5) * (60 / timeSetting)),
+          rawWpm: Math.round((newNonEmptyCount / 5) * (60 / timeSetting)),
+          wpm: Math.round((newCorrectCount / 5) * (60 / timeSetting)),
           mode: "time",
+          accuracy,
+          wpmStats,
+          rawStats,
           modeSetting: 15,
           language: "english",
         };

@@ -48,7 +48,7 @@ export const AuthBox: React.FC<Props> = ({ initial }) => {
           <NavLink href={"/register"} Icon={BiSolidUser} textPosition={"left"}>
             register
           </NavLink>
-          <NavLink href={"/login"} Icon={BiLogIn} />
+          <NavLink href={"/login"} Icon={BiLogIn} /> {/* why does its size not change lol */}
         </>
       )}
     </div>

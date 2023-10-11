@@ -1,7 +1,6 @@
 import React, { PropsWithChildren } from "react";
 import Link from "next/link";
 import styles from "@/components/navbar/Navbar.module.css";
-import { BsKeyboardFill } from "react-icons/bs";
 import { IconType } from "react-icons";
 
 interface Props {

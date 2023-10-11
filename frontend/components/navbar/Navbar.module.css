@@ -15,14 +15,6 @@
 .spacer {
 }
 
-.logout {
-    all: unset;
-}
-
-.logout:hover {
-    cursor: pointer;
-}
-
 .item {
     all: unset;
     display: flex;
@@ -32,6 +24,7 @@
 }
 
 .item:hover {
+    cursor: pointer;
     color: azure;
 }
 

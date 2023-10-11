@@ -11,10 +11,13 @@ interface Props {}
 
 const initialScore: ScoreType = {
   id: undefined,
-  averageWpm: 0,
+  wpm: 0,
   rawWpm: 0,
   mode: "",
+  accuracy: 0,
   modeSetting: 0,
+  wpmStats: [],
+  rawStats: [],
   language: "",
   createdAt: undefined,
   updatedAt: undefined,
@@ -31,17 +34,22 @@ export const MainBox: FC<Props> = ({}) => {
     setScoreData(score);
     // TODO: some validation of course, anti-cheat (LONG SHOT)
     // TODO: Probably use a GraphQL fragment so I can do { input: { ...score } } or something alike
-    await createScore({
+    // TODO: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    const response = await createScore({
       variables: {
         input: {
-          averageWpm: Math.round(score.averageWpm), // since there's no way to enforce `int`, we round here just to be sure
+          wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
           rawWpm: Math.round(score.rawWpm), // up
+          accuracy: score.accuracy,
+          wpmStats: score.wpmStats,
+          rawStats: score.rawStats,
           mode: score.mode,
           modeSetting: score.modeSetting,
           language: score.language,
         },
       },
     });
+    console.log("response:", response);
   }
 
   function handleStartNextTest() {

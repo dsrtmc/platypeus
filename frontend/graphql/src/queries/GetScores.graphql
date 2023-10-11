@@ -3,7 +3,7 @@ query GetScores($after: String, $before: String, $first: Int, $last: Int, $order
         edges {
             node {
                 id
-                averageWpm
+                wpm
                 user {
                     username
                 }
