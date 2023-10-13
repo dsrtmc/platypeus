@@ -19,6 +19,7 @@ import styles from "./Test.module.css";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
+import { calculateWpm } from "@/utils/calculateWpm";
 
 interface Props {
   focused: boolean;
@@ -40,6 +41,7 @@ type State = {
   correctCharacters: number;
   nonEmptyCharacters: number; // correct && incorrect, used for calculating raw
   allWordsLength: number;
+  accuracy: number;
   wpmStats: number[];
   rawStats: number[];
 };
@@ -50,6 +52,7 @@ const initialState: State = {
   correctCharacters: 0,
   nonEmptyCharacters: 0,
   allWordsLength: 0,
+  accuracy: 0,
   wpmStats: [],
   rawStats: [],
 };
@@ -59,6 +62,7 @@ export const Test = forwardRef<TestMethods, Props>(
     { focused, running, finished, time, timeSetting, handleChangeWpm, handleStart, onKeyDown, onSaveScore }: Props,
     ref
   ) => {
+    // TODO: for some reason raw seems weird on 30s test, idk if im just testing incorrectly or Xd
     const [wordIndex, setWordIndex] = useState(-1);
     const [letterIndex, setLetterIndex] = useState(-1);
     const [lineSkip, setLineSkip] = useState(true);
@@ -68,10 +72,8 @@ export const Test = forwardRef<TestMethods, Props>(
     const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
     const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
 
-    const [{ correctCharacters, nonEmptyCharacters, allWordsLength, wpmStats, rawStats }, dispatch] = useReducer(
-      reducer,
-      initialState as ReducerState<State>
-    );
+    const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, wpmStats, rawStats }, dispatch] =
+      useReducer(reducer, initialState as ReducerState<State>);
 
     const caretRef = useRef<HTMLDivElement | null>(null);
     const wordsRef = useRef<Array<HTMLDivElement>>([]);
@@ -190,7 +192,7 @@ export const Test = forwardRef<TestMethods, Props>(
       const currentLetter = currentWord.children[letterIndex];
       if (!currentLetter) return;
 
-      if (key == currentLetter.textContent) {
+      if (key === currentLetter.textContent) {
         currentLetter.classList.add(styles.correct);
       } else {
         currentLetter.classList.add(styles.incorrect);
@@ -272,12 +274,35 @@ export const Test = forwardRef<TestMethods, Props>(
       }
     }
 
+    function updateStats(delta: number) {
+      const currentWord = wordsRef.current[wordIndex];
+      const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
+
+      const newCorrectCount = correctCharacters + correctCount;
+      const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
+
+      const wpm = calculateWpm(newCorrectCount, delta);
+      const rawWpm = calculateWpm(newNonEmptyCount, delta);
+
+      dispatch({ wpmStats: [...wpmStats, wpm] });
+      dispatch({ rawStats: [...rawStats, rawWpm] });
+
+      dispatch({ correctCharacters: newCorrectCount });
+      dispatch({ nonEmptyCharacters: newNonEmptyCount });
+      dispatch({ allWordsLength: allWordsLength + nonEmptyCount });
+
+      // if we ever somehow divide by 0 here we're in bigger trouble
+      dispatch({ accuracy: newCorrectCount / newNonEmptyCount });
+
+      handleChangeWpm(wpm);
+    }
+
     function createWordElement() {
       // funny type idk if correct
       return createElement(Word as FunctionComponent<Word>, {
         word: generateWord(),
         ref: addToRefs,
-        key: `word-${generateRandomString(5)}`,
+        key: `word-${generateRandomString(7)}`,
       });
     }
 
@@ -291,10 +316,7 @@ export const Test = forwardRef<TestMethods, Props>(
         words.push(createWordElement());
       }
       setWordPool(words);
-      // TODO: i likely dont need to do n lines like that
-      dispatch({ correctCharacters: 0 });
-      dispatch({ nonEmptyCharacters: 0 });
-      dispatch({ allWordsLength: 0 });
+      dispatch(initialState);
     }
 
     // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
@@ -370,17 +392,7 @@ export const Test = forwardRef<TestMethods, Props>(
       const delta = timeSetting - time;
       if (delta === timeSetting) return; // no need to recalculate here because the component will near-immediately unmount
       if (delta > 0) {
-        const currentWord = wordsRef.current[wordIndex];
-        const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
-
-        let correctChars = correctCharacters + correctCount;
-        let nonEmptyChars = nonEmptyCharacters + nonEmptyCount;
-        const wpm = (correctChars / 5) * (60 / delta);
-        const rawWpm = (nonEmptyChars / 5) * (60 / delta);
-
-        dispatch({ wpmStats: [...wpmStats, wpm] });
-        dispatch({ rawStats: [...rawStats, rawWpm] });
-        handleChangeWpm(wpm);
+        updateStats(delta);
       }
     }, [time]);
 
@@ -393,23 +405,17 @@ export const Test = forwardRef<TestMethods, Props>(
         const newCorrectCount = correctCharacters + correctCount;
         const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
 
-        dispatch({ correctCharacters: newCorrectCount });
-        dispatch({ nonEmptyCharacters: newNonEmptyCount });
-        dispatch({ nonEmptyCharacters: allWordsLength + nonEmptyCount });
+        const wpm = calculateWpm(newCorrectCount, timeSetting);
+        const rawWpm = calculateWpm(newNonEmptyCount, timeSetting);
 
-        const accuracy = (newCorrectCount / 5 / (newNonEmptyCount / 5)) * 100;
-
-        // TODO: Calculate wpmStats and rawStats last input, right now it has (time - 1)
-        // -------------------
-        // TODO: calculateWpm function(s)
         const score: Partial<ScoreType> = {
-          rawWpm: Math.round((newNonEmptyCount / 5) * (60 / timeSetting)),
-          wpm: Math.round((newCorrectCount / 5) * (60 / timeSetting)),
+          wpm,
+          rawWpm,
           mode: "time",
-          accuracy,
-          wpmStats,
-          rawStats,
-          modeSetting: 15,
+          accuracy: newCorrectCount / newNonEmptyCount,
+          wpmStats: [...wpmStats, wpm],
+          rawStats: [...rawStats, rawWpm],
+          modeSetting: timeSetting,
           language: "english",
         };
         handleSaveScore(score);

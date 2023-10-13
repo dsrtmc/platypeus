@@ -170,7 +170,7 @@
     border-radius: 10px;
 }
 
+/* TODO: maybe move it to another module, I can't say I hardcore like it being here */
 .score {
     color: white;
-    background-color: darkslateblue;
 }

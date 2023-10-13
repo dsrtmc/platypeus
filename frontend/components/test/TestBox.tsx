@@ -53,6 +53,7 @@ export function TestBox({ handleSaveScore }: Props) {
 
   function handleTimeSettingSelection(time: number) {
     return () => {
+      handleReset();
       setTimeSetting(time);
     };
   }
