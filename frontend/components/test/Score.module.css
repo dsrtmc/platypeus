@@ -1,0 +1,48 @@
+.score {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "stats chart"
+                         "stats2 stats2";
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    width: 100%;
+    overflow: visible;
+}
+
+.chart {
+    grid-area: chart;
+    height: 200px;
+    width: 100%!important;
+}
+
+.stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    grid-area: stats;
+}
+
+.stats2 {
+    display: flex;
+    gap: 1rem;
+    grid-area: stats2;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.top {
+    color: var(--light-gray);
+}
+
+.bottom {
+    
+}
+
+.big {
+    font-size: 2rem;
+}

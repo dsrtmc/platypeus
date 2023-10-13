@@ -20,6 +20,8 @@ svg {
     --color-fg: #999;
     --color-accent-1: palegoldenrod;
     
+    --wrapper-width: 900px;
+    
     /* Temporary, remove it in the future */
     --dark-gray: #222;
     --gray: #444;
@@ -59,7 +61,7 @@ a:hover {
     gap: 2rem;
     grid-auto-flow: row;
     grid-template-rows: auto 1fr auto;
-    max-width: 900px;
+    max-width: var(--wrapper-width);
     min-height: 100vh;
     padding: 2rem;
     transition: padding-top .125s;

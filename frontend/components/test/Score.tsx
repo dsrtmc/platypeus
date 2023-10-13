@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { Score } from "@/graphql/generated/graphql";
-import styles from "./Test.module.css";
+import styles from "./Score.module.css";
 import { Line } from "react-chartjs-2";
 import {
   CategoryScale,
@@ -33,7 +33,7 @@ export const Score: FC<Props> = ({ score }) => {
         beginAtZero: true,
       },
     },
-    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top" as const,
@@ -65,17 +65,36 @@ export const Score: FC<Props> = ({ score }) => {
   };
   return (
     <div className={styles.score}>
-      <h1>score</h1>
-      <h3>mode: {score.mode}</h3>
-      <h3>modeSetting: {score.modeSetting}</h3>
-      <h3>wpm chart: {score.wpmStats.join("|")}</h3>
-      <h3>raw wpm chart: {score.rawStats.join("|")}</h3>
-      <h3>accuracy: {score.accuracy}</h3>
-      <h3>average wpm: {score.wpm}</h3>
-      <h3>raw wpm: {score.rawWpm}</h3>
-      <h3>mode: {score.mode}</h3>
-      <h3>language: {score.language}</h3>
-      <Line data={data} options={options} />
+      <div className={styles.stats}>
+        <div className={styles.group}>
+          <div className={styles.top}>wpm</div>
+          <div className={`${styles.bottom} ${styles.big}`}>{score.wpm}</div>
+        </div>
+        <div className={styles.group}>
+          <div className={styles.top}>acc</div>
+          <div className={`${styles.bottom} ${styles.big}`}>{Math.round(score.accuracy * 100)}%</div>
+        </div>
+      </div>
+      <div className={styles.chart}>
+        <Line data={data} options={options} />
+      </div>
+      <div className={styles.stats2}>
+        <div className={styles.group}>
+          <div className={styles.top}>mode</div>
+          <div className={styles.bottom}>
+            {score.mode} {score.language}
+          </div>
+        </div>
+        <div className={styles.group}>
+          <div className={styles.top}>raw</div>
+          <div className={styles.bottom}>{score.rawWpm}</div>
+        </div>
+        <div className={styles.group}>
+          {/* depends on the test mode */}
+          <div className={styles.top}>time</div>
+          <div className={styles.bottom}>{score.modeSetting}</div>
+        </div>
+      </div>
     </div>
   );
 };
