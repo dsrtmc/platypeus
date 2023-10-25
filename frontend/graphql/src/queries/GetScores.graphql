@@ -1,5 +1,5 @@
-query GetScores($after: String, $before: String, $first: Int, $last: Int, $order: [ScoreSortInput!]) {
-    scores(after: $after, before: $before, first: $first, last: $last, order: $order) {
+query GetScores($after: String, $before: String, $first: Int, $last: Int, $order: [ScoreSortInput!], $where: ScoreFilterInput) {
+    scores(after: $after, before: $before, first: $first, last: $last, order: $order, where: $where) {
         edges {
             node {
                 id

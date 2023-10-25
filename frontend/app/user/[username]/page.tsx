@@ -1,24 +1,60 @@
 import { getClient } from "@/lib/client";
-import { GetUserByUsernameDocument } from "@/graphql/generated/graphql";
+import styles from "./User.module.css";
+import {
+  GetScoresDocument,
+  GetScoresQueryVariables,
+  GetUserByUsernameDocument,
+  GetUsersBestScoresDocument,
+} from "@/graphql/generated/graphql";
+import { ChartData } from "chart.js";
+import { PerformanceChart } from "@/app/user/[username]/PerformanceChart";
 
 export default async function UserPage({ params }: { params: { username: string } }) {
-  const { data } = await getClient().query({
+  const { data: userData } = await getClient().query({
     query: GetUserByUsernameDocument,
     variables: {
       username: params.username,
     },
   });
-  if (!data.userByUsername) return <div>no such user</div>;
+  if (!userData.userByUsername) return <div>no such user</div>;
+  const { data: bestScoresData } = await getClient().query({
+    query: GetUsersBestScoresDocument,
+    variables: {
+      userId: userData.userByUsername?.id,
+    },
+  });
+  const { data: scoresData } = await getClient().query({
+    query: GetScoresDocument,
+    variables: {
+      where: {
+        or: [
+          {
+            user: {
+              username: {
+                eq: params.username,
+              },
+            },
+          },
+        ],
+      },
+    } as GetScoresQueryVariables,
+  });
   return (
     <div>
-      <p>
-        hello you are on <code>{data.userByUsername.username}</code> page
-      </p>
-      this account has been created on<code>{JSON.stringify(new Date(data.userByUsername.createdAt))}</code>
-      all user's scores:{" "}
-      {data.userByUsername.scores.map((score) => (
-        <p key={score.id}>wpm: {score.wpm}</p>
-      ))}
+      <div>
+        this account has been created on<code>{JSON.stringify(new Date(userData.userByUsername.createdAt))}</code>
+      </div>
+      <div className={styles.box}>
+        {/* TODO: Fix nullable stuff here, we shouldn't have gaps */}
+        {bestScoresData.usersBestScores.map((score) => (
+          <div key={score?.modeSetting} className={styles.group}>
+            <div className={styles.top}>{score?.modeSetting} seconds</div>
+            <div className={styles.middle}>{score?.wpm}</div>
+            <div className={styles.bottom}>{score?.accuracy.toFixed(2) * 100}%</div>
+          </div>
+        ))}
+      </div>
+      <PerformanceChart scoresData={scoresData} />
     </div>
   );
 }

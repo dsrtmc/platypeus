@@ -398,7 +398,6 @@ export const Test = forwardRef<TestMethods, Props>(
 
     useEffect(() => {
       if (finished) {
-        // TODO: clean this shit up lol also scroll up and rename these stuff like `correct` to `correctCount` for consistency
         const currentWord = wordsRef.current[wordIndex];
         const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 

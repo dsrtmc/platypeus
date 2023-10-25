@@ -1,0 +1,8 @@
+query GetUsersBestScores($userId: UUID!) {
+    usersBestScores(userId: $userId) {
+        wpm
+        mode
+        modeSetting
+        accuracy
+    }
+}

@@ -15,7 +15,7 @@ public static class ScoreQueries
     
     [UsePaging]
     [UseProjection]
-    // filtering /<- correct order
+    [UseFiltering]
     [UseSorting]
     public static IQueryable<Score> GetScores(DatabaseContext db)
     {

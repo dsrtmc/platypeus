@@ -127,7 +127,7 @@ export function TestBox({ handleSaveScore }: Props) {
           </section>
           <section className={styles.right}>
             <TimeSettingSelection
-              timeSettings={[5, 15, 30]}
+              timeSettings={[5, 15, 30, 60]}
               currentTimeSetting={timeSetting}
               handleSelect={handleTimeSettingSelection}
             />

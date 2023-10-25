@@ -22,6 +22,18 @@ public static class UserQueries
         return db.Users.Find(new Guid(claim.Value));
     }
 
+    public static List<Score?> GetUsersBestScores(Guid userId, DatabaseContext db)
+    {
+        var user = db.Users.Include(u => u.Scores).FirstOrDefault(u => u.ID == userId);
+        if (user is null)
+            return new List<Score?>();
+
+        int[] times = { 5, 15, 30, 60 };
+        var scores = times.Select(time => user.Scores.Where(s => s.ModeSetting == time).MaxBy(s => s.Wpm)).ToList();
+
+        return scores;
+    }
+
     public static User? GetUserByUsername(string username, DatabaseContext db)
     {
         return db.Users.Include(u => u.Scores).FirstOrDefault(u => u.Username == username);

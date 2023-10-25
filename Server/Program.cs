@@ -74,6 +74,7 @@ builder.Services.AddGraphQLServer()
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>()
     .AddProjections()
+    .AddFiltering()
     .AddSorting();
 
 var app = builder.Build();

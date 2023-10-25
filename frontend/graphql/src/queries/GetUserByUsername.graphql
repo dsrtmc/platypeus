@@ -1,5 +1,6 @@
 query GetUserByUsername($username: String!) {
     userByUsername(username: $username) {
+        id
         username
         scores {
             id

@@ -18,9 +18,11 @@ svg {
     --nav-size: 75px;
     --color-bg: #1a1a1a;
     --color-fg: #999;
-    --color-accent-1: palegoldenrod;
+    --color-accent-1: violet;
     
     --wrapper-width: 900px;
+    
+    --caret-speed: 100ms;
     
     /* Temporary, remove it in the future */
     --dark-gray: #222;

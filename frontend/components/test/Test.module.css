@@ -77,7 +77,7 @@
     border-radius: 10%;
     width: 3px;
     height: 2em;
-    transition: all ease 100ms;
+    transition: all ease var(--caret-speed);
 }
 
 .blinking {

@@ -76,7 +76,7 @@ export function Leaderboard({}) {
                 <p className="main-data numeric">{index + 1}</p>
               </td>
               <td className="username">
-                <p className="secondary-data">{edge.node.user.username}</p>
+                <p className="secondary-data">{edge.node.user?.username}</p>
               </td>
               <td>
                 <p className="main-data numeric">{edge.node.wpm}</p>
