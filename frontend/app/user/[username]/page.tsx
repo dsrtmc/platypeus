@@ -27,15 +27,11 @@ export default async function UserPage({ params }: { params: { username: string 
     query: GetScoresDocument,
     variables: {
       where: {
-        or: [
-          {
-            user: {
-              username: {
-                eq: params.username,
-              },
-            },
+        user: {
+          username: {
+            eq: params.username,
           },
-        ],
+        },
       },
     } as GetScoresQueryVariables,
   });

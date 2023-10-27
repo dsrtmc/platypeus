@@ -17,6 +17,7 @@ public static class ScoreQueries
     [UseProjection]
     [UseFiltering]
     [UseSorting]
+    // DUPLICATION????????????? STUPID BUG
     public static IQueryable<Score> GetScores(DatabaseContext db)
     {
         // TODO: Distinct on User, not necessarily here or make it opt-in

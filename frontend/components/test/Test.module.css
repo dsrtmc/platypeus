@@ -73,7 +73,7 @@
 
 .caret {
     position: absolute;
-    background-color: lightcyan;
+    background-color: var(--color-accent-1);
     border-radius: 10%;
     width: 3px;
     height: 2em;

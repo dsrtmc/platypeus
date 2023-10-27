@@ -14,17 +14,25 @@
 }
 
 .top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: var(--light-gray);
     font-size: 0.75rem;
 }
 
 .middle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: slateblue;
     font-size: 2rem;
 }
 
 .bottom {
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .chart {

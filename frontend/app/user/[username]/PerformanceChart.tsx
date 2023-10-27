@@ -46,8 +46,8 @@ export const PerformanceChart: React.FC<Props> = ({ scoresData }) => {
       {
         label: "wpm",
         data: scoresData.scores?.edges?.map((edge) => edge.node.wpm),
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        // borderColor: "rgb(255, 99, 132)",
+        // backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
       // {
       //   label: "raw",
