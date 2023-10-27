@@ -1,0 +1,279 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type CreateScorePayload {
+  score: Score
+}
+
+type LoginPayload {
+  user: User
+}
+
+type LogoutPayload {
+  boolean: Boolean
+}
+
+type Mutation {
+  register(input: RegisterInput!): RegisterPayload!
+  login(input: LoginInput!): LoginPayload!
+  logout: LogoutPayload!
+  createScore(input: CreateScoreInput!): CreateScorePayload!
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+type Query {
+  me: User
+  usersBestScores(userId: UUID!): [Score]!
+  userByUsername(username: String!): User
+  userById(id: UUID!): User
+  bye: String! @authorize
+  allUsers: [User!]!
+  allScores: [Score!]!
+  scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
+  score(id: UUID!): Score
+}
+
+type RegisterPayload {
+  user: User
+}
+
+type Score {
+  wpm: Int!
+  rawWpm: Int!
+  mode: String!
+  modeSetting: Int!
+  language: String!
+  accuracy: Float!
+  wpmStats: [Int!]!
+  rawStats: [Int!]!
+  user: User
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"A connection to a list of items."
+type ScoresConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [ScoresEdge!]
+  "A flattened list of the nodes."
+  nodes: [Score!]
+}
+
+"An edge in a connection."
+type ScoresEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Score!
+}
+
+type User {
+  username: String!
+  email: String!
+  password: String!
+  scores: [Score!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input CreateScoreInput {
+  wpm: Int!
+  rawWpm: Int!
+  mode: String!
+  accuracy: Float!
+  wpmStats: [Int!]!
+  rawStats: [Int!]!
+  modeSetting: Int!
+  language: String!
+}
+
+input DateTimeOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input FloatOperationFilterInput {
+  eq: Float
+  neq: Float
+  in: [Float]
+  nin: [Float]
+  gt: Float
+  ngt: Float
+  gte: Float
+  ngte: Float
+  lt: Float
+  nlt: Float
+  lte: Float
+  nlte: Float
+}
+
+input IntOperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int]
+  nin: [Int]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input ListFilterInputTypeOfScoreFilterInput {
+  all: ScoreFilterInput
+  none: ScoreFilterInput
+  some: ScoreFilterInput
+  any: Boolean
+}
+
+input ListIntOperationFilterInput {
+  all: IntOperationFilterInput
+  none: IntOperationFilterInput
+  some: IntOperationFilterInput
+  any: Boolean
+}
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+input RegisterInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input ScoreFilterInput {
+  and: [ScoreFilterInput!]
+  or: [ScoreFilterInput!]
+  wpm: IntOperationFilterInput
+  rawWpm: IntOperationFilterInput
+  mode: StringOperationFilterInput
+  modeSetting: IntOperationFilterInput
+  language: StringOperationFilterInput
+  accuracy: FloatOperationFilterInput
+  wpmStats: ListIntOperationFilterInput
+  rawStats: ListIntOperationFilterInput
+  user: UserFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input ScoreSortInput {
+  wpm: SortEnumType
+  rawWpm: SortEnumType
+  mode: SortEnumType
+  modeSetting: SortEnumType
+  language: SortEnumType
+  accuracy: SortEnumType
+  user: UserSortInput
+  id: SortEnumType
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+input UserFilterInput {
+  and: [UserFilterInput!]
+  or: [UserFilterInput!]
+  username: StringOperationFilterInput
+  email: StringOperationFilterInput
+  password: StringOperationFilterInput
+  scores: ListFilterInputTypeOfScoreFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input UserSortInput {
+  username: SortEnumType
+  email: SortEnumType
+  password: SortEnumType
+  id: SortEnumType
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
+}
+
+input UuidOperationFilterInput {
+  eq: UUID
+  neq: UUID
+  in: [UUID]
+  nin: [UUID]
+  gt: UUID
+  ngt: UUID
+  gte: UUID
+  ngte: UUID
+  lt: UUID
+  nlt: UUID
+  lte: UUID
+  nlte: UUID
+}
+
+enum ApplyPolicy {
+  BEFORE_RESOLVER
+  AFTER_RESOLVER
+  VALIDATION
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+directive @allowAnonymous repeatable on FIELD_DEFINITION
+
+directive @authorize("The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!] "Defines when when the authorize directive shall be applied.By default the authorize directives are applied during the validation phase." apply: ApplyPolicy! = BEFORE_RESOLVER) repeatable on OBJECT | FIELD_DEFINITION
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
