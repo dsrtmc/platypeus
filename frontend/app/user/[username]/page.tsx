@@ -44,9 +44,9 @@ export default async function UserPage({ params }: { params: { username: string 
         {/* TODO: Fix nullable stuff here, we shouldn't have gaps */}
         {bestScoresData.usersBestScores.map((score) => (
           <div key={score?.modeSetting} className={styles.group}>
-            <div className={styles.top}>{score?.modeSetting} seconds</div>
-            <div className={styles.middle}>{score?.wpm}</div>
-            <div className={styles.bottom}>{score?.accuracy.toFixed(2) * 100}%</div>
+            <div className={styles.test}>{score?.modeSetting} seconds</div>
+            <div className={styles.wpm}>{score?.wpm}</div>
+            <div className={styles.accuracy}>{score?.accuracy.toFixed(2) * 100}%</div>
           </div>
         ))}
       </div>

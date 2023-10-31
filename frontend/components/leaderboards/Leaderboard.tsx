@@ -1,20 +1,19 @@
 "use client";
 
 import React, { startTransition, useEffect, useRef } from "react";
-import { GetScoresDocument, GetScoresQueryVariables } from "@/graphql/generated/graphql";
-import { useReactiveVar, useSuspenseQuery } from "@apollo/client";
+import { GetScoresDocument, GetScoresQuery, GetScoresQueryVariables } from "@/graphql/generated/graphql";
+import { UseSuspenseQueryResult } from "@apollo/client";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
-import { BsSignIntersectionT } from "react-icons/bs";
 
-interface Props {}
+interface Props {
+  queryResult: UseSuspenseQueryResult<GetScoresQuery, GetScoresQueryVariables>;
+}
 
-export function Leaderboard({}) {
+export function Leaderboard({ queryResult }: Props) {
   // TODO: stupid fucking types
   // TODO: also for some reason there's this funny duplication error, I have a hard time believing it's my fault (backend too)
-  const { data, fetchMore } = useSuspenseQuery(GetScoresDocument, {
-    variables: { first: 25, order: [{ wpm: "DESC", user: { username: "DESC" } }] },
-  });
-  async function handleRefetch() {
+  const { data, fetchMore } = queryResult;
+  async function handleFetchMore() {
     console.log("The next cursor:", data?.scores?.pageInfo?.endCursor);
     if (data?.scores?.pageInfo?.hasNextPage) {
       startTransition(() => {
@@ -28,10 +27,19 @@ export function Leaderboard({}) {
           updateQuery: (previousQueryResult, { fetchMoreResult }) => {
             console.log("Previous query result:", previousQueryResult);
             console.log("Fetch more result:", fetchMoreResult);
+            //  NOT SURE IF THAT MAKES SENSE BUT LOL W/E
+            if (!fetchMoreResult || !fetchMoreResult.scores || !previousQueryResult || !previousQueryResult.scores) {
+              return {
+                scores: {
+                  pageInfo: { hasNextPage: false },
+                  edges: [],
+                },
+              };
+            }
             return {
               scores: {
-                pageInfo: fetchMoreResult?.scores?.pageInfo,
-                edges: [...previousQueryResult?.scores?.edges, ...fetchMoreResult?.scores?.edges],
+                pageInfo: fetchMoreResult.scores.pageInfo,
+                edges: [...previousQueryResult.scores.edges, ...fetchMoreResult.scores.edges],
               },
             };
           },
@@ -45,6 +53,7 @@ export function Leaderboard({}) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(async (entry) => {
         if (entry.isIntersecting) {
+          // uncomment for infinite scroll
           // await handleRefetch();
         }
       });
@@ -61,68 +70,72 @@ export function Leaderboard({}) {
     };
   }, [observerRef]);
   return (
-    <>
-      {data?.scores?.pageInfo?.hasNextPage && <button onClick={handleRefetch}> fetch more </button>}
-      <div className={styles.wrapper}>
-        <table className={styles.table}>
-          <thead className={styles.head}>
-            <tr>
-              <th className={styles.cell}>
-                <p className="main-data numeric">#</p>
-              </th>
-              <th className={styles.cell}>
-                <p className="main-data">name</p>
-                <p className="secondary-data">user</p>
-              </th>
-              <th className={styles.cell}>
-                <p className="main-data numeric">wpm</p>
-                <p className="secondary-data numeric">cpm</p>
-              </th>
-              <th className={styles.cell}>
-                <p className="main-data numeric">raw</p>
-                <p className="secondary-data numeric">acc</p>
-              </th>
-              <th className={styles.cell}>
-                <p className="main-data numeric">test</p>
-                <p className="secondary-data numeric">mode</p>
-              </th>
-              <th className={styles.cell}>
-                <p className="main-data">date</p>
-                <p className="secondary-data">time</p>
-              </th>
+    <div className={styles.wrapper}>
+      <table className={styles.table}>
+        <thead className={styles.head}>
+          <tr>
+            <th className={styles.cell}>
+              <p>#</p>
+            </th>
+            <th className={styles.cell}>
+              <p>name</p>
+              <p>user</p>
+            </th>
+            <th className={styles.cell}>
+              <p>wpm</p>
+              <p>cpm</p>
+            </th>
+            <th className={styles.cell}>
+              <p>raw</p>
+              <p>acc</p>
+            </th>
+            <th className={styles.cell}>
+              <p>test</p>
+              <p>mode</p>
+            </th>
+            <th className={styles.cell}>
+              <p>date</p>
+              <p>time</p>
+            </th>
+          </tr>
+        </thead>
+        <tbody className={styles.body}>
+          {data?.scores?.edges.map((edge, index) => (
+            <tr className={styles.row} key={edge.node.id}>
+              <td className={styles.cell}>
+                <p>{index + 1}</p>
+              </td>
+              <td className={styles.cell}>
+                <p>{edge.node.user?.username}</p>
+              </td>
+              <td className={styles.cell}>
+                <p>{edge.node.wpm}</p>
+                <p>{edge.node.wpm * 5}</p>
+              </td>
+              <td className={styles.cell}>
+                <p>{edge.node.rawWpm}</p>
+                <p>acc%</p>
+              </td>
+              <td className={styles.cell}>
+                <p>{edge.node.mode}</p>
+                <p>{edge.node.modeSetting}</p>
+              </td>
+              <td className={styles.cell}>
+                <p>{new Date(edge.node.createdAt).toLocaleDateString()}</p>
+                <p>{new Date(edge.node.createdAt).toLocaleTimeString()}</p>
+              </td>
             </tr>
-          </thead>
-          <tbody className={styles.body}>
-            {data?.scores?.edges.map((edge, index) => (
-              <tr className={styles.row} key={edge.node.id}>
-                <td className={styles.cell}>
-                  <p className="main-data numeric">{index + 1}</p>
-                </td>
-                <td className={styles.cell}>
-                  <p className="secondary-data">{edge.node.user?.username}</p>
-                </td>
-                <td className={styles.cell}>
-                  <p className="main-data numeric">{edge.node.wpm}</p>
-                  <p className="secondary-data numeric">{edge.node.wpm * 5}</p>
-                </td>
-                <td className={styles.cell}>
-                  <p className="main-data numeric">{edge.node.rawWpm}</p>
-                  <p className="secondary-data numeric">acc%</p>
-                </td>
-                <td className={styles.cell}>
-                  <p className="main-data numeric">{edge.node.mode}</p>
-                  <p className="secondary-data numeric">{edge.node.modeSetting}</p>
-                </td>
-                <td className={styles.cell}>
-                  <p className="main-data">{new Date(edge.node.createdAt).toLocaleDateString()}</p>
-                  <p className="secondary-data">{new Date(edge.node.createdAt).toLocaleTimeString()}</p>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div ref={observerRef}></div>
-      </div>
-    </>
+          ))}
+        </tbody>
+        <tfoot className={styles.foot}>
+          <tr className={styles.row}>
+            <td className={styles.cell} colSpan={"100%" as any}>
+              {data?.scores?.pageInfo?.hasNextPage && <button onClick={handleFetchMore}>fetch more</button>}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+      <div ref={observerRef} />
+    </div>
   );
 }

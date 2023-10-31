@@ -6,34 +6,67 @@ thead {
     display: table-header-group;
 }
 
+tbody {
+    display: table-row-group;
+}
+
+tfoot {
+    display: table-footer-group;
+}
+
+td {
+    display: table-cell;
+}
+
 td, th {
-    padding: 4px 10px;
+    padding: 2px 6px;
 }
 
 tr td:first-child {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
 }
 
 tr td:last-child {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.tables {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.box {
+    width: 100%;
 }
 
 .table {
     border-spacing: 0;
     border-collapse: collapse;
     font-size: .8rem;
+    width: 100%;
 }
 
 .wrapper {
     height: calc(100vh - 14rem);
     overflow-x: auto;
     overflow-y: scroll;
-    width: min-content;
+    width: 100%;
+}
+
+.head {
+    position: sticky;
+    top: 0;
 }
 
 .body {
+}
+
+.foot {
+    position: sticky;
+    bottom: 0;
 }
 
 .cell {
@@ -42,17 +75,18 @@ tr td:last-child {
 .row {
 }
 
-.row:nth-child(odd) {
+.row:nth-child(odd) .cell {
     background-color: #333;
-    border-radius: 5px;
 }
 
-.row:nth-child(even), .head {
+.row:nth-child(even) .cell, .head .cell {
     background-color: var(--color-bg);
-    border-radius: 5px;
 }
 
-.head {
-    position: sticky;
-    top: 0;
+/* idk why this one doesnt have priority and I have to use `!important` xd */
+.foot .cell {
+    text-align: center;
+    padding: 1rem 0;
+    border-radius: 0 !important;
+    background-color: var(--color-bg) !important;
 }

@@ -9,11 +9,12 @@
 .group {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: .5rem;
     padding: 8px 12px;
+    font-weight: 500;
 }
 
-.top {
+.test {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -21,15 +22,16 @@
     font-size: 0.75rem;
 }
 
-.middle {
+.wpm {
     display: flex;
     justify-content: center;
     align-items: center;
     color: slateblue;
     font-size: 2rem;
+    font-weight: 600;
 }
 
-.bottom {
+.accuracy {
     display: flex;
     justify-content: center;
     align-items: center;
