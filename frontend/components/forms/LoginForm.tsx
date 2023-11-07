@@ -2,10 +2,11 @@
 
 import { useMutation } from "@apollo/client";
 import { LoginDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
-import styles from "./Login.module.css";
+import styles from "./Form.module.css";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
+import { BiLogIn } from "react-icons/bi";
 
 type FormValues = {
   username: string;
@@ -58,20 +59,24 @@ export default function LoginForm() {
       <input
         type={"text"}
         {...register("username" as FieldPath<FormValues>, { required: "This field is required." })}
+        placeholder={"username"}
         aria-invalid={errors.username ? "true" : "false"}
         className={styles.field}
       />
       <input
         type={"password"}
         {...register("password" as FieldPath<FormValues>, { required: "This field is required." })}
+        placeholder={"password"}
         aria-invalid={errors.password ? "true" : "false"}
         className={styles.field}
       />
-      {errors.password && <span>{errors.password.message}</span>}
+      {errors.password && <span className={styles.error}>{errors.password.message}</span>}
       <button type={"submit"} disabled={!!errors.password || !!errors.username} className={styles.button}>
-        login
+        <BiLogIn /> login
       </button>
-      <Link href={"/register"}>sign up instead</Link>
+      <Link href={"/register"} className={styles.instead}>
+        Sign up instead
+      </Link>
     </form>
   );
 }

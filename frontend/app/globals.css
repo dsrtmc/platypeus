@@ -2,13 +2,20 @@
 
 :root {
     --nav-size: 75px;
-    --color-bg: #1a1a1a;
-    --color-fg: #999;
-    --color-accent-1: mediumvioletred;
+    
+    --bg-color: #121520;
+    --main-color: #fff;
+    --sub-color: #676e8a;
+    --sub-alt-color: #1b1e2c;
+    --text-color: #fff;
+    --error-color: #da3333;
+    --error-extra-color: #791717;
 
     --wrapper-width: 900px;
 
     --caret-speed: 100ms;
+    
+    --roundness: 5px;
 
     /* Temporary, remove it in the future */
     --dark-gray: #222;
@@ -29,12 +36,17 @@
     font-weight: 500;
     
     /* Firefox */
-    scrollbar-color: var(--color-fg) transparent !important;
+    scrollbar-color: var(--main-color) transparent !important;
 }
 
 svg {
     display: block;
     max-width: 100%;
+}
+
+::selection {
+    background-color: var(--main-color);
+    color: var(--sub-alt-color);
 }
 
 ::-webkit-scrollbar {
@@ -46,12 +58,12 @@ svg {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--color-fg);
+    background: var(--main-color);
     border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-accent-1);
+    background: var(--sub-color);
 }
 
 html, body {
@@ -69,8 +81,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-bg);
-    color: var(--color-fg);
+    background-color: var(--bg-color);
+    color: var(--main-color);
 }
 
 a {

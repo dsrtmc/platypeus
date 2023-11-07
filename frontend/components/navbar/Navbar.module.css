@@ -21,11 +21,12 @@
     gap: .5rem;
     align-items: center;
     transition: all 150ms ease;
+    color: var(--sub-color);
 }
 
 .item:hover {
     cursor: pointer;
-    color: azure;
+    color: var(--text-color);
 }
 
 .icon {

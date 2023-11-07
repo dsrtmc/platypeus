@@ -6,7 +6,7 @@
 }
 
 .logo {
-    background-image: linear-gradient(var(--color-accent-1), mediumvioletred, slateblue);
+    background-image: linear-gradient(var(--sub-color), mediumvioletred, slateblue);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

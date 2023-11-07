@@ -2,10 +2,11 @@
 
 import { useMutation } from "@apollo/client";
 import { RegisterDocument } from "@/graphql/generated/graphql";
-import styles from "./Register.module.css";
+import styles from "./Form.module.css";
 import { useEffect } from "react";
 import Link from "next/link";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
+import { AiOutlineUserAdd } from "react-icons/ai";
 
 type FormValues = {
   username: string;
@@ -46,25 +47,30 @@ export default function RegisterForm() {
       <input
         type={"text"}
         {...register("username" as FieldPath<FormValues>, { required: "This field is required." })}
+        placeholder={"username"}
         aria-invalid={errors.username ? "true" : "false"}
         className={styles.field}
       />
       <input
         type={"email"}
         {...register("email" as FieldPath<FormValues>, { required: "This field is required." })}
+        placeholder={"email"}
         aria-invalid={errors.email ? "true" : "false"}
         className={styles.field}
       />
       <input
         type={"password"}
         {...register("password" as FieldPath<FormValues>, { required: "This field is required." })}
+        placeholder={"password"}
         aria-invalid={errors.password ? "true" : "false"}
         className={styles.field}
       />
       <button type="submit" className={styles.button}>
-        register
+        <AiOutlineUserAdd /> register
       </button>
-      <Link href={"/login"}>sign in instead</Link>
+      <Link href={"/login"} className={styles.instead}>
+        Sign in instead
+      </Link>
     </form>
   );
 }

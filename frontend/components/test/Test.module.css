@@ -68,12 +68,12 @@
 }
 
 .letter {
-    color: var(--color-fg);
+    color: var(--sub-color);
 }
 
 .caret {
     position: absolute;
-    background-color: var(--color-accent-1);
+    background-color: var(--sub-color);
     border-radius: 10%;
     width: 3px;
     height: 2em;
@@ -97,32 +97,31 @@
 }
 
 .correct {
-    color: mediumspringgreen !important;
+    color: var(--text-color) !important;
 }
 
 .incorrect {
-    color: palevioletred !important;
+    color: var(--error-color) !important;
 }
 
 .error {
     text-decoration: underline;
-    text-decoration-color: palevioletred;
+    text-decoration-color: var(--error-color);
 }
 
 .selection {
     display: flex;
     gap: 1rem;
-    /*margin-left: auto;*/
 }
 
 .setting {
     all: unset;
-    color: var(--gray);
+    color: var(--sub-alt-color);
     font-size: 1.5rem;
 }
 
 .selected {
-    color: var(--color-accent-1);
+    color: var(--sub-color);
 }
 
 .setting:hover {
@@ -147,7 +146,7 @@
 
 .mode:hover {
     cursor: pointer;
-    color: var(--color-accent-1);
+    color: var(--sub-color);
 }
 
 .restart {

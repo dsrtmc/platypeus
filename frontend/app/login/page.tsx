@@ -1,4 +1,4 @@
-import LoginForm from "@/app/login/LoginForm";
+import LoginForm from "@/components/forms/LoginForm";
 
 export default async function LoginPage() {
   // for some reason Next.js always throws an error when using `redirect()`.
