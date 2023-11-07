@@ -5,7 +5,7 @@ mutation Login($input: LoginInput!) {
             username
         }
         errors {
-            __typename
+            code: __typename
             ... on Error {
                 message
             }

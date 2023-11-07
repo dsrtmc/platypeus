@@ -4,5 +4,11 @@ mutation Register($input: RegisterInput!) {
             username
             email
         }
+        errors {
+            code: __typename
+            ... on Error {
+                message
+            }
+        }
     }
 }
