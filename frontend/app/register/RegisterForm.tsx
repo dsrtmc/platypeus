@@ -2,37 +2,69 @@
 
 import { useMutation } from "@apollo/client";
 import { RegisterDocument } from "@/graphql/generated/graphql";
-import { Field, Form, Formik } from "formik";
 import styles from "./Register.module.css";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
+import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
+
+type FormValues = {
+  username: string;
+  email: string;
+  password: string;
+};
 
 export default function RegisterForm() {
-  const [register] = useMutation(RegisterDocument);
-  const ref = useRef<HTMLInputElement | null>(null);
+  const [registerUser] = useMutation(RegisterDocument);
+
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    setFocus,
+  } = useForm<FormValues>({
+    defaultValues: {
+      email: "",
+      username: "",
+      password: "",
+    },
+  });
+
+  const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
+    event?.preventDefault();
+    const response = await registerUser({
+      variables: { input: { username: data.username, email: data.email, password: data.password } },
+    });
+    console.log("Register response:", response);
+  };
 
   useEffect(() => {
-    if (ref && ref.current) ref.current!.focus();
-  }, []);
+    setFocus("username");
+  }, [setFocus]);
 
   return (
-    <Formik
-      initialValues={{ username: "", password: "" }}
-      onSubmit={async ({ username, email, password }) => {
-        await register({ variables: { input: { username, email, password } } });
-      }}
-    >
-      {() => (
-        <Form className={styles.form}>
-          <Field type="text" name="username" placeholder="username" className={styles.field} innerRef={ref} />
-          <Field type="email" name="email" placeholder="email" className={styles.field} />
-          <Field type="password" name="password" placeholder="password" className={styles.field} />
-          <button type="submit" disabled={false} className={styles.button}>
-            register
-          </button>
-          <Link href={"/login"}>sign in instead</Link>
-        </Form>
-      )}
-    </Formik>
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <input
+        type={"text"}
+        {...register("username" as FieldPath<FormValues>, { required: "This field is required." })}
+        aria-invalid={errors.username ? "true" : "false"}
+        className={styles.field}
+      />
+      <input
+        type={"email"}
+        {...register("email" as FieldPath<FormValues>, { required: "This field is required." })}
+        aria-invalid={errors.email ? "true" : "false"}
+        className={styles.field}
+      />
+      <input
+        type={"password"}
+        {...register("password" as FieldPath<FormValues>, { required: "This field is required." })}
+        aria-invalid={errors.password ? "true" : "false"}
+        className={styles.field}
+      />
+      <button type="submit" className={styles.button}>
+        register
+      </button>
+      <Link href={"/login"}>sign in instead</Link>
+    </form>
   );
 }

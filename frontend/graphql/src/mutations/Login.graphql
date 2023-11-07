@@ -4,5 +4,11 @@ mutation Login($input: LoginInput!) {
             id
             username
         }
+        errors {
+            __typename
+            ... on Error {
+                message
+            }
+        }
     }
 }

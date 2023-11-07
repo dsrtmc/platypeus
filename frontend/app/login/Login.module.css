@@ -28,3 +28,11 @@
     width: 10rem;
     margin: auto;
 }
+
+.button:hover {
+    color: blue;
+}
+
+.button:disabled {
+    color: red;
+}

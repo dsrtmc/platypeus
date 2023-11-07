@@ -2,51 +2,76 @@
 
 import { useMutation } from "@apollo/client";
 import { LoginDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
-import { Field, Form, Formik } from "formik";
 import styles from "./Login.module.css";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
+
+type FormValues = {
+  username: string;
+  password: string;
+};
 
 export default function LoginForm() {
   const [login] = useMutation(LoginDocument);
-  const ref = useRef<HTMLInputElement | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setFocus,
+  } = useForm<FormValues>({
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
   useEffect(() => {
-    if (ref && ref.current) ref.current!.focus();
-  }, []);
+    setFocus("username");
+  }, [setFocus]);
 
-  return (
-    <Formik
-      // IGNORE THIS SQUIGGLY LINE IT MAKES NO SENSE
-      // ???????????????????????????????????????????
-      initialValues={{ username: "", password: "" }}
-      onSubmit={async ({ username, password }) => {
-        await login({
-          variables: { input: { username, password } },
-          update: (cache, { data }) => {
-            if (!data) {
-              return null;
-            }
-            cache.writeQuery<MeQuery>({
-              query: MeDocument,
-              data: {
-                me: data.login.user,
-              },
-            });
+  // TODO: Figure out why response doesn't have error messages
+  const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
+    event?.preventDefault();
+    const response = await login({
+      variables: { input: { username: data.username, password: data.password } },
+      update: (cache, { data }) => {
+        if (!data) {
+          return null;
+        }
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            me: data.login.user,
           },
         });
-      }}
-    >
-      {() => (
-        <Form className={styles.form}>
-          <Field type="text" name="username" placeholder="username" className={styles.field} innerRef={ref} />
-          <Field type="password" name="password" placeholder="password" className={styles.field} />
-          <button type="submit" disabled={false} className={styles.button}>
-            login
-          </button>
-          <Link href={"/register"}>sign up instead</Link>
-        </Form>
-      )}
-    </Formik>
+      },
+    });
+    console.log("Response:", response);
+    // TODO: redirect home
+  };
+
+  // Ignore squiggly lines, explicit type declaration fixes it despite being the same type; `react-hook-form` doing the funny
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <input
+        type={"text"}
+        {...register("username" as FieldPath<FormValues>, { required: "This field is required." })}
+        aria-invalid={errors.username ? "true" : "false"}
+        className={styles.field}
+      />
+      <input
+        type={"password"}
+        {...register("password" as FieldPath<FormValues>, { required: "This field is required." })}
+        aria-invalid={errors.password ? "true" : "false"}
+        className={styles.field}
+      />
+      {errors.password && <span>{errors.password.message}</span>}
+      <button type={"submit"} disabled={!!errors.password || !!errors.username} className={styles.button}>
+        login
+      </button>
+      <Link href={"/register"}>sign up instead</Link>
+    </form>
   );
 }
