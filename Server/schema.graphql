@@ -3,12 +3,25 @@ schema {
   mutation: Mutation
 }
 
+interface Error {
+  message: String!
+}
+
 type CreateScorePayload {
   score: Score
 }
 
+type IncorrectCredentialsError implements Error {
+  message: String!
+}
+
+type InvalidFieldError implements Error {
+  message: String!
+}
+
 type LoginPayload {
   user: User
+  errors: [LoginError!]
 }
 
 type LogoutPayload {
@@ -93,6 +106,8 @@ type User {
   updatedAt: DateTime!
 }
 
+union LoginError = InvalidFieldError | IncorrectCredentialsError
+
 input CreateScoreInput {
   wpm: Int!
   rawWpm: Int!
@@ -164,8 +179,8 @@ input ListIntOperationFilterInput {
 }
 
 input LoginInput {
-  username: String!
-  password: String!
+  username: String
+  password: String
 }
 
 input RegisterInput {

@@ -1,9 +1,9 @@
 using System.Security.Claims;
-using System.Text;
-using Konscious.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Server.Models;
+using Server.Schema.Types.Errors;
 using Server.Services;
 using Server.Utilities;
 
@@ -28,26 +28,35 @@ public static class UserMutations
         ));
         return user;
     }
-
-    public static async Task<User?> Login(string username, string password, DatabaseContext db, IHttpContextAccessor accessor)
+    
+    public static async Task<MutationResult<User, InvalidFieldError, IncorrectCredentialsError>> Login(string? username, string? password, DatabaseContext db, IHttpContextAccessor accessor)
     {
         // TODO: better validation
+        var errors = new List<object>();
+        if (username is null)
+            errors.Add(new InvalidFieldError("username", username));
+        
+        if (password is null)
+            errors.Add(new InvalidFieldError("password", password));
+        
         var user = await db.Users.FirstOrDefaultAsync(u => u.Username == username);
 
         if (user is null)
         {
-            Console.WriteLine("user is null");
-            return null;
+            errors.Add(new IncorrectCredentialsError());
         }
+        
+        // TODO: I guess we can end the validation here? Then only check the password? hmm...
+        if (errors.Count > 0)
+            return new(errors);
 
         if (!await PasswordHasher.Verify(user.Password, password))
         {
-            Console.WriteLine("password is incorrect");
-            return null;
+            return new(new IncorrectCredentialsError());
         }
 
         await accessor.HttpContext!.SignInAsync("default", new ClaimsPrincipal(
-            new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user!.ID.ToString()) }, "default")
+            new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()) }, "default")
         ));
 
         return user;
