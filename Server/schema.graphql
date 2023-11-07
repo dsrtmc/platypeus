@@ -61,6 +61,7 @@ type Query {
 
 type RegisterPayload {
   user: User
+  errors: [RegisterError!]
 }
 
 type Score {
@@ -106,7 +107,13 @@ type User {
   updatedAt: DateTime!
 }
 
+type UsernameTakenError implements Error {
+  message: String!
+}
+
 union LoginError = InvalidFieldError | IncorrectCredentialsError
+
+union RegisterError = InvalidFieldError | UsernameTakenError
 
 input CreateScoreInput {
   wpm: Int!
@@ -184,9 +191,9 @@ input LoginInput {
 }
 
 input RegisterInput {
-  username: String!
-  email: String!
-  password: String!
+  username: String
+  email: String
+  password: String
 }
 
 input ScoreFilterInput {
