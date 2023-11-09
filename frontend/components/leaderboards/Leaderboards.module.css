@@ -18,8 +18,16 @@ td {
     display: table-cell;
 }
 
+td p {
+    color: var(--text-color);
+}
+
+th p {
+    color: var(--sub-color);
+}
+
 td, th {
-    padding: 2px 6px;
+    padding: 2px 12px;
 }
 
 tr td:first-child {
@@ -69,17 +77,26 @@ tr td:last-child {
     bottom: 0;
 }
 
-.cell {
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.sub {
+    opacity: 0.5;
 }
 
 .row {
 }
 
-.row:nth-child(odd) .cell {
+.row:nth-child(odd) td {
     background-color: var(--sub-alt-color);
 }
 
-.row:nth-child(even) .cell, .head .cell {
+.row:nth-child(even) td, .head .cell {
     background-color: var(--bg-color);
 }
 

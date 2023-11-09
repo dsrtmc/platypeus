@@ -1,13 +1,13 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
+import styles from "@/components/test/Score.module.css";
 import { Line } from "react-chartjs-2";
-import { GetScoresQuery } from "@/graphql/generated/graphql";
+import { Score } from "@/graphql/generated/graphql";
 import { LineProps } from "chart.js";
-import styles from "./User.module.css";
 import {
   CategoryScale,
   Chart as ChartJS,
+  ChartData,
+  ChartOptions,
   Legend,
   LinearScale,
   LineElement,
@@ -17,27 +17,27 @@ import {
 } from "chart.js";
 
 interface Props {
-  scoresData: GetScoresQuery;
+  score: Score;
 }
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-export const PerformanceChart: React.FC<Props> = ({ scoresData }) => {
+interface LineProps {
+  options: ChartOptions<"line">;
+  data: ChartData<"line">;
+}
+
+export const ScoreChart: React.FC<Props> = ({ score }) => {
   const [subColor, setSubColor] = useState("white");
   const [subAltColor, setSubAltColor] = useState("white");
-
   const options: LineProps["options"] = {
     scales: {
       y: {
         beginAtZero: true,
-        ticks: {
-          color: subColor,
-        },
+        ticks: { color: subColor },
       },
       x: {
-        ticks: {
-          color: subColor,
-        },
+        ticks: { color: subColor },
       },
     },
     maintainAspectRatio: false,
@@ -45,26 +45,25 @@ export const PerformanceChart: React.FC<Props> = ({ scoresData }) => {
       legend: {
         position: "top" as const,
       },
-      title: {
-        display: true,
-        text: "wpm chart",
-      },
     },
   };
 
+  // funny squiggly lines despite it being correct 😐
   const data = {
-    // labels: scoresData.scores?.edges?.map((edge) => new Date(edge.node.createdAt)),
+    labels: score.wpmStats.map((_, index) => index + 1),
     datasets: [
       {
         label: "wpm",
-        data: scoresData.scores?.edges?.map((edge) => edge.node.wpm),
+        data: score.wpmStats,
         borderColor: subColor,
-        backgroundColor: subAltColor,
+      },
+      {
+        label: "raw",
+        data: score.rawStats,
+        borderColor: subAltColor,
       },
     ],
   };
-
-  // really don't know whether I should be doing it like that, it seems very very very error-prone but oh well
   useEffect(() => {
     let style = getComputedStyle(document.body);
     setSubColor(style.getPropertyValue("--sub-color"));

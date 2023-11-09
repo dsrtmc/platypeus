@@ -5,7 +5,7 @@
                          "stats2 stats2";
     align-items: center;
     gap: 1rem;
-    color: white;
+    color: var(--text-color);
     width: 100%;
     overflow: visible;
 }
@@ -36,7 +36,7 @@
 }
 
 .top {
-    color: var(--light-gray);
+    color: var(--sub-color);
 }
 
 .bottom {

@@ -4,6 +4,8 @@ query GetScores($after: String, $before: String, $first: Int, $last: Int, $order
             node {
                 id
                 wpm
+                rawWpm
+                accuracy
                 user {
                     username
                 }

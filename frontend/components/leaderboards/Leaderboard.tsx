@@ -73,56 +73,57 @@ export function Leaderboard({ queryResult }: Props) {
     <div className={styles.wrapper}>
       <table className={styles.table}>
         <thead className={styles.head}>
+          {/* TODO: fix opacity on those lol */}
           <tr>
-            <th className={styles.cell}>
+            <th className={styles.left}>
               <p>#</p>
             </th>
-            <th className={styles.cell}>
+            <th className={styles.left}>
               <p>name</p>
-              <p>user</p>
+              <p className={styles.sub}>user</p>
             </th>
-            <th className={styles.cell}>
+            <th className={styles.right}>
               <p>wpm</p>
-              <p>cpm</p>
+              <p className={styles.sub}>cpm</p>
             </th>
-            <th className={styles.cell}>
+            <th className={styles.right}>
               <p>raw</p>
-              <p>acc</p>
+              <p className={styles.sub}>acc</p>
             </th>
-            <th className={styles.cell}>
+            <th className={styles.right}>
               <p>test</p>
-              <p>mode</p>
+              <p className={styles.sub}>mode</p>
             </th>
-            <th className={styles.cell}>
+            <th className={styles.right}>
               <p>date</p>
-              <p>time</p>
+              <p className={styles.sub}>time</p>
             </th>
           </tr>
         </thead>
         <tbody className={styles.body}>
           {data?.scores?.edges.map((edge, index) => (
             <tr className={styles.row} key={edge.node.id}>
-              <td className={styles.cell}>
+              <td className={styles.left}>
                 <p>{index + 1}</p>
               </td>
-              <td className={styles.cell}>
+              <td className={styles.left}>
                 <p>{edge.node.user?.username}</p>
               </td>
-              <td className={styles.cell}>
+              <td className={styles.right}>
                 <p>{edge.node.wpm}</p>
-                <p>{edge.node.wpm * 5}</p>
+                <p className={styles.sub}>{edge.node.wpm * 5}</p>
               </td>
-              <td className={styles.cell}>
+              <td className={styles.right}>
                 <p>{edge.node.rawWpm}</p>
-                <p>acc%</p>
+                <p className={styles.sub}>{edge.node.accuracy.toFixed(2) * 100}%</p>
               </td>
-              <td className={styles.cell}>
+              <td className={styles.right}>
                 <p>{edge.node.mode}</p>
-                <p>{edge.node.modeSetting}</p>
+                <p className={styles.sub}>{edge.node.modeSetting}</p>
               </td>
-              <td className={styles.cell}>
+              <td className={styles.right}>
                 <p>{new Date(edge.node.createdAt).toLocaleDateString()}</p>
-                <p>{new Date(edge.node.createdAt).toLocaleTimeString()}</p>
+                <p className={styles.sub}>{new Date(edge.node.createdAt).toLocaleTimeString()}</p>
               </td>
             </tr>
           ))}

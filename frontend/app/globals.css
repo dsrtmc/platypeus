@@ -36,7 +36,7 @@
     font-weight: 500;
     
     /* Firefox */
-    scrollbar-color: var(--main-color) transparent !important;
+    scrollbar-color: var(--sub-color) transparent !important;
 }
 
 svg {
@@ -58,12 +58,12 @@ svg {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--main-color);
+    background: var(--sub-color);
     border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--sub-color);
+    background: var(--text-color);
 }
 
 html, body {

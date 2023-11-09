@@ -1,68 +1,13 @@
 import React, { FC } from "react";
 import { Score } from "@/graphql/generated/graphql";
 import styles from "./Score.module.css";
-import { Line } from "react-chartjs-2";
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  ChartData,
-  ChartOptions,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-} from "chart.js";
+import { ScoreChart } from "@/components/test/ScoreChart";
 
 interface Props {
   score: Score;
 }
 
-interface LineProps {
-  options: ChartOptions<"line">;
-  data: ChartData<"line">;
-}
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
 export const Score: FC<Props> = ({ score }) => {
-  const options: LineProps["options"] = {
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "wpm chart",
-      },
-    },
-  };
-
-  // funny squiggly lines despite it being correct 😐
-  const data: ChartData<"line"> = {
-    labels: score.wpmStats.map((_, index) => index + 1),
-    datasets: [
-      {
-        label: "wpm",
-        data: score.wpmStats,
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-      {
-        label: "raw",
-        data: score.rawStats,
-        borderColor: "rgb(53, 162, 235)",
-        backgroundColor: "rgba(53, 162, 235, 0.5)",
-      },
-    ],
-  };
   return (
     <div className={styles.score}>
       <div className={styles.stats}>
@@ -75,9 +20,7 @@ export const Score: FC<Props> = ({ score }) => {
           <div className={`${styles.bottom} ${styles.big}`}>{Math.round(score.accuracy * 100)}%</div>
         </div>
       </div>
-      <div className={styles.chart}>
-        <Line data={data} options={options} />
-      </div>
+      <ScoreChart score={score} />
       <div className={styles.stats2}>
         <div className={styles.group}>
           <div className={styles.top}>mode</div>
