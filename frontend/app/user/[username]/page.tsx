@@ -6,7 +6,6 @@ import {
   GetUserByUsernameDocument,
   GetUsersBestScoresDocument,
 } from "@/graphql/generated/graphql";
-import { ChartData } from "chart.js";
 import { PerformanceChart } from "@/app/user/[username]/PerformanceChart";
 
 export default async function UserPage({ params }: { params: { username: string } }) {
