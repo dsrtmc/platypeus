@@ -1,16 +1,7 @@
-using System.Diagnostics;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json.Nodes;
 using HotChocolate.Execution;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Server.Services;
-using Server.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,26 +24,6 @@ builder.Services.AddCors((o) =>
     });
 });
 
-// JWT setup
-// builder.Services.AddAuthentication(o =>
-// {
-//     o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.RequireAuthenticatedSignIn = false;
-// }).AddJwtBearer(o =>
-// {
-//     o.TokenValidationParameters = new TokenValidationParameters
-//     {
-//         // TODO: add issuer/audience
-//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!)),
-//         ValidateIssuerSigningKey = true,
-//         ValidateIssuer = false, // probably true
-//         ValidateAudience = false, // probably true
-//         ClockSkew = TimeSpan.Zero
-//     };
-// });
 builder.Services
     .AddAuthentication("default")
     .AddCookie("default", options => {
@@ -100,3 +71,24 @@ app.MapGet("/secret", () => $"top secret").RequireAuthorization();
 app.MapGraphQL();
 
 app.Run();
+
+// JWT setup
+// builder.Services.AddAuthentication(o =>
+// {
+//     o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//     o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//     o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//     o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+//     o.RequireAuthenticatedSignIn = false;
+// }).AddJwtBearer(o =>
+// {
+//     o.TokenValidationParameters = new TokenValidationParameters
+//     {
+//         // TODO: add issuer/audience
+//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!)),
+//         ValidateIssuerSigningKey = true,
+//         ValidateIssuer = false, // probably true
+//         ValidateAudience = false, // probably true
+//         ClockSkew = TimeSpan.Zero
+//     };
+// });

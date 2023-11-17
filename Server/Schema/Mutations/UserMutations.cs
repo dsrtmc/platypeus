@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Server.Models;
 using Server.Schema.Types.Errors;
 using Server.Services;
@@ -12,7 +11,10 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class UserMutations
 {
-    public static async Task<MutationResult<User, InvalidFieldError, UsernameTakenError>> Register(string? username, string? email, string? password, DatabaseContext db, IHttpContextAccessor accessor)
+    public static async Task<MutationResult<User, InvalidFieldError, UsernameTakenError>> Register(
+        string? username, string? email, string? password,
+        DatabaseContext db,
+        IHttpContextAccessor accessor)
     {
         // TODO: better validation
         var errors = new List<object>();
@@ -49,7 +51,10 @@ public static class UserMutations
         return user;
     }
     
-    public static async Task<MutationResult<User, InvalidFieldError, IncorrectCredentialsError>> Login(string? username, string? password, DatabaseContext db, IHttpContextAccessor accessor)
+    public static async Task<MutationResult<User, InvalidFieldError, IncorrectCredentialsError>> Login(
+        string? username, string? password,
+        DatabaseContext db,
+        IHttpContextAccessor accessor)
     {
         // TODO: better validation
         var errors = new List<object>();
