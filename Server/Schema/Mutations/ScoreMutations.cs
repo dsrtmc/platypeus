@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 using Server.Models;
 using Server.Services;
 
@@ -25,8 +27,7 @@ public static class ScoreMutations
         int wpm, int rawWpm, string mode, float accuracy, List<int> wpmStats, List<int> rawStats,
         int modeSetting, string language, DatabaseContext db,
         [Service] IHttpContextAccessor accessor
-    )
-    {
+    ) {
         var score = new Score
         {
             Wpm = wpm,
@@ -41,15 +42,15 @@ public static class ScoreMutations
         
         var context = accessor.HttpContext!;
         
-        // No idea if `Identity` can ever be null; the type suggests so, but no idea how that can occur.
-        if (!context.User.Identity!.IsAuthenticated)
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
             return score;
-        
-        var userId = new Guid(context.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        score.User = (await db.Users.FindAsync(userId))!;
+
+        score.User = (await db.Users.FindAsync(new Guid(userId)))!;
         
         await db.Scores.AddAsync(score);
         await db.SaveChangesAsync();
+        
         return score;
     }
 }

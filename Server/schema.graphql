@@ -1,14 +1,23 @@
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
 
 interface Error {
   message: String!
 }
 
+type CreateRacePayload {
+  race: Race
+}
+
 type CreateScorePayload {
   score: Score
+}
+
+type DeleteUserPayload {
+  boolean: Boolean
 }
 
 type IncorrectCredentialsError implements Error {
@@ -32,7 +41,9 @@ type Mutation {
   register(input: RegisterInput!): RegisterPayload!
   login(input: LoginInput!): LoginPayload!
   logout: LogoutPayload!
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
+  createRace: CreateRacePayload!
 }
 
 "Information about pagination in a connection."
@@ -57,6 +68,22 @@ type Query {
   allScores: [Score!]!
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
   score(id: UUID!): Score
+}
+
+type Race {
+  racers: [User!]!
+  racerStatistics: [RacerStatistics!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type RacerStatistics {
+  racer: User!
+  wpm: Int!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type RegisterPayload {
@@ -95,6 +122,10 @@ type ScoresEdge {
   cursor: String!
   "The item at the end of the edge."
   node: Score!
+}
+
+type Subscription {
+  onCreated: Race!
 }
 
 type User {
@@ -139,6 +170,10 @@ input DateTimeOperationFilterInput {
   nlt: DateTime
   lte: DateTime
   nlte: DateTime
+}
+
+input DeleteUserInput {
+  userId: UUID!
 }
 
 input FloatOperationFilterInput {

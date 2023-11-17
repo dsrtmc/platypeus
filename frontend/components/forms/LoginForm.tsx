@@ -28,10 +28,6 @@ export default function LoginForm() {
     },
   });
 
-  useEffect(() => {
-    setFocus("username");
-  }, [setFocus]);
-
   // TODO: Figure out why response doesn't have error messages
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
@@ -52,6 +48,10 @@ export default function LoginForm() {
     console.log("Response:", response);
     // TODO: redirect home
   };
+
+  useEffect(() => {
+    setFocus("username");
+  }, [setFocus]);
 
   // Ignore squiggly lines, explicit type declaration fixes it despite being the same type; `react-hook-form` doing the funny
   return (

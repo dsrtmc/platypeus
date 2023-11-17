@@ -44,6 +44,7 @@ builder.Services.AddGraphQLServer()
     .AddMutationConventions()
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>()
+    .AddInMemorySubscriptions()
     .AddProjections()
     .AddFiltering()
     .AddSorting();

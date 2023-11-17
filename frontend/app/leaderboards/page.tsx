@@ -25,6 +25,7 @@ export default function LeaderboardsPage() {
       where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 5 } }] },
       order: [{ wpm: "DESC", user: { username: "DESC" } }],
     },
+    fetchPolicy: "network-only",
   } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);
   const queryResult15 = useSuspenseQuery(GetScoresDocument, {
     variables: {
@@ -32,6 +33,7 @@ export default function LeaderboardsPage() {
       where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 15 } }] },
       order: [{ wpm: "DESC", user: { username: "DESC" } }],
     },
+    fetchPolicy: "network-only",
   } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);
   return (
     <div className={styles.tables}>

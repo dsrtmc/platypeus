@@ -88,4 +88,17 @@ public static class UserMutations
         await accessor.HttpContext!.SignOutAsync();
         return true;
     }
+
+    public static async Task<bool> DeleteUser(Guid userId, DatabaseContext db)
+    {
+        var user = await db.Users.FindAsync(userId);
+        
+        if (user is null)
+            return false;
+        
+        db.Users.Remove(user);
+        await db.SaveChangesAsync();
+        
+        return true;
+    }
 }
