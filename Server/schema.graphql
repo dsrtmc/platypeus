@@ -8,6 +8,10 @@ interface Error {
   message: String!
 }
 
+type AddUserToRacePayload {
+  user: User
+}
+
 type CreateRacePayload {
   race: Race
 }
@@ -44,6 +48,7 @@ type Mutation {
   deleteUser(input: DeleteUserInput!): DeleteUserPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
   createRace: CreateRacePayload!
+  addUserToRace(input: AddUserToRaceInput!): AddUserToRacePayload!
 }
 
 "Information about pagination in a connection."
@@ -68,6 +73,7 @@ type Query {
   allScores: [Score!]!
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
   score(id: UUID!): Score
+  allRaces: [Race!]!
 }
 
 type Race {
@@ -125,7 +131,7 @@ type ScoresEdge {
 }
 
 type Subscription {
-  onCreated: Race!
+  onJoined: Race!
 }
 
 type User {
@@ -145,6 +151,11 @@ type UsernameTakenError implements Error {
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
 union RegisterError = InvalidFieldError | UsernameTakenError
+
+input AddUserToRaceInput {
+  userId: UUID!
+  raceId: UUID!
+}
 
 input CreateScoreInput {
   wpm: Int!
