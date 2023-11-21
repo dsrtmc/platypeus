@@ -8,10 +8,6 @@ interface Error {
   message: String!
 }
 
-type AddUserToRacePayload {
-  user: User
-}
-
 type CreateRacePayload {
   race: Race
 }
@@ -32,6 +28,14 @@ type InvalidFieldError implements Error {
   message: String!
 }
 
+type JoinRacePayload {
+  race: Race
+}
+
+type LeaveRacePayload {
+  race: Race
+}
+
 type LoginPayload {
   user: User
   errors: [LoginError!]
@@ -42,13 +46,14 @@ type LogoutPayload {
 }
 
 type Mutation {
+  joinRace(input: JoinRaceInput!): JoinRacePayload!
+  leaveRace(input: LeaveRaceInput!): LeaveRacePayload!
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
   register(input: RegisterInput!): RegisterPayload!
   login(input: LoginInput!): LoginPayload!
   logout: LogoutPayload!
-  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
   createRace: CreateRacePayload!
-  addUserToRace(input: AddUserToRaceInput!): AddUserToRacePayload!
 }
 
 "Information about pagination in a connection."
@@ -78,15 +83,6 @@ type Query {
 
 type Race {
   racers: [User!]!
-  racerStatistics: [RacerStatistics!]!
-  id: UUID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type RacerStatistics {
-  racer: User!
-  wpm: Int!
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -131,7 +127,8 @@ type ScoresEdge {
 }
 
 type Subscription {
-  onJoined: Race!
+  onJoined(raceId: UUID!): Race!
+  onLeft(raceId: UUID!): Race!
 }
 
 type User {
@@ -151,11 +148,6 @@ type UsernameTakenError implements Error {
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
 union RegisterError = InvalidFieldError | UsernameTakenError
-
-input AddUserToRaceInput {
-  userId: UUID!
-  raceId: UUID!
-}
 
 input CreateScoreInput {
   wpm: Int!
@@ -215,6 +207,16 @@ input IntOperationFilterInput {
   nlt: Int
   lte: Int
   nlte: Int
+}
+
+input JoinRaceInput {
+  userId: UUID!
+  raceId: UUID!
+}
+
+input LeaveRaceInput {
+  userId: UUID!
+  raceId: UUID!
 }
 
 input ListFilterInputTypeOfScoreFilterInput {

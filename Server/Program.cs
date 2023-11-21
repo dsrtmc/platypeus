@@ -69,6 +69,7 @@ await File.WriteAllTextAsync("schema.graphql", executor.Schema.ToString());
 app.MapGet("/", () => "><((((*>");
 app.MapGet("/secret", () => $"top secret").RequireAuthorization();
 
+app.UseWebSockets();
 app.MapGraphQL();
 
 app.Run();

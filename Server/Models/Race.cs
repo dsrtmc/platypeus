@@ -4,8 +4,6 @@ public class Race : BaseEntity
 {
     // lowkey idk if needed
     public List<User> Racers { get; set; } = new();
-
-    public List<RacerStatistics> RacerStatistics { get; set; } = new();
 }
 
 /*

@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using HotChocolate.Subscriptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Server.Models;
+using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Services;
 using Server.Utilities;
@@ -11,6 +13,67 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class UserMutations
 {
+    // TODO: bad return value (???)
+    // TODO: Not sure whether it shouldn't be a part of `RaceMutations`
+    public static async Task<Race?> JoinRace(
+        Guid userId, Guid raceId, DatabaseContext db,
+        [Service] ITopicEventSender eventSender,
+        CancellationToken cancellationToken
+    ) {
+        var user = await db.Users.FindAsync(userId);
+        if (user is null)
+            return null;
+
+        var race = await db.Races.Include(r => r.Racers).FirstOrDefaultAsync(r => r.ID == raceId, cancellationToken);
+        if (race is null)
+            return null;
+
+        if (!race.Racers.Contains(user))
+            race.Racers.Add(user);
+
+        await eventSender.SendAsync($"{nameof(Subscription.OnJoined)}_{raceId}", race, cancellationToken);
+        
+        await db.SaveChangesAsync(cancellationToken);
+
+        return race;
+    }
+    
+    public static async Task<Race?> LeaveRace(
+        Guid userId, Guid raceId, DatabaseContext db,
+        [Service] ITopicEventSender eventSender,
+        CancellationToken cancellationToken
+    ) {
+        var user = await db.Users.FindAsync(userId);
+        if (user is null)
+            return null;
+    
+        var race = await db.Races.Include(r => r.Racers).FirstOrDefaultAsync(r => r.ID == raceId, cancellationToken);
+        if (race is null)
+            return null;
+        
+        if (race.Racers.Contains(user))
+            race.Racers.Remove(user);
+    
+        await eventSender.SendAsync($"{nameof(Subscription.OnLeft)}_{raceId}", race, cancellationToken);
+        
+        await db.SaveChangesAsync(cancellationToken);
+    
+        return race;
+    }
+    
+    public static async Task<bool> DeleteUser(Guid userId, DatabaseContext db)
+    {
+        var user = await db.Users.FindAsync(userId);
+        
+        if (user is null)
+            return false;
+        
+        db.Users.Remove(user);
+        await db.SaveChangesAsync();
+        
+        return true;
+    }
+    
     public static async Task<MutationResult<User, InvalidFieldError, UsernameTakenError>> Register(
         string? username, string? email, string? password,
         DatabaseContext db,
@@ -86,19 +149,6 @@ public static class UserMutations
     public static async Task<bool> Logout(DatabaseContext db, IHttpContextAccessor accessor)
     {
         await accessor.HttpContext!.SignOutAsync();
-        return true;
-    }
-
-    public static async Task<bool> DeleteUser(Guid userId, DatabaseContext db)
-    {
-        var user = await db.Users.FindAsync(userId);
-        
-        if (user is null)
-            return false;
-        
-        db.Users.Remove(user);
-        await db.SaveChangesAsync();
-        
         return true;
     }
 }

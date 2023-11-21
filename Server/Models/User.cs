@@ -8,5 +8,6 @@ public class User : BaseEntity
     
     public string Password { get; set; } = null!;
     
+    // TODO: Probably not needed? idk we can just do a field resolver if it's possible with hot chocolate (no way it's not)
     public List<Score> Scores { get; set; } = new();
 }
