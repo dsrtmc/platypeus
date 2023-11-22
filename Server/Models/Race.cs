@@ -2,8 +2,13 @@ namespace Server.Models;
 
 public class Race : BaseEntity
 {
+    // TODO: think whether a long ID like a GUID is worth it, maybe base64-ify it
     // lowkey idk if needed
     public List<User> Racers { get; set; } = new();
+
+    public bool Unlisted { get; set; } = false;
+    
+    public string? Password { get; set; }
 }
 
 /*

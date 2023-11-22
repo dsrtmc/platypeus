@@ -10,12 +10,16 @@ namespace Server.Schema.Mutations;
 public static class RaceMutations
 {
     public static async Task<Race> CreateRace(
+        bool unlisted,
+        string? password,
         DatabaseContext db,
         [Service] IHttpContextAccessor accessor
     ) {
         var race = new Race
         {
-            Racers = new List<User>()
+            Racers = new List<User>(),
+            Unlisted = unlisted,
+            Password = password
         };
         
         db.Races.Add(race);

@@ -1,0 +1,10 @@
+mutation CreateRace {
+    createRace {
+        race {
+            id
+            racers {
+                username
+            }
+        }
+    }
+}

@@ -14,7 +14,9 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "fragment MeFragment on User {\n  id\n  username\n  email\n}": types.MeFragmentFragmentDoc,
+    "mutation CreateRace {\n  createRace {\n    race {\n      id\n      racers {\n        username\n      }\n    }\n  }\n}": types.CreateRaceDocument,
     "mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      language\n      user {\n        username\n      }\n    }\n  }\n}": types.CreateScoreDocument,
+    "mutation JoinRace($input: JoinRaceInput!) {\n  joinRace(input: $input) {\n    race {\n      racers {\n        username\n      }\n    }\n  }\n}": types.JoinRaceDocument,
     "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.LoginDocument,
     "mutation Logout {\n  logout {\n    boolean\n  }\n}": types.LogoutDocument,
     "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.RegisterDocument,
@@ -25,6 +27,7 @@ const documents = {
     "query GetUserByUsername($username: String!) {\n  userByUsername(username: $username) {\n    id\n    username\n    scores {\n      id\n      wpm\n    }\n    createdAt\n    updatedAt\n  }\n}": types.GetUserByUsernameDocument,
     "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}": types.GetUsersBestScoresDocument,
     "query Me {\n  me {\n    ...MeFragment\n  }\n}": types.MeDocument,
+    "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      username\n    }\n  }\n}": types.OnRaceJoinLeaveDocument,
 };
 
 /**
@@ -48,7 +51,15 @@ export function graphql(source: "fragment MeFragment on User {\n  id\n  username
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "mutation CreateRace {\n  createRace {\n    race {\n      id\n      racers {\n        username\n      }\n    }\n  }\n}"): (typeof documents)["mutation CreateRace {\n  createRace {\n    race {\n      id\n      racers {\n        username\n      }\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      language\n      user {\n        username\n      }\n    }\n  }\n}"): (typeof documents)["mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      language\n      user {\n        username\n      }\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation JoinRace($input: JoinRaceInput!) {\n  joinRace(input: $input) {\n    race {\n      racers {\n        username\n      }\n    }\n  }\n}"): (typeof documents)["mutation JoinRace($input: JoinRaceInput!) {\n  joinRace(input: $input) {\n    race {\n      racers {\n        username\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -89,6 +100,10 @@ export function graphql(source: "query GetUsersBestScores($userId: UUID!) {\n  u
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "query Me {\n  me {\n    ...MeFragment\n  }\n}"): (typeof documents)["query Me {\n  me {\n    ...MeFragment\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      username\n    }\n  }\n}"): (typeof documents)["subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      username\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

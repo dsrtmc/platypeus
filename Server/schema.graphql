@@ -53,7 +53,7 @@ type Mutation {
   login(input: LoginInput!): LoginPayload!
   logout: LogoutPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
-  createRace: CreateRacePayload!
+  createRace(input: CreateRaceInput!): CreateRacePayload!
 }
 
 "Information about pagination in a connection."
@@ -83,6 +83,8 @@ type Query {
 
 type Race {
   racers: [User!]!
+  unlisted: Boolean!
+  password: String
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -147,6 +149,11 @@ type UsernameTakenError implements Error {
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
 union RegisterError = InvalidFieldError | UsernameTakenError
+
+input CreateRaceInput {
+  unlisted: Boolean!
+  password: String
+}
 
 input CreateScoreInput {
   wpm: Int!

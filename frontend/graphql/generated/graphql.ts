@@ -114,6 +114,26 @@ export type InvalidFieldError = Error & {
   message: Scalars['String']['output'];
 };
 
+export type JoinRaceInput = {
+  raceId: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
+};
+
+export type JoinRacePayload = {
+  __typename?: 'JoinRacePayload';
+  race?: Maybe<Race>;
+};
+
+export type LeaveRaceInput = {
+  raceId: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
+};
+
+export type LeaveRacePayload = {
+  __typename?: 'LeaveRacePayload';
+  race?: Maybe<Race>;
+};
+
 export type ListFilterInputTypeOfScoreFilterInput = {
   all?: InputMaybe<ScoreFilterInput>;
   any?: InputMaybe<Scalars['Boolean']['input']>;
@@ -151,6 +171,8 @@ export type Mutation = {
   createRace: CreateRacePayload;
   createScore: CreateScorePayload;
   deleteUser: DeleteUserPayload;
+  joinRace: JoinRacePayload;
+  leaveRace: LeaveRacePayload;
   login: LoginPayload;
   logout: LogoutPayload;
   register: RegisterPayload;
@@ -164,6 +186,16 @@ export type MutationCreateScoreArgs = {
 
 export type MutationDeleteUserArgs = {
   input: DeleteUserInput;
+};
+
+
+export type MutationJoinRaceArgs = {
+  input: JoinRaceInput;
+};
+
+
+export type MutationLeaveRaceArgs = {
+  input: LeaveRaceInput;
 };
 
 
@@ -191,6 +223,7 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  allRaces: Array<Race>;
   allScores: Array<Score>;
   allUsers: Array<User>;
   bye: Scalars['String']['output'];
@@ -236,18 +269,8 @@ export type Race = {
   __typename?: 'Race';
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['UUID']['output'];
-  racerStatistics: Array<RacerStatistics>;
   racers: Array<User>;
   updatedAt: Scalars['DateTime']['output'];
-};
-
-export type RacerStatistics = {
-  __typename?: 'RacerStatistics';
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
-  racer: User;
-  updatedAt: Scalars['DateTime']['output'];
-  wpm: Scalars['Int']['output'];
 };
 
 export type RegisterError = InvalidFieldError | UsernameTakenError;
@@ -352,7 +375,12 @@ export type StringOperationFilterInput = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  onCreated: Race;
+  onRaceJoinLeave: Race;
+};
+
+
+export type SubscriptionOnRaceJoinLeaveArgs = {
+  raceId: Scalars['UUID']['input'];
 };
 
 export type User = {
@@ -409,12 +437,24 @@ export type UuidOperationFilterInput = {
 
 export type MeFragmentFragment = { __typename?: 'User', id: any, username: string, email: string } & { ' $fragmentName'?: 'MeFragmentFragment' };
 
+export type CreateRaceMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CreateRaceMutation = { __typename?: 'Mutation', createRace: { __typename?: 'CreateRacePayload', race?: { __typename?: 'Race', id: any, racers: Array<{ __typename?: 'User', username: string }> } | null } };
+
 export type CreateScoreMutationVariables = Exact<{
   input: CreateScoreInput;
 }>;
 
 
 export type CreateScoreMutation = { __typename?: 'Mutation', createScore: { __typename?: 'CreateScorePayload', score?: { __typename?: 'Score', id: any, wpm: number, rawWpm: number, mode: string, modeSetting: number, language: string, user?: { __typename?: 'User', username: string } | null } | null } };
+
+export type JoinRaceMutationVariables = Exact<{
+  input: JoinRaceInput;
+}>;
+
+
+export type JoinRaceMutation = { __typename?: 'Mutation', joinRace: { __typename?: 'JoinRacePayload', race?: { __typename?: 'Race', racers: Array<{ __typename?: 'User', username: string }> } | null } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -492,8 +532,17 @@ export type MeQuery = { __typename?: 'Query', me?: (
     & { ' $fragmentRefs'?: { 'MeFragmentFragment': MeFragmentFragment } }
   ) | null };
 
+export type OnRaceJoinLeaveSubscriptionVariables = Exact<{
+  raceId: Scalars['UUID']['input'];
+}>;
+
+
+export type OnRaceJoinLeaveSubscription = { __typename?: 'Subscription', onRaceJoinLeave: { __typename?: 'Race', racers: Array<{ __typename?: 'User', username: string }> } };
+
 export const MeFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]} as unknown as DocumentNode<MeFragmentFragment, unknown>;
+export const CreateRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateRace"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createRace"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"racers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreateRaceMutation, CreateRaceMutationVariables>;
 export const CreateScoreDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateScore"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateScoreInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createScore"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"score"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"rawWpm"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"modeSetting"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreateScoreMutation, CreateScoreMutationVariables>;
+export const JoinRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"JoinRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JoinRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"joinRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"racers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<JoinRaceMutation, JoinRaceMutationVariables>;
 export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MeFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"code"},"name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
 export const LogoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Logout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"logout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"boolean"}}]}}]}}]} as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Register"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"register"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MeFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"code"},"name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]} as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
@@ -504,3 +553,4 @@ export const GetScoresDocument = {"kind":"Document","definitions":[{"kind":"Oper
 export const GetUserByUsernameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserByUsername"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userByUsername"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"scores"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetUserByUsernameQuery, GetUserByUsernameQueryVariables>;
 export const GetUsersBestScoresDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsersBestScores"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"usersBestScores"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"modeSetting"}},{"kind":"Field","name":{"kind":"Name","value":"accuracy"}}]}}]}}]} as unknown as DocumentNode<GetUsersBestScoresQuery, GetUsersBestScoresQueryVariables>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MeFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MeFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
+export const OnRaceJoinLeaveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"OnRaceJoinLeave"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"raceId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"onRaceJoinLeave"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"raceId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"raceId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"racers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]} as unknown as DocumentNode<OnRaceJoinLeaveSubscription, OnRaceJoinLeaveSubscriptionVariables>;

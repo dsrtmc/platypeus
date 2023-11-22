@@ -1,0 +1,7 @@
+subscription OnRaceJoinLeave($raceId: UUID!) {
+    onRaceJoinLeave(raceId: $raceId) {
+        racers {
+            username
+        }
+    }
+}

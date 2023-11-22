@@ -1,0 +1,9 @@
+mutation JoinRace($input: JoinRaceInput!) {
+    joinRace(input: $input) {
+        race {
+            racers {
+                username
+            }
+        }
+    }
+}
