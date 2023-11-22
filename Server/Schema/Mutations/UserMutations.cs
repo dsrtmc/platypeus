@@ -31,7 +31,7 @@ public static class UserMutations
         if (!race.Racers.Contains(user))
             race.Racers.Add(user);
 
-        await eventSender.SendAsync($"{nameof(Subscription.OnJoined)}_{raceId}", race, cancellationToken);
+        await eventSender.SendAsync($"{nameof(Subscription.OnRaceJoinLeave)}_{raceId}", race, cancellationToken);
         
         await db.SaveChangesAsync(cancellationToken);
 
@@ -54,7 +54,7 @@ public static class UserMutations
         if (race.Racers.Contains(user))
             race.Racers.Remove(user);
     
-        await eventSender.SendAsync($"{nameof(Subscription.OnLeft)}_{raceId}", race, cancellationToken);
+        await eventSender.SendAsync($"{nameof(Subscription.OnRaceJoinLeave)}_{raceId}", race, cancellationToken);
         
         await db.SaveChangesAsync(cancellationToken);
     

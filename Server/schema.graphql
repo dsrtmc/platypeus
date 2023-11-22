@@ -127,8 +127,7 @@ type ScoresEdge {
 }
 
 type Subscription {
-  onJoined(raceId: UUID!): Race!
-  onLeft(raceId: UUID!): Race!
+  onRaceJoinLeave(raceId: UUID!): Race!
 }
 
 type User {
