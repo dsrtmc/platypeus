@@ -34,7 +34,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         <ul>
           users:{" "}
           {data.onRaceJoinLeave.racers.map((racer) => (
-            <li>{racer.username}</li>
+            <li key={racer.username}>{racer.username}</li>
           ))}
         </ul>
       )}
