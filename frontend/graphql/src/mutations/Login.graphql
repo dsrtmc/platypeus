@@ -1,7 +1,8 @@
 mutation Login($input: LoginInput!) {
     login(input: $input) {
         user {
-            ...MeFragment
+            id
+            ...UserInfoFragment
         }
         errors {
             code: __typename

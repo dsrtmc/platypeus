@@ -1,10 +1,11 @@
-mutation CreateRace {
-    createRace {
+mutation CreateRace($input: CreateRaceInput!) {
+    createRace(input: $input) {
         race {
             id
             racers {
                 username
             }
+            private
         }
     }
 }

@@ -5,6 +5,8 @@ import { BsBarChartFill, BsInfoLg, BsKeyboardFill } from "react-icons/bs";
 import { AuthBox } from "@/components/navbar/AuthBox";
 import { getClient } from "@/lib/client";
 import { NavLink } from "@/components/navbar/NavLink";
+import { FieldValues } from "react-hook-form";
+import { FaCarSide } from "react-icons/fa";
 
 /*
  * Next.js 13 is really funny and I can't seem to figure out a way to get `AuthBox` to work as expected as a client component.
@@ -21,6 +23,7 @@ export default async function Navbar() {
         <NavLink href={"/leaderboards"} Icon={BsBarChartFill} />
         <NavLink href={"/about"} Icon={BsInfoLg} />
         <NavLink href={"/bye"} Icon={BsKeyboardFill} />
+        <NavLink href={"/races"} Icon={FaCarSide} />
       </div>
       <AuthBox initial={response.data.me} />
     </nav>

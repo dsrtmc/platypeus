@@ -13,20 +13,20 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "fragment MeFragment on User {\n  id\n  username\n  email\n}": types.MeFragmentFragmentDoc,
-    "mutation CreateRace {\n  createRace {\n    race {\n      id\n      racers {\n        username\n      }\n    }\n  }\n}": types.CreateRaceDocument,
+    "fragment UserInfoFragment on User {\n  username\n  email\n}": types.UserInfoFragmentFragmentDoc,
+    "mutation CreateRace($input: CreateRaceInput!) {\n  createRace(input: $input) {\n    race {\n      id\n      racers {\n        username\n      }\n      private\n    }\n  }\n}": types.CreateRaceDocument,
     "mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      language\n      user {\n        username\n      }\n    }\n  }\n}": types.CreateScoreDocument,
     "mutation JoinRace($input: JoinRaceInput!) {\n  joinRace(input: $input) {\n    race {\n      racers {\n        username\n      }\n    }\n  }\n}": types.JoinRaceDocument,
-    "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.LoginDocument,
+    "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      id\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.LoginDocument,
     "mutation Logout {\n  logout {\n    boolean\n  }\n}": types.LogoutDocument,
-    "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.RegisterDocument,
+    "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.RegisterDocument,
     "query Bye {\n  bye\n}": types.ByeDocument,
     "query GetAllUsers {\n  allUsers {\n    id\n    username\n    email\n  }\n}": types.GetAllUsersDocument,
     "query GetScore($id: UUID!) {\n  score(id: $id) {\n    id\n    wpm\n    rawWpm\n  }\n}": types.GetScoreDocument,
     "query GetScores($after: String, $before: String, $first: Int, $last: Int, $order: [ScoreSortInput!], $where: ScoreFilterInput) {\n  scores(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    order: $order\n    where: $where\n  ) {\n    edges {\n      node {\n        id\n        wpm\n        rawWpm\n        accuracy\n        user {\n          username\n        }\n        mode\n        modeSetting\n        createdAt\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.GetScoresDocument,
     "query GetUserByUsername($username: String!) {\n  userByUsername(username: $username) {\n    id\n    username\n    scores {\n      id\n      wpm\n    }\n    createdAt\n    updatedAt\n  }\n}": types.GetUserByUsernameDocument,
     "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}": types.GetUsersBestScoresDocument,
-    "query Me {\n  me {\n    ...MeFragment\n  }\n}": types.MeDocument,
+    "query Me {\n  me {\n    id\n    ...UserInfoFragment\n  }\n}": types.MeDocument,
     "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      username\n    }\n  }\n}": types.OnRaceJoinLeaveDocument,
 };
 
@@ -47,11 +47,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "fragment MeFragment on User {\n  id\n  username\n  email\n}"): (typeof documents)["fragment MeFragment on User {\n  id\n  username\n  email\n}"];
+export function graphql(source: "fragment UserInfoFragment on User {\n  username\n  email\n}"): (typeof documents)["fragment UserInfoFragment on User {\n  username\n  email\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation CreateRace {\n  createRace {\n    race {\n      id\n      racers {\n        username\n      }\n    }\n  }\n}"): (typeof documents)["mutation CreateRace {\n  createRace {\n    race {\n      id\n      racers {\n        username\n      }\n    }\n  }\n}"];
+export function graphql(source: "mutation CreateRace($input: CreateRaceInput!) {\n  createRace(input: $input) {\n    race {\n      id\n      racers {\n        username\n      }\n      private\n    }\n  }\n}"): (typeof documents)["mutation CreateRace($input: CreateRaceInput!) {\n  createRace(input: $input) {\n    race {\n      id\n      racers {\n        username\n      }\n      private\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -63,7 +63,7 @@ export function graphql(source: "mutation JoinRace($input: JoinRaceInput!) {\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
+export function graphql(source: "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      id\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      id\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -71,7 +71,7 @@ export function graphql(source: "mutation Logout {\n  logout {\n    boolean\n  }
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...MeFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
+export function graphql(source: "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -99,7 +99,7 @@ export function graphql(source: "query GetUsersBestScores($userId: UUID!) {\n  u
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query Me {\n  me {\n    ...MeFragment\n  }\n}"): (typeof documents)["query Me {\n  me {\n    ...MeFragment\n  }\n}"];
+export function graphql(source: "query Me {\n  me {\n    id\n    ...UserInfoFragment\n  }\n}"): (typeof documents)["query Me {\n  me {\n    id\n    ...UserInfoFragment\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

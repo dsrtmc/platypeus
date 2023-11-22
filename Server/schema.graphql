@@ -83,7 +83,7 @@ type Query {
 
 type Race {
   racers: [User!]!
-  unlisted: Boolean!
+  private: Boolean!
   password: String
   id: UUID!
   createdAt: DateTime!
@@ -151,7 +151,7 @@ union LoginError = InvalidFieldError | IncorrectCredentialsError
 union RegisterError = InvalidFieldError | UsernameTakenError
 
 input CreateRaceInput {
-  unlisted: Boolean!
+  isPrivate: Boolean!
   password: String
 }
 

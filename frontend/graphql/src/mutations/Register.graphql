@@ -1,7 +1,7 @@
 mutation Register($input: RegisterInput!) {
     register(input: $input) {
         user {
-            ...MeFragment
+            ...UserInfoFragment
         }
         errors {
             code: __typename

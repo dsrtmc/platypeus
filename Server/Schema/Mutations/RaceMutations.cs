@@ -10,15 +10,16 @@ namespace Server.Schema.Mutations;
 public static class RaceMutations
 {
     public static async Task<Race> CreateRace(
-        bool unlisted,
+        bool isPrivate,
         string? password,
         DatabaseContext db,
         [Service] IHttpContextAccessor accessor
     ) {
+        // if (unlisted) password = null; // could be funny to add that, seems like it'd make sense.
         var race = new Race
         {
             Racers = new List<User>(),
-            Unlisted = unlisted,
+            Private = isPrivate,
             Password = password
         };
         

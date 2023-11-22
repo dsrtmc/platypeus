@@ -6,7 +6,7 @@ public class Race : BaseEntity
     // lowkey idk if needed
     public List<User> Racers { get; set; } = new();
 
-    public bool Unlisted { get; set; } = false;
+    public bool Private { get; set; } = false;
     
     public string? Password { get; set; }
 }
