@@ -1,0 +1,11 @@
+subscription OnChatboxEvent($chatboxId: UUID!) {
+    onChatboxEvent(chatboxId: $chatboxId) {
+        messages {
+            author {
+                username
+            }
+            content
+            createdAt
+        }
+    }
+}

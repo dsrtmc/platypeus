@@ -2,7 +2,8 @@
 
 import React from "react";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
-import { JoinRaceDocument, MeDocument, OnRaceJoinLeaveDocument } from "@/graphql/generated/graphql";
+import { JoinRaceDocument, LeaveRaceDocument, MeDocument, OnRaceJoinLeaveDocument } from "@/graphql/generated/graphql";
+import { Chatbox } from "@/app/races/[id]/Chatbox";
 
 interface Props {
   raceId: string;
@@ -11,13 +12,19 @@ interface Props {
 export const RaceBox: React.FC<Props> = ({ raceId }) => {
   const { data: meData } = useQuery(MeDocument);
   const [joinRace, {}] = useMutation(JoinRaceDocument);
+  const [leaveRace, {}] = useMutation(LeaveRaceDocument);
   const { data, loading, error } = useSubscription(OnRaceJoinLeaveDocument, {
     variables: {
       raceId,
     },
   });
+  // const { data: dataB } = useSubscription(OnChatboxJoinLeaveDocument, {
+  //   variables: {
+  //     raceId,
+  //   },
+  // });
   async function handleJoinRace() {
-    const response = await joinRace({
+    await joinRace({
       variables: {
         input: {
           userId: meData?.me?.id,
@@ -25,22 +32,38 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         },
       },
     });
-    console.log("Join race response:", response);
+  }
+  async function handleLeaveRace() {
+    await leaveRace({
+      variables: {
+        input: {
+          userId: meData?.me?.id,
+          raceId,
+        },
+      },
+    });
   }
   return (
     <div>
       <code>meow</code>
-      {data && (
-        <ul>
-          users:{" "}
-          {data.onRaceJoinLeave.racers.map((racer) => (
-            <li key={racer.username}>{racer.username}</li>
-          ))}
-        </ul>
+      {data && meData && (
+        <>
+          <ul>
+            users:
+            {data.onRaceJoinLeave.racers.map((racer) => (
+              <li key={racer.username}>{racer.username}</li>
+            ))}
+          </ul>
+          {!data.onRaceJoinLeave.racers.find((racer) => racer.id === meData?.me?.id) ? (
+            <button onClick={handleJoinRace}>Join the race</button>
+          ) : (
+            <button onClick={handleLeaveRace}>leave the race</button>
+          )}
+          <Chatbox chatboxData={data.onRaceJoinLeave.chatbox} meData={meData} />
+        </>
       )}
       {loading && <p>its loading</p>}
       {error && <p>there is a funny error: {JSON.stringify(error)}</p>}
-      <button onClick={handleJoinRace}>Join the race</button>
     </div>
   );
 };

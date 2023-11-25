@@ -23,5 +23,5 @@ public class Score : BaseEntity
     public User? User { get; set; }
     
     [GraphQLIgnore]
-    public Guid? UserID { get; set; }
+    public Guid? UserId { get; set; }
 }

@@ -73,3 +73,8 @@
 .instead:hover {
     color: var(--text-color);
 }
+
+.chatbox {
+    border: 2px solid var(--text-color);
+    padding: 2rem;
+}

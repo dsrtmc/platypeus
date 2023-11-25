@@ -9,7 +9,7 @@ public abstract class BaseEntity
         UpdatedAt = now;
     }
 
-    public Guid ID { get; init; }
+    public Guid Id { get; init; }
 
     public DateTime CreatedAt { get; init; }
 

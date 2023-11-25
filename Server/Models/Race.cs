@@ -9,6 +9,8 @@ public class Race : BaseEntity
     public bool Private { get; set; } = false;
     
     public string? Password { get; set; }
+    
+    public Chatbox Chatbox { get; set; } = null!;
 }
 
 /*

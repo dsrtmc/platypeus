@@ -127,7 +127,7 @@ public static class PasswordHasher
     /// <param name="argon">The Argon2 object so as to access <see cref="EncodedParameters.Options"/></param>
     /// <param name="salt"><see cref="EncodedParameters.Salt"/></param>
     /// <param name="hash"><see cref="EncodedParameters.Hash"/></param>
-    /// <returns></returns>
+    /// <returns>The formatted hash.</returns>
     private static string FormatHash(Argon2 argon, string salt, string hash)
     {
         // Version is v=19 because Argon2 1.3 => 0x13 == 19

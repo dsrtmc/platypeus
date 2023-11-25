@@ -20,6 +20,7 @@ public static class RaceMutations
         {
             Racers = new List<User>(),
             Private = isPrivate,
+            Chatbox = new Chatbox(),
             Password = password
         };
         

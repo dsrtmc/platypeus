@@ -51,8 +51,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
       <input
         {...register("password" as FieldPath<FormValues>, {
           disabled: !watch("private"),
-          required: { value: watch("private"), message: "When set to private, password is required." },
+          required: { value: watch("private"), message: "When set to private, a password is required." },
         })}
+        type={"password"}
         placeholder={"password"}
         aria-invalid={errors.password ? "true" : "false"}
         className={styles.field}

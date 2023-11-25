@@ -8,6 +8,15 @@ interface Error {
   message: String!
 }
 
+type Chatbox {
+  raceId: UUID!
+  race: Race!
+  messages: [Message!]!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type CreateRacePayload {
   race: Race
 }
@@ -28,6 +37,10 @@ type InvalidFieldError implements Error {
   message: String!
 }
 
+type JoinChatboxPayload {
+  chatbox: Chatbox
+}
+
 type JoinRacePayload {
   race: Race
 }
@@ -45,7 +58,18 @@ type LogoutPayload {
   boolean: Boolean
 }
 
+type Message {
+  author: User!
+  chatbox: Chatbox!
+  content: String!
+  id: UUID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Mutation {
+  sendMessage(input: SendMessageInput!): SendMessagePayload!
+  joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload!
   joinRace(input: JoinRaceInput!): JoinRacePayload!
   leaveRace(input: LeaveRaceInput!): LeaveRacePayload!
   deleteUser(input: DeleteUserInput!): DeleteUserPayload!
@@ -79,12 +103,14 @@ type Query {
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
   score(id: UUID!): Score
   allRaces: [Race!]!
+  allChatboxes: [Chatbox!]!
 }
 
 type Race {
   racers: [User!]!
   private: Boolean!
   password: String
+  chatbox: Chatbox!
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -128,8 +154,13 @@ type ScoresEdge {
   node: Score!
 }
 
+type SendMessagePayload {
+  boolean: Boolean
+}
+
 type Subscription {
   onRaceJoinLeave(raceId: UUID!): Race!
+  onChatboxEvent(chatboxId: UUID!): Chatbox!
 }
 
 type User {
@@ -215,9 +246,15 @@ input IntOperationFilterInput {
   nlte: Int
 }
 
+input JoinChatboxInput {
+  userId: UUID!
+  chatboxId: UUID!
+}
+
 input JoinRaceInput {
   userId: UUID!
   raceId: UUID!
+  password: String
 }
 
 input LeaveRaceInput {
@@ -278,6 +315,12 @@ input ScoreSortInput {
   id: SortEnumType
   createdAt: SortEnumType
   updatedAt: SortEnumType
+}
+
+input SendMessageInput {
+  userId: UUID!
+  chatboxId: UUID!
+  content: String!
 }
 
 input StringOperationFilterInput {

@@ -24,7 +24,7 @@ public static class UserQueries
 
     public static List<Score?> GetUsersBestScores(Guid userId, DatabaseContext db)
     {
-        var user = db.Users.Include(u => u.Scores).FirstOrDefault(u => u.ID == userId);
+        var user = db.Users.Include(u => u.Scores).FirstOrDefault(u => u.Id == userId);
         if (user is null)
             return new List<Score?>();
 

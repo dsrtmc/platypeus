@@ -8,6 +8,15 @@ public class DatabaseContext : DbContext
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) {}
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Race>()
+            .HasOne(e => e.Chatbox)
+            .WithOne(e => e.Race)
+            .HasForeignKey<Chatbox>(e => e.RaceId)
+            .IsRequired();
+    }
+
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
         OnUpdate();
@@ -42,4 +51,6 @@ public class DatabaseContext : DbContext
     public DbSet<Score> Scores { get; set; } = null!;
     public DbSet<Race> Races { get; set; } = null!;
     public DbSet<RacerStatistics> RacerStatistics { get; set; } = null!;
+    public DbSet<Chatbox> Chatboxes { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
 }
