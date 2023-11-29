@@ -38,7 +38,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 // GraphQL setup
-builder.Services.AddGraphQLServer()
+builder.Services
+    .AddGraphQLServer()
     .AddTypes()
     .AddAuthorization()
     .AddMutationConventions()

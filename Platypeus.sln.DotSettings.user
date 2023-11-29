@@ -1,7 +1,8 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cc5fd281_002De82a_002D4600_002D9985_002D1e0562e35600/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="SchemaChangeTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::57A300EC-CB42-4F45-AC28-F84BCBC9FF56::net7.0::Server.Tests.UnitTest1.Test1&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::57A300EC-CB42-4F45-AC28-F84BCBC9FF56::net7.0::Server.Tests.UnitTest1&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::57A300EC-CB42-4F45-AC28-F84BCBC9FF56::net7.0::Server.Tests.SampleTest.Users_ListsAllUsersFromDatabase&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=lowkey/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

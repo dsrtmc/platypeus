@@ -1,7 +1,4 @@
-using HotChocolate.Subscriptions;
-using Microsoft.EntityFrameworkCore;
 using Server.Models;
-using Server.Schema.Subscriptions;
 using Server.Services;
 
 namespace Server.Schema.Mutations;

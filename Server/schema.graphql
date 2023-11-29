@@ -15,6 +15,10 @@ type Chatbox {
   updatedAt: DateTime!
 }
 
+type CreateChatboxPayload {
+  chatbox: Chatbox
+}
+
 type CreateRacePayload {
   race: Race
 }
@@ -76,6 +80,7 @@ type Mutation {
   logout: LogoutPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
   createRace(input: CreateRaceInput!): CreateRacePayload!
+  createChatbox: CreateChatboxPayload!
 }
 
 "Information about pagination in a connection."
@@ -101,6 +106,7 @@ type Query {
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
   score(id: UUID!): Score
   allRaces: [Race!]!
+  hello: String!
 }
 
 type Race {
