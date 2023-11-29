@@ -150,12 +150,7 @@ public static class UserMutations
             return new UsernameTakenError(input.Username!);
         
         var hashedPassword = await PasswordHasher.Hash(input.Password!);
-        var user = new User
-        {
-            Username = input.Username!,
-            Email = input.Email!,
-            Password = hashedPassword
-        };
+        var user = new User(input.Username!, input.Email!, hashedPassword);
         
         await db.Users.AddAsync(user);
         await db.SaveChangesAsync();

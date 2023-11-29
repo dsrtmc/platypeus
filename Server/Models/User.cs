@@ -2,11 +2,18 @@ namespace Server.Models;
 
 public class User : BaseEntity
 {
-    public string Username { get; set; } = null!;
-
-    public string Email { get; set; } = null!;
+    public User(string username, string email, string password)
+    {
+        Username = username;
+        Email = email;
+        Password = password;
+    }
     
-    public string Password { get; set; } = null!;
+    public string Username { get; set; }
+
+    public string Email { get; set; }
+    
+    public string Password { get; set; }
     
     public List<Score> Scores { get; set; } = new();
 }
