@@ -1,7 +1,11 @@
 "use client";
 
 import { ApolloClient, ApolloLink, HttpLink, HttpOptions, split } from "@apollo/client";
-import { ApolloNextAppProvider, NextSSRInMemoryCache, SSRMultipartLink, } from "@apollo/experimental-nextjs-app-support/ssr";
+import {
+  ApolloNextAppProvider,
+  NextSSRInMemoryCache,
+  SSRMultipartLink,
+} from "@apollo/experimental-nextjs-app-support/ssr";
 import { PropsWithChildren } from "react";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";

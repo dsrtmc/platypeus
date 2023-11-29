@@ -5,9 +5,9 @@ namespace Server.Models;
 public class Chatbox : BaseEntity
 {
     // maybe graphql ignore here once i figure it out? lol
-    public Guid RaceId { get; set; }
+    // public Guid? RaceId { get; set; }
     
-    public Race Race { get; set; } = null!;
+    // public Race? Race { get; set; } = null!;
 
     public List<Message> Messages { get; set; } = new();
 }

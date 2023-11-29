@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
+import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 import { JoinRaceDocument, LeaveRaceDocument, MeDocument, OnRaceJoinLeaveDocument } from "@/graphql/generated/graphql";
 import { Chatbox } from "@/app/races/[id]/Chatbox";
 
@@ -18,11 +18,6 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       raceId,
     },
   });
-  // const { data: dataB } = useSubscription(OnChatboxJoinLeaveDocument, {
-  //   variables: {
-  //     raceId,
-  //   },
-  // });
   async function handleJoinRace() {
     await joinRace({
       variables: {
@@ -59,7 +54,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           ) : (
             <button onClick={handleLeaveRace}>leave the race</button>
           )}
-          <Chatbox chatboxData={data.onRaceJoinLeave.chatbox} meData={meData} />
+          <Chatbox chatboxId={data.onRaceJoinLeave.chatboxId} meData={meData} />
         </>
       )}
       {loading && <p>its loading</p>}

@@ -1,6 +1,7 @@
 subscription OnChatboxEvent($chatboxId: UUID!) {
     onChatboxEvent(chatboxId: $chatboxId) {
         messages {
+            id
             author {
                 username
             }

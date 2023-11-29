@@ -4,8 +4,6 @@ subscription OnRaceJoinLeave($raceId: UUID!) {
             id
             username
         }
-        chatbox {
-            id
-        }
+        chatboxId
     }
 }

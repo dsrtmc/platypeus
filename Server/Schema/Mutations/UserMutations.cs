@@ -70,11 +70,14 @@ public static class UserMutations
     // TODO: bad return value (???)
     // TODO: Not sure whether it shouldn't be a part of `RaceMutations`
     public static async Task<Race?> JoinRace(
-        Guid userId, Guid raceId, string? password,
+        Guid? userId, Guid raceId, string? password,
         DatabaseContext db,
         [Service] ITopicEventSender eventSender,
         CancellationToken cancellationToken
     ) {
+        if (userId is null)
+            return null;
+        
         var user = await db.Users.FindAsync(userId);
         if (user is null)
             return null;

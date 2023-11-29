@@ -30,8 +30,8 @@ const documents = {
     "query GetUserByUsername($username: String!) {\n  userByUsername(username: $username) {\n    id\n    username\n    scores {\n      id\n      wpm\n    }\n    createdAt\n    updatedAt\n  }\n}": types.GetUserByUsernameDocument,
     "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}": types.GetUsersBestScoresDocument,
     "query Me {\n  me {\n    id\n    ...UserInfoFragment\n  }\n}": types.MeDocument,
-    "subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}": types.OnChatboxEventDocument,
-    "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      id\n      username\n    }\n    chatbox {\n      id\n    }\n  }\n}": types.OnRaceJoinLeaveDocument,
+    "subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      id\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}": types.OnChatboxEventDocument,
+    "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      id\n      username\n    }\n    chatboxId\n  }\n}": types.OnRaceJoinLeaveDocument,
 };
 
 /**
@@ -119,11 +119,11 @@ export function graphql(source: "query Me {\n  me {\n    id\n    ...UserInfoFrag
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}"): (typeof documents)["subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}"];
+export function graphql(source: "subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      id\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}"): (typeof documents)["subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      id\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      id\n      username\n    }\n    chatbox {\n      id\n    }\n  }\n}"): (typeof documents)["subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      id\n      username\n    }\n    chatbox {\n      id\n    }\n  }\n}"];
+export function graphql(source: "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      id\n      username\n    }\n    chatboxId\n  }\n}"): (typeof documents)["subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    racers {\n      id\n      username\n    }\n    chatboxId\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

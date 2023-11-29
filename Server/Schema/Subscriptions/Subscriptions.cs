@@ -26,7 +26,6 @@ public class Subscription
     ) {
         yield return (await db.Races
             .Include(r => r.Racers)
-            .Include(r => r.Chatbox)
             .FirstOrDefaultAsync(r => r.Id == raceId))!;
         
         var sourceStream = await eventReceiver.SubscribeAsync<Race>(Helper.EncodeOnRaceJoinLeaveToken(raceId));

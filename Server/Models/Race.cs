@@ -10,6 +10,8 @@ public class Race : BaseEntity
     
     public string? Password { get; set; }
     
+    public Guid ChatboxId { get; set; }
+    
     public Chatbox Chatbox { get; set; } = null!;
 }
 

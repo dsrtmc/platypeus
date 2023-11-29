@@ -8,14 +8,14 @@ public class DatabaseContext : DbContext
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) {}
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Race>()
-            .HasOne(e => e.Chatbox)
-            .WithOne(e => e.Race)
-            .HasForeignKey<Chatbox>(e => e.RaceId)
-            .IsRequired();
-    }
+    // protected override void OnModelCreating(ModelBuilder modelBuilder)
+    // {
+    //     modelBuilder.Entity<Race>()
+    //         .HasOne(e => e.Chatbox)
+    //         .WithOne()
+    //         .HasForeignKey<Chatbox>(c => c.RaceId)
+    //         .IsRequired(false);
+    // }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {

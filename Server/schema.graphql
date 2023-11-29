@@ -9,8 +9,6 @@ interface Error {
 }
 
 type Chatbox {
-  raceId: UUID!
-  race: Race!
   messages: [Message!]!
   id: UUID!
   createdAt: DateTime!
@@ -103,13 +101,13 @@ type Query {
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
   score(id: UUID!): Score
   allRaces: [Race!]!
-  allChatboxes: [Chatbox!]!
 }
 
 type Race {
   racers: [User!]!
   private: Boolean!
   password: String
+  chatboxId: UUID!
   chatbox: Chatbox!
   id: UUID!
   createdAt: DateTime!
@@ -252,7 +250,7 @@ input JoinChatboxInput {
 }
 
 input JoinRaceInput {
-  userId: UUID!
+  userId: UUID
   raceId: UUID!
   password: String
 }
