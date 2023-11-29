@@ -59,7 +59,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
         className={styles.field}
       />
       {errors.password && <span className={styles.error}>{errors.password.message}</span>}
-      <button type={"submit"} disabled={!!errors.password} className={styles.button}>
+      <button type={"submit"} disabled={!!errors.password} className={styles.submitButton}>
         <FaPlus /> Create
       </button>
     </form>

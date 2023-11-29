@@ -70,16 +70,16 @@ type Message {
 }
 
 type Mutation {
-  sendMessage(input: SendMessageInput!): SendMessagePayload!
-  joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload!
-  joinRace(input: JoinRaceInput!): JoinRacePayload!
-  leaveRace(input: LeaveRaceInput!): LeaveRacePayload!
   deleteUser(input: DeleteUserInput!): DeleteUserPayload!
   register(input: RegisterInput!): RegisterPayload!
   login(input: LoginInput!): LoginPayload!
   logout: LogoutPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
+  joinRace(input: JoinRaceInput!): JoinRacePayload!
+  leaveRace(input: LeaveRaceInput!): LeaveRacePayload!
   createRace(input: CreateRaceInput!): CreateRacePayload!
+  sendMessage(input: SendMessageInput!): SendMessagePayload!
+  joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload!
   createChatbox: CreateChatboxPayload!
 }
 
@@ -107,6 +107,7 @@ type Query {
   score(id: UUID!): Score
   allRaces: [Race!]!
   hello: String!
+  allChatboxes: [Chatbox!]!
 }
 
 type Race {

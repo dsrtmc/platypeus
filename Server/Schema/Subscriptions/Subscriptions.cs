@@ -49,7 +49,7 @@ public class Subscription
         [Service] ITopicEventReceiver eventReceiver
     ) {
         yield return (await db.Chatboxes
-            .Include(c => c.Messages)
+            .Include(c => c.Messages.OrderBy(m => m.CreatedAt))
                 .ThenInclude(m => m.Author)
             .FirstOrDefaultAsync(r => r.Id == chatboxId))!;
         

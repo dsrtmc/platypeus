@@ -55,6 +55,7 @@ export default function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <span>Sign up</span>
       <input
         type={"text"}
         {...register("username" as FieldPath<FormValues>, { required: "This field is required." })}

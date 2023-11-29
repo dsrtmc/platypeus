@@ -1,0 +1,162 @@
+.raceBox {
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*align-items: center;*/
+    /*gap: 2rem;*/
+}
+
+.chatbox {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    gap: 1rem;
+}
+
+.textarea {
+    outline: none;
+    border: 2px solid transparent;
+    color: var(--text-color);
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    padding: 6px 10px;
+    transition: filter 200ms ease;
+    width: 100%;
+    font-size: 0.9rem;
+    overflow: hidden;
+    resize: none;
+    min-height: 1.25rem;
+    line-height: 1.25rem;
+    word-break: break-word;
+}
+
+.textarea:focus {
+    border: 2px solid var(--main-color);
+    border-radius: var(--roundness);
+}
+
+.textarea:disabled {
+    filter: opacity(50%);
+}
+
+.textarea::placeholder {
+    color: var(--sub-color);
+}
+
+.sendButton {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+    color: var(--sub-color);
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    padding: 6px 8px;
+    transition: color 100ms ease;
+}
+
+.sendButton:focus-visible {
+    border: 2px solid var(--text-color);
+    /*border-bottom-left-radius: var(--roundness);*/
+    /*border-top-left-radius: var(--roundness);*/
+    border-radius: var(--roundness);
+}
+
+.sendButton:hover {
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.sendButton:active {
+    color: var(--sub-color);
+}
+
+.sendButton:disabled {
+    color: var(--bg-color);
+}
+
+.submitButton {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+    color: var(--text-color);
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    padding: 4px 6px;
+    transition: color, background-color 200ms ease;
+}
+
+.submitButton:focus {
+    border: 2px solid var(--main-color);
+}
+
+.submitButton:hover {
+    color: var(--sub-alt-color);
+    background-color: var(--text-color);
+    cursor: pointer;
+}
+
+.submitButton:disabled {
+    color: var(--bg-color);
+}
+
+.error {
+    font-size: 0.75rem;
+}
+
+.instead {
+    font-size: 0.75rem;
+    color: var(--sub-color);
+    transition: color 100ms ease;
+}
+
+.instead:hover {
+    color: var(--text-color);
+}
+
+.messageListWrapper {
+    flex-direction: column-reverse;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: scroll;
+    word-break: break-word;
+    height: 10rem;
+}
+
+.messageList {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    gap: 0.2rem;
+}
+
+.message {
+    color: var(--sub-color);
+}
+
+.author {
+}
+
+.me {
+    color: var(--text-color);
+}
+
+.content {
+}
+
+.bottom {
+    display: flex;
+}
+
+.hr {
+    height: 2px;
+    background-image: linear-gradient(to right, transparent, var(--sub-alt-color), transparent);
+}

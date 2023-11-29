@@ -2,9 +2,7 @@
     display: flex;
     flex-direction: column;
     margin: auto;
-    gap: .5rem;
-    max-width: calc(var(--wrapper-width) / 3);
-    padding: 24px 36px;
+    gap: 1rem;
 }
 
 .field {
@@ -16,8 +14,23 @@
     color: var(--text-color);
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
-    padding: 4px 6px;
+    padding: 6px 8px;
     transition: filter 200ms ease;
+    width: 100%;
+}
+
+.chatInputField {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid transparent;
+    color: var(--text-color);
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    padding: 6px 8px;
+    transition: filter 200ms ease;
+    width: 100%;
 }
 
 .field:focus {
@@ -32,7 +45,7 @@
     color: var(--sub-color);
 }
 
-.button {
+.submitButton {
     all: unset;
     display: flex;
     justify-content: center;
@@ -42,39 +55,25 @@
     color: var(--text-color);
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
-    padding: 4px 6px;
+    padding: 6px 8px;
     transition: color, background-color 200ms ease;
+    width: 100%;
 }
 
-.button:focus {
+.submitButton:focus {
     border: 2px solid var(--main-color);
 }
 
-.button:hover {
+.submitButton:hover {
     color: var(--sub-alt-color);
     background-color: var(--text-color);
     cursor: pointer;
 }
 
-.button:disabled {
+.submitButton:disabled {
     color: var(--bg-color);
 }
 
 .error {
     font-size: 0.75rem;
-}
-
-.instead {
-    font-size: 0.75rem;
-    color: var(--sub-color);
-    transition: color 100ms ease;
-}
-
-.instead:hover {
-    color: var(--text-color);
-}
-
-.chatbox {
-    border: 2px solid var(--text-color);
-    padding: 2rem;
 }

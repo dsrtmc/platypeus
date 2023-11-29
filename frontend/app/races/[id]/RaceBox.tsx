@@ -4,6 +4,7 @@ import React from "react";
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 import { JoinRaceDocument, LeaveRaceDocument, MeDocument, OnRaceJoinLeaveDocument } from "@/graphql/generated/graphql";
 import { Chatbox } from "@/app/races/[id]/Chatbox";
+import styles from "./Race.module.css";
 
 interface Props {
   raceId: string;
@@ -39,8 +40,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     });
   }
   return (
-    <div>
-      <code>meow</code>
+    <div className={styles.raceBox}>
       {data && meData && (
         <>
           <ul>
@@ -54,6 +54,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           ) : (
             <button onClick={handleLeaveRace}>leave the race</button>
           )}
+          <div className={styles.hr} />
           <Chatbox chatboxId={data.onRaceJoinLeave.chatboxId} meData={meData} />
         </>
       )}

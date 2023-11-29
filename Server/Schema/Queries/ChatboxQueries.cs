@@ -7,6 +7,6 @@ namespace Server.Schema.Queries;
 [QueryType]
 public static class ChatboxQueries
 {
-    // public static List<Chatbox> GetAllChatboxes(DatabaseContext db)
-    //     => db.Chatboxes.Include(c => c.Race).Include(c => c.Messages).ToList();
+    public static List<Chatbox> GetAllChatboxes(DatabaseContext db)
+        => db.Chatboxes.Include(c => c.Messages).ToList();
 }

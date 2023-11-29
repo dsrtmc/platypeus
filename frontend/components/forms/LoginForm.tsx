@@ -56,6 +56,7 @@ export default function LoginForm() {
   // Ignore squiggly lines, explicit type declaration fixes it despite being the same type; `react-hook-form` doing the funny
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <span>Sign in</span>
       <input
         type={"text"}
         {...register("username" as FieldPath<FormValues>, { required: "This field is required." })}

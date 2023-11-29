@@ -7,9 +7,6 @@ export default async function LoginPage() {
   // if (response.data.me) redirect(`/user/${response.data.me.username}`);
   return (
     <div>
-      <h1>
-        you are on the <code>login</code> page
-      </h1>
       <LoginForm />
     </div>
   );
