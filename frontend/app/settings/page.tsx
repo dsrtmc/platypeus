@@ -1,6 +1,7 @@
 "use client";
 
-import React, { ReducerState, useReducer } from "react";
+import React, { ReducerState, useEffect, useReducer } from "react";
+import { PropertyEditor } from "@/app/settings/PropertyEditor";
 
 interface Props {}
 
@@ -14,30 +15,17 @@ const themeCssVariables = {
   "extra error": "--error-extra-color",
 };
 
-type State = { [variable: keyof typeof themeCssVariables]: string };
-const initialState: State = {
-  background: "",
-  main: "",
-  sub: "",
-  "sub alt": "",
-  text: "",
-  error: "",
-  "extra error": "",
-};
+type State = typeof themeCssVariables;
 
 const reducer = (current: State, update: Partial<State>) => ({ ...current, ...update });
 
 export default function SettingsPage() {
-  const [state, dispatch] = useReducer(reducer, initialState as ReducerState<State>);
-  const root = document.querySelector(":root");
-  const cs = getComputedStyle(root);
+  const [state, dispatch] = useReducer(reducer, themeCssVariables as ReducerState<State>);
+
   return (
     <div>
-      {themeCssVariables.map((variable) => (
-        <>
-          <span>{variable}</span>
-          <input type={"text"} />
-        </>
+      {Object.entries(state).map(([name, cssName]) => (
+        <PropertyEditor name={name} cssName={cssName} key={cssName} />
       ))}
     </div>
   );

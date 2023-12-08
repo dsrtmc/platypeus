@@ -1,0 +1,37 @@
+.box {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.field {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid transparent;
+    color: var(--text-color);
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    padding: 4px 6px;
+}
+
+#sub-input {
+    all: unset;
+    height: 2rem;
+    width: 2rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--roundness);
+}
+#sub-input::-webkit-color-swatch {
+    border-radius: 15px;
+    border: none;
+}
+#sub-input::-moz-color-swatch {
+    border-radius: 15px;
+    border: none;
+}

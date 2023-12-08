@@ -52,7 +52,6 @@ public static class RaceMutations
         if (race is null)
             return null;
 
-        // abcdefghijklmnopqrstuvwxyz
         if (race.Private && race.Password != password)
             return null;
 
