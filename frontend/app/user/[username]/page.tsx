@@ -22,18 +22,19 @@ export default async function UserPage({ params }: { params: { username: string 
       userId: userData.userByUsername?.id,
     },
   });
-  const { data: scoresData } = await getClient().query({
-    query: GetScoresDocument,
-    variables: {
-      where: {
-        user: {
-          username: {
-            eq: params.username,
-          },
-        },
-      },
-    } as GetScoresQueryVariables,
-  });
+  // TODO: this shit doesn't work, no clue why - it works on the backend
+  // const { data: scoresData } = await getClient().query({
+  //   query: GetScoresDocument,
+  //   variables: {
+  //     where: {
+  //       user: {
+  //         username: {
+  //           eq: params.username,
+  //         },
+  //       },
+  //     },
+  //   } as GetScoresQueryVariables,
+  // });
   return (
     <div>
       <div>
@@ -49,7 +50,7 @@ export default async function UserPage({ params }: { params: { username: string 
           </div>
         ))}
       </div>
-      <PerformanceChart scoresData={scoresData} />
+      {/*<PerformanceChart scoresData={scoresData} />*/}
     </div>
   );
 }

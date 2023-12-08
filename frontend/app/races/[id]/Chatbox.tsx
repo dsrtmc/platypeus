@@ -1,9 +1,8 @@
 "use client";
 
-import React, { ChangeEvent, KeyboardEvent, FC, useEffect, useState } from "react";
+import React, { FC, KeyboardEvent } from "react";
 import styles from "./Race.module.css";
 import {
-  MeDocument,
   MeQuery,
   OnChatboxEventDocument,
   OnRaceJoinLeaveSubscription,
@@ -93,14 +92,16 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
           aria-invalid={errors.content ? "true" : "false"}
           className={styles.textarea}
         />
-        {(watch("content") as string).length >= maxMessageLength - 50 && (
-          <span className={styles.error}>{maxMessageLength - (watch("content") as string).length}</span>
-        )}
-        {errors.content && <span className={styles.error}>{errors.content.message}</span>}
         <button type={"submit"} className={styles.sendButton}>
           <IoSend />
         </button>
       </div>
+      {(watch("content") as string).length >= maxMessageLength - 50 && (
+        <span className={styles.error}>
+          {maxMessageLength - (watch("content") as string).length} characters remaining
+        </span>
+      )}
+      {errors.content && <span className={styles.error}>{errors.content.message}</span>}
     </form>
   );
 };

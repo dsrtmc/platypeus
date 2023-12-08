@@ -6,7 +6,9 @@ import { AuthBox } from "@/components/navbar/AuthBox";
 import { getClient } from "@/lib/client";
 import { NavLink } from "@/components/navbar/NavLink";
 import { FieldValues } from "react-hook-form";
-import { FaCarSide } from "react-icons/fa";
+import { FaCarSide, FaCog, FaInfo } from "react-icons/fa";
+import { FaChartSimple, FaKeyboard } from "react-icons/fa6";
+import { IoInformation } from "react-icons/io5";
 
 /*
  * Next.js 13 is really funny and I can't seem to figure out a way to get `AuthBox` to work as expected as a client component.
@@ -19,11 +21,12 @@ export default async function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={styles.box}>
-        <NavLink href={"/"} Icon={BsKeyboardFill} />
-        <NavLink href={"/leaderboards"} Icon={BsBarChartFill} />
-        <NavLink href={"/about"} Icon={BsInfoLg} />
-        <NavLink href={"/bye"} Icon={BsKeyboardFill} />
-        <NavLink href={"/races"} Icon={FaCarSide} />
+        <NavLink href={"/"} Icon={FaKeyboard} iconSize={"1.15rem"} />
+        <NavLink href={"/leaderboards"} Icon={FaChartSimple} iconSize={"1.15rem"} />
+        <NavLink href={"/about"} Icon={FaInfo} iconSize={"1.05rem"} />
+        <NavLink href={"/bye"} Icon={BsKeyboardFill} iconSize={"1.15rem"} />
+        <NavLink href={"/races"} Icon={FaCarSide} iconSize={"1.15rem"} />
+        <NavLink href={"/settings"} Icon={FaCog} iconSize={"1.15rem"} />
       </div>
       <AuthBox initial={response.data.me} />
     </nav>

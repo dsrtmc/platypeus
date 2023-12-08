@@ -9,7 +9,7 @@
 
 .box {
     display: flex;
-    gap: 1.5rem;
+    gap: .5rem;
 }
 
 .spacer {
@@ -22,6 +22,7 @@
     align-items: center;
     transition: all 150ms ease;
     color: var(--sub-color);
+    padding: .5rem;
 }
 
 .item:hover {
@@ -29,6 +30,9 @@
     color: var(--text-color);
 }
 
+.item:active {
+    filter: opacity(0.8);
+}
+
 .icon {
-    font-size: 1.5rem;
 }

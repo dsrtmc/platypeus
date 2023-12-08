@@ -5,7 +5,11 @@ public class Race : BaseEntity
     // TODO: think whether a long ID like a GUID is worth it, maybe base64-ify it
     // lowkey idk if needed
     public List<User> Racers { get; set; } = new();
+    
+    public string Mode { get; init; } = null!; // "time", "words", "quote"
 
+    public int ModeSetting { get; init; } // "time" -> 15; "words" -> 25 etc.
+    
     public bool Private { get; set; } = false;
     
     public string? Password { get; set; }

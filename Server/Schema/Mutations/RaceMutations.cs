@@ -9,12 +9,38 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class RaceMutations
 {
+    public static async Task AddRacerStatisticToRace()
+    {
+        
+    }
+
+    // lol
+    public static async Task<Race?> StartRace(Guid raceId, DatabaseContext db)
+    {
+        var race = await db.Races.FindAsync(raceId);
+        if (race is null)
+            return null;
+
+        foreach (var racer in race.Racers)
+        {
+            var stats = new RacerStatistics
+            {
+                Race = race,
+                Racer = racer,
+                Wpm = 0
+            };
+            db.RacerStatistics.Add(stats);
+        }
+
+        return race;
+    }
+    
     public static async Task<Race?> JoinRace(
         Guid? userId, Guid raceId, string? password,
         DatabaseContext db,
         [Service] ITopicEventSender eventSender,
-        CancellationToken cancellationToken
-    ) {
+        CancellationToken cancellationToken)
+    {
         if (userId is null)
             return null;
         
@@ -43,8 +69,8 @@ public static class RaceMutations
     public static async Task<Race?> LeaveRace(
         Guid userId, Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
-        CancellationToken cancellationToken
-    ) {
+        CancellationToken cancellationToken)
+    {
         var user = await db.Users.FindAsync(userId);
         if (user is null)
             return null;
@@ -67,7 +93,8 @@ public static class RaceMutations
         bool isPrivate,
         string? password,
         DatabaseContext db,
-        [Service] IHttpContextAccessor accessor) {
+        [Service] IHttpContextAccessor accessor)
+    {
         // if (unlisted) password = null; // could be funny to add that, seems like it'd make sense.
         var race = new Race
         {

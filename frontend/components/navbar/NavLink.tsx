@@ -6,14 +6,21 @@ import { IconType } from "react-icons";
 interface Props {
   href: string;
   Icon: IconType;
+  iconSize: string;
   textPosition?: "left" | "right" | undefined;
 }
 
-export const NavLink: React.FC<Props> = ({ href, Icon, textPosition, children }: PropsWithChildren<Props>) => {
+export const NavLink: React.FC<Props> = ({
+  href,
+  Icon,
+  iconSize,
+  textPosition,
+  children,
+}: PropsWithChildren<Props>) => {
   return (
     <Link href={href} className={styles.item}>
       {textPosition === "left" && children}
-      <Icon className={styles.icon} />
+      <Icon className={styles.icon} style={{ fontSize: iconSize }} />
       {textPosition === "right" && children}
     </Link>
   );

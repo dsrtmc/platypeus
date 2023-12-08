@@ -38,17 +38,17 @@ export const AuthBox: React.FC<Props> = ({ initial }) => {
     <div className={styles.box}>
       {user ? (
         <>
-          <NavLink href={`/user/${user.username}`} Icon={BiSolidUser} textPosition={"left"}>
+          <NavLink href={`/user/${user.username}`} Icon={BiSolidUser} textPosition={"left"} iconSize={"1.15rem"}>
             {user.username}
           </NavLink>
-          <NavButton onClick={handleLogout} Icon={BiLogOut} />
+          <NavButton onClick={handleLogout} Icon={BiLogOut} iconSize={"1.15rem"} />
         </>
       ) : (
         <>
-          <NavLink href={"/register"} Icon={BiSolidUser} textPosition={"left"}>
+          <NavLink href={"/register"} Icon={BiSolidUser} textPosition={"left"} iconSize={"1.15rem"}>
             register
           </NavLink>
-          <NavLink href={"/login"} Icon={BiLogIn} /> {/* why does its size not change lol */}
+          <NavLink href={"/login"} Icon={BiLogIn} iconSize={"1.15rem"} />
         </>
       )}
     </div>
