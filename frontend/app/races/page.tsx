@@ -6,6 +6,7 @@ interface Props {}
 export default function RacesPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      {/* TODO: RaceList */}
       <CreateRaceForm />
     </div>
   );

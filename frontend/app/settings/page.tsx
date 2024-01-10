@@ -5,6 +5,7 @@ import { PropertyEditor } from "@/app/settings/PropertyEditor";
 
 interface Props {}
 
+// name: cssName
 const themeCssVariables = {
   background: "--bg-color",
   main: "--main-color",

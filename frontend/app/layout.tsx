@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { ApolloWrapper } from "@/lib/apollo-provider";
 import { ContentWrapper } from "@/components/ContentWrapper";
 import { Header } from "@/components/header/Header";
+import { ConfigLoader } from "@/app/ConfigLoader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ApolloWrapper>
           <ContentWrapper>
             <Header />
+            <ConfigLoader />
             {children}
           </ContentWrapper>
         </ApolloWrapper>
