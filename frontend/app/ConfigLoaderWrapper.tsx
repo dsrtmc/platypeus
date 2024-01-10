@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import { ConfigType } from "@/shared/types/configTypes";
 import { THEMES } from "@/shared/constants/themes";
 
@@ -11,12 +11,9 @@ const defaultConfig: ConfigType = {
   themeConfig: THEMES.default,
 };
 
-/*
- * NOTE: Not sure whether that component is required, but for now I think it's
- * a good way to ensure something happens on every page on the client,
- * after the server-side render.
- */
-export const ConfigLoader: React.FC<Props> = ({}) => {
+// for fun, makes me lean towards going back to client side rendering
+export const ConfigLoaderWrapper: React.FC<PropsWithChildren<Props>> = ({ children }) => {
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
     console.log("Config loaded.");
     let config: ConfigType = JSON.parse(localStorage.getItem("config"));
@@ -27,6 +24,7 @@ export const ConfigLoader: React.FC<Props> = ({}) => {
     for (const property in config.themeConfig) {
       document.documentElement.style.setProperty(property, config.themeConfig[property]);
     }
+    setVisible(true);
   }, []);
-  return null;
+  return visible && children;
 };

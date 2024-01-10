@@ -9,6 +9,7 @@ interface Props {
 }
 
 export const Word = forwardRef<HTMLDivElement, Props>(({ word }, ref) => {
+  // TODO: ?
   function handleChange(e: ChangeEvent<HTMLInputElement>) {}
   return (
     <div className={styles.word} ref={ref}>

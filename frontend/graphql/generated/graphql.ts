@@ -25,12 +25,32 @@ export enum ApplyPolicy {
   Validation = 'VALIDATION'
 }
 
+export type BooleanOperationFilterInput = {
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  neq?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type Chatbox = {
   __typename?: 'Chatbox';
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['UUID']['output'];
   messages: Array<Message>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ChatboxFilterInput = {
+  and?: InputMaybe<Array<ChatboxFilterInput>>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  messages?: InputMaybe<ListFilterInputTypeOfMessageFilterInput>;
+  or?: InputMaybe<Array<ChatboxFilterInput>>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type ChatboxSortInput = {
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  updatedAt?: InputMaybe<SortEnumType>;
 };
 
 export type CreateChatboxPayload = {
@@ -163,11 +183,25 @@ export type LeaveRacePayload = {
   race?: Maybe<Race>;
 };
 
+export type ListFilterInputTypeOfMessageFilterInput = {
+  all?: InputMaybe<MessageFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<MessageFilterInput>;
+  some?: InputMaybe<MessageFilterInput>;
+};
+
 export type ListFilterInputTypeOfScoreFilterInput = {
   all?: InputMaybe<ScoreFilterInput>;
   any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<ScoreFilterInput>;
   some?: InputMaybe<ScoreFilterInput>;
+};
+
+export type ListFilterInputTypeOfUserFilterInput = {
+  all?: InputMaybe<UserFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<UserFilterInput>;
+  some?: InputMaybe<UserFilterInput>;
 };
 
 export type ListIntOperationFilterInput = {
@@ -205,6 +239,17 @@ export type Message = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type MessageFilterInput = {
+  and?: InputMaybe<Array<MessageFilterInput>>;
+  author?: InputMaybe<UserFilterInput>;
+  chatbox?: InputMaybe<ChatboxFilterInput>;
+  content?: InputMaybe<StringOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<MessageFilterInput>>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createChatbox: CreateChatboxPayload;
@@ -218,6 +263,7 @@ export type Mutation = {
   logout: LogoutPayload;
   register: RegisterPayload;
   sendMessage: SendMessagePayload;
+  startRace: StartRacePayload;
 };
 
 
@@ -265,6 +311,11 @@ export type MutationSendMessageArgs = {
   input: SendMessageInput;
 };
 
+
+export type MutationStartRaceArgs = {
+  input: StartRaceInput;
+};
+
 /** Information about pagination in a connection. */
 export type PageInfo = {
   __typename?: 'PageInfo';
@@ -287,11 +338,28 @@ export type Query = {
   bye: Scalars['String']['output'];
   hello: Scalars['String']['output'];
   me?: Maybe<User>;
+  racersStatistics: Array<RacerStatistics>;
+  races?: Maybe<RacesConnection>;
   score?: Maybe<Score>;
   scores?: Maybe<ScoresConnection>;
   userById?: Maybe<User>;
   userByUsername?: Maybe<User>;
   usersBestScores: Array<Maybe<Score>>;
+};
+
+
+export type QueryRacersStatisticsArgs = {
+  raceId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRacesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<RaceSortInput>>;
+  where?: InputMaybe<RaceFilterInput>;
 };
 
 
@@ -330,10 +398,69 @@ export type Race = {
   chatboxId: Scalars['UUID']['output'];
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['UUID']['output'];
+  mode: Scalars['String']['output'];
+  modeSetting: Scalars['Int']['output'];
   password?: Maybe<Scalars['String']['output']>;
   private: Scalars['Boolean']['output'];
   racers: Array<User>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type RaceFilterInput = {
+  and?: InputMaybe<Array<RaceFilterInput>>;
+  chatbox?: InputMaybe<ChatboxFilterInput>;
+  chatboxId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  mode?: InputMaybe<StringOperationFilterInput>;
+  modeSetting?: InputMaybe<IntOperationFilterInput>;
+  or?: InputMaybe<Array<RaceFilterInput>>;
+  password?: InputMaybe<StringOperationFilterInput>;
+  private?: InputMaybe<BooleanOperationFilterInput>;
+  racers?: InputMaybe<ListFilterInputTypeOfUserFilterInput>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type RaceSortInput = {
+  chatbox?: InputMaybe<ChatboxSortInput>;
+  chatboxId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  mode?: InputMaybe<SortEnumType>;
+  modeSetting?: InputMaybe<SortEnumType>;
+  password?: InputMaybe<SortEnumType>;
+  private?: InputMaybe<SortEnumType>;
+  updatedAt?: InputMaybe<SortEnumType>;
+};
+
+export type RacerStatistics = {
+  __typename?: 'RacerStatistics';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  race: Race;
+  racer: User;
+  updatedAt: Scalars['DateTime']['output'];
+  wpm: Scalars['Int']['output'];
+};
+
+/** A connection to a list of items. */
+export type RacesConnection = {
+  __typename?: 'RacesConnection';
+  /** A list of edges. */
+  edges?: Maybe<Array<RacesEdge>>;
+  /** A flattened list of the nodes. */
+  nodes?: Maybe<Array<Race>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type RacesEdge = {
+  __typename?: 'RacesEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Race;
 };
 
 export type RegisterError = InvalidFieldError | UsernameTakenError;
@@ -431,6 +558,15 @@ export enum SortEnumType {
   Asc = 'ASC',
   Desc = 'DESC'
 }
+
+export type StartRaceInput = {
+  raceId: Scalars['UUID']['input'];
+};
+
+export type StartRacePayload = {
+  __typename?: 'StartRacePayload';
+  race?: Maybe<Race>;
+};
 
 export type StringOperationFilterInput = {
   and?: InputMaybe<Array<StringOperationFilterInput>>;
@@ -594,6 +730,18 @@ export type GetAllUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAllUsersQuery = { __typename?: 'Query', allUsers: Array<{ __typename?: 'User', id: any, username: string, email: string }> };
 
+export type GetRacesQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<RaceSortInput> | RaceSortInput>;
+  where?: InputMaybe<RaceFilterInput>;
+}>;
+
+
+export type GetRacesQuery = { __typename?: 'Query', races?: { __typename?: 'RacesConnection', edges?: Array<{ __typename?: 'RacesEdge', node: { __typename?: 'Race', id: any, createdAt: any } }> | null } | null };
+
 export type GetScoreQueryVariables = Exact<{
   id: Scalars['UUID']['input'];
 }>;
@@ -661,6 +809,7 @@ export const RegisterDocument = {"kind":"Document","definitions":[{"kind":"Opera
 export const SendMessageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SendMessage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SendMessageInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendMessage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"boolean"}}]}}]}}]} as unknown as DocumentNode<SendMessageMutation, SendMessageMutationVariables>;
 export const ByeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Bye"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bye"}}]}}]} as unknown as DocumentNode<ByeQuery, ByeQueryVariables>;
 export const GetAllUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]} as unknown as DocumentNode<GetAllUsersQuery, GetAllUsersQueryVariables>;
+export const GetRacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRaces"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"before"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"last"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RaceSortInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"RaceFilterInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"races"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"before"},"value":{"kind":"Variable","name":{"kind":"Name","value":"before"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"last"},"value":{"kind":"Variable","name":{"kind":"Name","value":"last"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetRacesQuery, GetRacesQueryVariables>;
 export const GetScoreDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetScore"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"score"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"rawWpm"}}]}}]}}]} as unknown as DocumentNode<GetScoreQuery, GetScoreQueryVariables>;
 export const GetScoresDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetScores"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"before"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"last"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ScoreSortInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ScoreFilterInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scores"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"before"},"value":{"kind":"Variable","name":{"kind":"Name","value":"before"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"last"},"value":{"kind":"Variable","name":{"kind":"Name","value":"last"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"rawWpm"}},{"kind":"Field","name":{"kind":"Name","value":"accuracy"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"modeSetting"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"cursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}}]} as unknown as DocumentNode<GetScoresQuery, GetScoresQueryVariables>;
 export const GetUserByUsernameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserByUsername"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userByUsername"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"scores"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetUserByUsernameQuery, GetUserByUsernameQueryVariables>;

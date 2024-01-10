@@ -107,6 +107,7 @@ type Query {
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
   score(id: UUID!): Score
   racersStatistics(raceId: UUID!): [RacerStatistics!]!
+  races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection
   allRaces: [Race!]!
   hello: String!
   allChatboxes: [Chatbox!]!
@@ -132,6 +133,24 @@ type RacerStatistics {
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+"A connection to a list of items."
+type RacesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [RacesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Race!]
+}
+
+"An edge in a connection."
+type RacesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Race!
 }
 
 type RegisterPayload {
@@ -202,6 +221,26 @@ type UsernameTakenError implements Error {
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
 union RegisterError = InvalidFieldError | UsernameTakenError
+
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+input ChatboxFilterInput {
+  and: [ChatboxFilterInput!]
+  or: [ChatboxFilterInput!]
+  messages: ListFilterInputTypeOfMessageFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input ChatboxSortInput {
+  id: SortEnumType
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
+}
 
 input CreateRaceInput {
   isPrivate: Boolean!
@@ -284,10 +323,24 @@ input LeaveRaceInput {
   raceId: UUID!
 }
 
+input ListFilterInputTypeOfMessageFilterInput {
+  all: MessageFilterInput
+  none: MessageFilterInput
+  some: MessageFilterInput
+  any: Boolean
+}
+
 input ListFilterInputTypeOfScoreFilterInput {
   all: ScoreFilterInput
   none: ScoreFilterInput
   some: ScoreFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfUserFilterInput {
+  all: UserFilterInput
+  none: UserFilterInput
+  some: UserFilterInput
   any: Boolean
 }
 
@@ -301,6 +354,44 @@ input ListIntOperationFilterInput {
 input LoginInput {
   username: String
   password: String
+}
+
+input MessageFilterInput {
+  and: [MessageFilterInput!]
+  or: [MessageFilterInput!]
+  author: UserFilterInput
+  chatbox: ChatboxFilterInput
+  content: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input RaceFilterInput {
+  and: [RaceFilterInput!]
+  or: [RaceFilterInput!]
+  racers: ListFilterInputTypeOfUserFilterInput
+  mode: StringOperationFilterInput
+  modeSetting: IntOperationFilterInput
+  private: BooleanOperationFilterInput
+  password: StringOperationFilterInput
+  chatboxId: UuidOperationFilterInput
+  chatbox: ChatboxFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input RaceSortInput {
+  mode: SortEnumType
+  modeSetting: SortEnumType
+  private: SortEnumType
+  password: SortEnumType
+  chatboxId: SortEnumType
+  chatbox: ChatboxSortInput
+  id: SortEnumType
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
 }
 
 input RegisterInput {

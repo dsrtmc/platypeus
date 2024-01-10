@@ -1,0 +1,10 @@
+query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order: [RaceSortInput!], $where: RaceFilterInput) {
+    races(after: $after, before: $before, first: $first, last: $last, order: $order, where: $where) {
+        edges {
+            node {
+                id
+                createdAt
+            }
+        }
+    }
+}

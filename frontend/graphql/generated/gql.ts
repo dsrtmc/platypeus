@@ -25,6 +25,7 @@ const documents = {
     "mutation SendMessage($input: SendMessageInput!) {\n  sendMessage(input: $input) {\n    boolean\n  }\n}": types.SendMessageDocument,
     "query Bye {\n  bye\n}": types.ByeDocument,
     "query GetAllUsers {\n  allUsers {\n    id\n    username\n    email\n  }\n}": types.GetAllUsersDocument,
+    "query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order: [RaceSortInput!], $where: RaceFilterInput) {\n  races(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    order: $order\n    where: $where\n  ) {\n    edges {\n      node {\n        id\n        createdAt\n      }\n    }\n  }\n}": types.GetRacesDocument,
     "query GetScore($id: UUID!) {\n  score(id: $id) {\n    id\n    wpm\n    rawWpm\n  }\n}": types.GetScoreDocument,
     "query GetScores($after: String, $before: String, $first: Int, $last: Int, $order: [ScoreSortInput!], $where: ScoreFilterInput) {\n  scores(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    order: $order\n    where: $where\n  ) {\n    edges {\n      node {\n        id\n        wpm\n        rawWpm\n        accuracy\n        user {\n          username\n        }\n        mode\n        modeSetting\n        createdAt\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.GetScoresDocument,
     "query GetUserByUsername($username: String!) {\n  userByUsername(username: $username) {\n    id\n    username\n    scores {\n      id\n      wpm\n    }\n    createdAt\n    updatedAt\n  }\n}": types.GetUserByUsernameDocument,
@@ -96,6 +97,10 @@ export function graphql(source: "query Bye {\n  bye\n}"): (typeof documents)["qu
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "query GetAllUsers {\n  allUsers {\n    id\n    username\n    email\n  }\n}"): (typeof documents)["query GetAllUsers {\n  allUsers {\n    id\n    username\n    email\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order: [RaceSortInput!], $where: RaceFilterInput) {\n  races(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    order: $order\n    where: $where\n  ) {\n    edges {\n      node {\n        id\n        createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order: [RaceSortInput!], $where: RaceFilterInput) {\n  races(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    order: $order\n    where: $where\n  ) {\n    edges {\n      node {\n        id\n        createdAt\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

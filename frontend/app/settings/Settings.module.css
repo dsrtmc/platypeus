@@ -27,10 +27,12 @@
     cursor: pointer;
     border-radius: var(--roundness);
 }
+
 #sub-input::-webkit-color-swatch {
     border-radius: 15px;
     border: none;
 }
+
 #sub-input::-moz-color-swatch {
     border-radius: 15px;
     border: none;

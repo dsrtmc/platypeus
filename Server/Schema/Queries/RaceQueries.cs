@@ -11,6 +11,12 @@ public static class RaceQueries
     {
         return await db.RacerStatistics.Where(rs => rs.Race.Id == raceId).ToListAsync();
     }
+
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<Race> GetRaces(DatabaseContext db) => db.Races;
     
     public static List<Race> GetAllRaces(DatabaseContext db) => db.Races.Include(r => r.Racers).Include(r => r.Chatbox).ToList();
 }

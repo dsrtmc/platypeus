@@ -58,8 +58,9 @@
     flex-wrap: wrap;
     gap: 0.75rem;
     border-radius: 5px;
-    font-size: 1.5rem;
-    height: 8rem;
+    font-size: 1rem;
+    /* TODO: GET CANCER HOW CAN I MAKE FLEX-WRAP LIMIT TO 3 ROWS MAN HOLY SHITTTTTTTTTTTTTTTT */
+    height: calc(100px * calc(1 * 0.75));
     overflow: hidden;
 }
 
@@ -118,19 +119,20 @@
     all: unset;
     color: var(--sub-color);
     font-size: 1.5rem;
-    transition: color 200ms ease;
-}
-
-.setting:hover {
-    color: var(--text-color);
-}
-
-.selected {
-    color: var(--text-color);
+    transition: color, filter 200ms ease;
 }
 
 .setting:hover {
     cursor: pointer;
+    color: var(--text-color);
+}
+
+.setting:active {
+    filter: opacity(75%);
+}
+
+.selected {
+    color: var(--text-color);
 }
 
 .timer {

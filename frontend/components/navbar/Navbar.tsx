@@ -1,14 +1,11 @@
-import Link from "next/link";
 import { MeDocument } from "@/graphql/generated/graphql";
 import styles from "./Navbar.module.css";
 import { BsBarChartFill, BsInfoLg, BsKeyboardFill } from "react-icons/bs";
 import { AuthBox } from "@/components/navbar/AuthBox";
 import { getClient } from "@/lib/client";
 import { NavLink } from "@/components/navbar/NavLink";
-import { FieldValues } from "react-hook-form";
 import { FaCarSide, FaCog, FaInfo } from "react-icons/fa";
 import { FaChartSimple, FaKeyboard } from "react-icons/fa6";
-import { IoInformation } from "react-icons/io5";
 
 /*
  * Next.js 13 is really funny and I can't seem to figure out a way to get `AuthBox` to work as expected as a client component.
