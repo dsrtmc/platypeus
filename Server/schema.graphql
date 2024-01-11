@@ -244,6 +244,8 @@ input ChatboxSortInput {
 
 input CreateRaceInput {
   isPrivate: Boolean!
+  mode: String!
+  modeSetting: Int!
   password: String
 }
 

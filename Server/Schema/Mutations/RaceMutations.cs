@@ -90,6 +90,8 @@ public static class RaceMutations
     
     public static async Task<Race> CreateRace(
         bool isPrivate,
+        string mode,
+        int modeSetting,
         string? password,
         DatabaseContext db,
         [Service] IHttpContextAccessor accessor)
@@ -99,6 +101,8 @@ public static class RaceMutations
         {
             Racers = new List<User>(),
             Private = isPrivate,
+            Mode = mode,
+            ModeSetting = modeSetting,
             Chatbox = new Chatbox(),
             Password = password
         };

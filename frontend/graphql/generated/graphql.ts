@@ -60,6 +60,8 @@ export type CreateChatboxPayload = {
 
 export type CreateRaceInput = {
   isPrivate: Scalars['Boolean']['input'];
+  mode: Scalars['String']['input'];
+  modeSetting: Scalars['Int']['input'];
   password?: InputMaybe<Scalars['String']['input']>;
 };
 

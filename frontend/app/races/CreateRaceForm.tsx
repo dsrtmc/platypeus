@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FieldName, FieldPath, SubmitHandler, useForm } from "react-hook-form";
+import { Field, FieldName, FieldPath, SubmitHandler, useForm, UseFormWatch } from "react-hook-form";
 import { useMutation } from "@apollo/client";
 import { CreateRaceDocument } from "@/graphql/generated/graphql";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,8 @@ interface Props {}
 type FormValues = {
   private: boolean;
   password?: string;
+  mode: "time" | "words";
+  modeSetting: string;
 };
 
 export const CreateRaceForm: React.FC<Props> = ({}) => {
@@ -28,6 +30,8 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
   } = useForm<FormValues>({
     defaultValues: {
       private: false,
+      mode: "time",
+      modeSetting: "5",
       password: "",
     },
   });
@@ -38,9 +42,12 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
       variables: {
         input: {
           isPrivate: false,
+          mode: data.mode,
+          modeSetting: parseInt(data.modeSetting),
         },
       },
     });
+    console.log("The response we got:", response);
     router.push(`/races/${response.data?.createRace.race?.id}`);
   };
   return (
@@ -58,6 +65,33 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
         aria-invalid={errors.password ? "true" : "false"}
         className={styles.field}
       />
+      <div style={{ display: "flex", gap: "1rem" }}>
+        <input {...register("mode" as FieldPath<FormValues>)} type={"radio"} value={"time"} />
+        <label htmlFor={"time"}>time</label>
+        <input {...register("mode" as FieldPath<FormValues>)} type={"radio"} value={"words"} />
+        <label htmlFor={"words"}>words</label>
+        <div>selected mode: {watch("mode")}</div>
+      </div>
+      <div>
+        {watch("mode") === "time" ? (
+          // TODO: that's probably not how I should be using `htmlFor` lol
+          // time
+          <>
+            <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"5"} />
+            <label htmlFor={"5"}>5</label>
+            <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"15"} />
+            <label htmlFor={"15"}>15</label>
+          </>
+        ) : (
+          // words
+          <>
+            <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"25"} />
+            <label htmlFor={"25"}>25</label>
+            <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"50"} />
+            <label htmlFor={"50"}>50</label>
+          </>
+        )}
+      </div>
       {errors.password && <span className={styles.error}>{errors.password.message}</span>}
       <button type={"submit"} disabled={!!errors.password} className={styles.submitButton}>
         <FaPlus /> Create
