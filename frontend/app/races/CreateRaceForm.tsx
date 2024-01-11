@@ -9,6 +9,7 @@ import styles from "./Races.module.css";
 import { BiLogIn } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
 import { generateInitialWordPool } from "@/utils/generateInitialWordPool";
+import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
 
 interface Props {}
 
@@ -37,6 +38,16 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     },
   });
 
+  // TODO: move it somewhere else?
+  function generateContent(mode: "time" | "words", modeSetting: number): string {
+    switch (mode) {
+      case "time":
+        return generateInitialWordPool(6 * modeSetting).join(" ");
+      case "words":
+        return generateInitialWordPool(modeSetting).join(" ");
+    }
+  }
+
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
     const response = await createRace({
@@ -47,10 +58,11 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           modeSetting: parseInt(data.modeSetting),
           // TODO: is that a good idea to just use a string? :/
           // the issue is that we have to de-stringify it later anyways, but idk another way to carry it over
-          content: generateInitialWordPool(50).join(" "),
+          content: generateContent(data.mode, parseInt(data.modeSetting)),
         },
       },
     });
+    console.log("mode setting:", data.modeSetting);
     console.log("The response we got:", response);
     router.push(`/races/${response.data?.createRace.race?.id}`);
   };
@@ -85,8 +97,12 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
             <label htmlFor={"5"}>5</label>
             <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"15"} />
             <label htmlFor={"15"}>15</label>
+            <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"60"} />
+            <label htmlFor={"60"}>60</label>
           </>
         ) : (
+          // TODO: Even though when selecting "word" and "25" being selected, it is not actually registered
+          // ^^^^^ and it stays at 5. FIX THIS FIX THIS VERY IMPORTANT!
           // words
           <>
             <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"25"} />

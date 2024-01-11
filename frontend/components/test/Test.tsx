@@ -280,20 +280,10 @@ export const Test = forwardRef<TestMethods, Props>(
           numberOfWordsToAddToPool++;
           i++;
         }
-        const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
-        /*
-         * TODO: Think about lifting the `createWordElement()` logic one level higher (or even the entire pool).
-         * The idea is: we can influence what kind of pool-updating behavior we're going for from the parent box,
-         * which is very useful considering multiplayer test is supposed to have one fixed pool, that's then updated
-         * per-client, depending on how well they're doing.
-         */
-        // const removedWords: string[] = [];
-        // for (let i = 0; i < numberOfWordsToAddToPool; i++) {
-        //   const removedWord = wordsRef.current.shift();
-        //   removedWords.push(removedWord.textContent);
-        //   // newWordPool.push(createWordElement());
-        // }
+
         wordsRef.current.splice(0, numberOfWordsToAddToPool);
+
+        const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
         newWordPool.push(...createWordElements(onPoolUpdate(numberOfWordsToAddToPool, wordIndex)));
 
         setWordPool(newWordPool);
@@ -485,8 +475,6 @@ export const Test = forwardRef<TestMethods, Props>(
       <>
         <div className={styles.words}>{wordPool.map((word) => word)}</div>
         <Caret x={caretPosition.x} y={caretPosition.y} running={running} focused={focused} ref={caretRef} />
-        <button onClick={() => console.log(wordPool)}>log word pool</button>
-        <button onClick={() => console.log(wordsRef.current)}>log words ref</button>
       </>
     );
   }
