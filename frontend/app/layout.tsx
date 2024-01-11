@@ -5,7 +5,6 @@ import { ApolloWrapper } from "@/lib/apollo-provider";
 import { ContentWrapper } from "@/components/ContentWrapper";
 import { Header } from "@/components/header/Header";
 import { ConfigLoader } from "@/app/ConfigLoader";
-import { ConfigLoaderWrapper } from "@/app/ConfigLoaderWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 

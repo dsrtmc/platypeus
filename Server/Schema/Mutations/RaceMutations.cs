@@ -92,6 +92,7 @@ public static class RaceMutations
         bool isPrivate,
         string mode,
         int modeSetting,
+        string content, 
         string? password,
         DatabaseContext db,
         [Service] IHttpContextAccessor accessor)
@@ -103,6 +104,7 @@ public static class RaceMutations
             Private = isPrivate,
             Mode = mode,
             ModeSetting = modeSetting,
+            Content = content,
             Chatbox = new Chatbox(),
             Password = password
         };

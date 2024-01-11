@@ -55,10 +55,11 @@
 
 .words {
     display: flex;
+    /* TODO: align-items: flex-start; or something because if there's 2 lines (not 3) then it looks off */
     flex-wrap: wrap;
     gap: 0.75rem;
     font-size: 2rem;
-    /* TODO: GET CANCER HOW CAN I MAKE FLEX-WRAP LIMIT TO 3 ROWS MAN HOLY SHITTTTTTTTTTTTTTTT */
+    /* TODO: GET CANCER HOW CAN I MAKE FLEX-WRAP LIMIT TO 3 ROWS MAN HOLY SHIT */
     height: calc(100px * calc(2 * 0.75));
     overflow: hidden;
 }
@@ -80,12 +81,16 @@
     background-color: var(--sub-color);
     border-radius: 10%;
     width: 3px;
-    height: 2em;
+    height: calc(2rem + 0.5rem); /* TODO: var(--font-size) */
     transition: all ease var(--caret-speed);
 }
 
 .blinking {
     animation: 1.25s ease infinite blink;
+}
+
+.hidden {
+    visibility: hidden;
 }
 
 @keyframes blink {

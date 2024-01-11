@@ -117,6 +117,7 @@ type Race {
   racers: [User!]!
   mode: String!
   modeSetting: Int!
+  content: String!
   private: Boolean!
   password: String
   chatboxId: UUID!
@@ -163,6 +164,7 @@ type Score {
   rawWpm: Int!
   mode: String!
   modeSetting: Int!
+  content: String!
   language: String!
   accuracy: Float!
   wpmStats: [Int!]!
@@ -246,6 +248,7 @@ input CreateRaceInput {
   isPrivate: Boolean!
   mode: String!
   modeSetting: Int!
+  content: String!
   password: String
 }
 
@@ -253,10 +256,11 @@ input CreateScoreInput {
   wpm: Int!
   rawWpm: Int!
   mode: String!
+  modeSetting: Int!
+  content: String!
   accuracy: Float!
   wpmStats: [Int!]!
   rawStats: [Int!]!
-  modeSetting: Int!
   language: String!
 }
 
@@ -375,6 +379,7 @@ input RaceFilterInput {
   racers: ListFilterInputTypeOfUserFilterInput
   mode: StringOperationFilterInput
   modeSetting: IntOperationFilterInput
+  content: StringOperationFilterInput
   private: BooleanOperationFilterInput
   password: StringOperationFilterInput
   chatboxId: UuidOperationFilterInput
@@ -387,6 +392,7 @@ input RaceFilterInput {
 input RaceSortInput {
   mode: SortEnumType
   modeSetting: SortEnumType
+  content: SortEnumType
   private: SortEnumType
   password: SortEnumType
   chatboxId: SortEnumType
@@ -409,6 +415,7 @@ input ScoreFilterInput {
   rawWpm: IntOperationFilterInput
   mode: StringOperationFilterInput
   modeSetting: IntOperationFilterInput
+  content: StringOperationFilterInput
   language: StringOperationFilterInput
   accuracy: FloatOperationFilterInput
   wpmStats: ListIntOperationFilterInput
@@ -424,6 +431,7 @@ input ScoreSortInput {
   rawWpm: SortEnumType
   mode: SortEnumType
   modeSetting: SortEnumType
+  content: SortEnumType
   language: SortEnumType
   accuracy: SortEnumType
   user: UserSortInput

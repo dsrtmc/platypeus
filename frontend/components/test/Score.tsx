@@ -25,7 +25,7 @@ export const Score: FC<Props> = ({ score }) => {
         <div className={styles.group}>
           <div className={styles.top}>mode</div>
           <div className={styles.bottom}>
-            {score.mode} {score.language}
+            {score.mode} {score.modeSetting}
           </div>
         </div>
         <div className={styles.group}>
@@ -34,8 +34,18 @@ export const Score: FC<Props> = ({ score }) => {
         </div>
         <div className={styles.group}>
           {/* depends on the test mode */}
-          <div className={styles.top}>time</div>
-          <div className={styles.bottom}>{score.modeSetting}</div>
+          <div className={styles.top}>language</div>
+          <div className={styles.bottom}>{score.language}</div>
+        </div>
+        <div className={styles.group}>
+          {/* depends on the test mode */}
+          <div className={styles.top}>cpm</div>
+          <div className={styles.bottom}>{score.wpm * 5}</div>
+        </div>
+        <div className={`${styles.group} ${styles.last}`}>
+          {/* TODO: xd fix  IH :) I HATE CSS I HATE CSS */}
+          <div className={styles.top}>content</div>
+          <div className={`${styles.bottom} ${styles.content}`}>{score.content}</div>
         </div>
       </div>
     </div>

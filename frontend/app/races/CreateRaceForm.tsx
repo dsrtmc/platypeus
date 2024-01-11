@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import styles from "./Races.module.css";
 import { BiLogIn } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
+import { generateInitialWordPool } from "@/utils/generateInitialWordPool";
 
 interface Props {}
 
@@ -44,6 +45,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           isPrivate: false,
           mode: data.mode,
           modeSetting: parseInt(data.modeSetting),
+          // TODO: is that a good idea to just use a string? :/
+          // the issue is that we have to de-stringify it later anyways, but idk another way to carry it over
+          content: generateInitialWordPool(50).join(" "),
         },
       },
     });

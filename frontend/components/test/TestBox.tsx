@@ -10,6 +10,8 @@ import { RestartButton } from "@/components/test/RestartButton";
 import { Score as ScoreType } from "@/graphql/generated/graphql";
 import { Mode } from "@/components/test/Mode";
 import { HiMiniLanguage } from "react-icons/hi2";
+import { generateWord } from "@/utils/generateWords";
+import { generateInitialWordPool } from "@/utils/generateInitialWordPool";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -110,6 +112,18 @@ export function TestBox({ handleSaveScore }: Props) {
     }
   }, [timeSetting]);
 
+  /**
+   * Returns the elements to be added to the word pool.
+   * @param {string} count - The number of elements to add to the pool
+   */
+  function onPoolUpdate(count: number) {
+    const words: string[] = [];
+    for (let i = 0; i < count; i++) {
+      words.push(generateWord());
+    }
+    return words;
+  }
+
   if (visible) {
     return (
       <div className={styles.box} ref={ref}>
@@ -121,6 +135,7 @@ export function TestBox({ handleSaveScore }: Props) {
           {/* that should actually be called Language lol */}
           {/* HOW CAN I CENTER A DIV LOL */}
           <section className={styles.center}>
+            {/* TODO ???????? XD wtf is this name */}
             <Mode>
               <HiMiniLanguage /> english
             </Mode>
@@ -145,6 +160,8 @@ export function TestBox({ handleSaveScore }: Props) {
             onKeyDown={handleKeyDown}
             ref={testRef}
             onSaveScore={handleSaveScore}
+            initialContent={generateInitialWordPool(50)}
+            onPoolUpdate={onPoolUpdate}
           />
         </section>
         <section className={styles.bottom}>

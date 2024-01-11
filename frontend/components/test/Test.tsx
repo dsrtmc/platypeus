@@ -20,6 +20,8 @@ import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
+import { remove } from "ts-invariant/process";
+import { generateInitialWordPool } from "@/utils/generateInitialWordPool";
 
 interface Props {
   focused: boolean;
@@ -31,6 +33,8 @@ interface Props {
   handleStart: () => void;
   onKeyDown: (e: globalThis.MouseEvent) => void;
   onSaveScore: (score: Partial<ScoreType>) => void; // danger zone
+  initialContent: string[];
+  onPoolUpdate: (count: number, index?: number) => string[];
 }
 
 export interface TestMethods {
@@ -42,6 +46,7 @@ type State = {
   nonEmptyCharacters: number; // correct && incorrect, used for calculating raw
   allWordsLength: number;
   accuracy: number;
+  content: string[];
   wpmStats: number[];
   rawStats: number[];
 };
@@ -53,13 +58,26 @@ const initialState: State = {
   nonEmptyCharacters: 0,
   allWordsLength: 0,
   accuracy: 0,
+  content: [],
   wpmStats: [],
   rawStats: [],
 };
 
 export const Test = forwardRef<TestMethods, Props>(
   (
-    { focused, running, finished, time, timeSetting, handleChangeWpm, handleStart, onKeyDown, onSaveScore }: Props,
+    {
+      focused,
+      running,
+      finished,
+      time,
+      timeSetting,
+      handleChangeWpm,
+      handleStart,
+      onKeyDown,
+      onSaveScore,
+      initialContent,
+      onPoolUpdate,
+    }: Props,
     ref
   ) => {
     // TODO: for some reason raw seems weird on 30s test, idk if im just testing incorrectly or Xd
@@ -72,7 +90,7 @@ export const Test = forwardRef<TestMethods, Props>(
     const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
     const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
 
-    const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, wpmStats, rawStats }, dispatch] =
+    const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
       useReducer(reducer, initialState as ReducerState<State>);
 
     const caretRef = useRef<HTMLDivElement | null>(null);
@@ -263,14 +281,27 @@ export const Test = forwardRef<TestMethods, Props>(
           i++;
         }
         const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
-        for (let i = 0; i < numberOfWordsToAddToPool; i++) {
-          wordsRef.current.shift();
-          newWordPool.push(createWordElement());
-        }
+        /*
+         * TODO: Think about lifting the `createWordElement()` logic one level higher (or even the entire pool).
+         * The idea is: we can influence what kind of pool-updating behavior we're going for from the parent box,
+         * which is very useful considering multiplayer test is supposed to have one fixed pool, that's then updated
+         * per-client, depending on how well they're doing.
+         */
+        // const removedWords: string[] = [];
+        // for (let i = 0; i < numberOfWordsToAddToPool; i++) {
+        //   const removedWord = wordsRef.current.shift();
+        //   removedWords.push(removedWord.textContent);
+        //   // newWordPool.push(createWordElement());
+        // }
+        wordsRef.current.splice(0, numberOfWordsToAddToPool);
+        newWordPool.push(...createWordElements(onPoolUpdate(numberOfWordsToAddToPool, wordIndex)));
 
         setWordPool(newWordPool);
         const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
         setWordIndex(newIndex);
+
+        // TODO: FIX ACTUALLY UPDATING THE CONTENT
+        // dispatch({ content: content.concat([]) });
       }
     }
 
@@ -304,6 +335,16 @@ export const Test = forwardRef<TestMethods, Props>(
         ref: addToRefs,
         key: `word-${generateRandomString(7)}`,
       });
+    }
+
+    function createWordElements(words: string[]) {
+      return words.map((word) =>
+        createElement(Word as FunctionComponent<Word>, {
+          word: word,
+          ref: addToRefs,
+          key: `word-${generateRandomString(7)}`,
+        })
+      );
     }
 
     function reset() {
@@ -356,11 +397,10 @@ export const Test = forwardRef<TestMethods, Props>(
     // Initialize the pool
     // TODO: code duplication? initialization is the same as resetting the test
     useEffect(() => {
-      let words = [];
-      for (let i = 0; i < 50; i++) {
-        words.push(createWordElement());
-      }
-      setWordPool(words);
+      console.log("The initial load should be the same:", initialContent);
+      const test = createWordElements(initialContent);
+      console.log("Test:", test);
+      setWordPool(test);
       setWordIndex(0);
       setLetterIndex(0);
     }, []);
@@ -412,10 +452,12 @@ export const Test = forwardRef<TestMethods, Props>(
           wpm,
           rawWpm,
           mode: "time",
+          modeSetting: timeSetting,
           accuracy: newCorrectCount / newNonEmptyCount,
           wpmStats: [...wpmStats, wpm],
           rawStats: [...rawStats, rawWpm],
-          modeSetting: timeSetting,
+          content:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
           language: "english",
         };
         handleSaveScore(score);
@@ -442,7 +484,9 @@ export const Test = forwardRef<TestMethods, Props>(
     return (
       <>
         <div className={styles.words}>{wordPool.map((word) => word)}</div>
-        <Caret x={caretPosition.x} y={caretPosition.y} running={running} ref={caretRef} />
+        <Caret x={caretPosition.x} y={caretPosition.y} running={running} focused={focused} ref={caretRef} />
+        <button onClick={() => console.log(wordPool)}>log word pool</button>
+        <button onClick={() => console.log(wordsRef.current)}>log words ref</button>
       </>
     );
   }

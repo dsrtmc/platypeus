@@ -32,7 +32,12 @@
 .group {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+}
+
+/* TODO: HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA */
+.last {
+    width: fit-content;
+    margin-top: 0.5rem;
 }
 
 .top {
@@ -41,6 +46,13 @@
 
 .bottom {
     
+}
+
+.content {
+    width: min-content;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .big {

@@ -10,6 +10,9 @@ public class Race : BaseEntity
 
     public int ModeSetting { get; init; } // "time" -> 15; "words" -> 25 etc.
     
+    // TODO: maybe change name xd `race content` sounds shit
+    public string Content { get; init; } = null!;
+
     public bool Private { get; set; } = false;
     
     public string? Password { get; set; }

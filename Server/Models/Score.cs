@@ -1,7 +1,6 @@
 namespace Server.Models;
 
 // TODO: add more properties, as of right now I don't know what
-// probably some test data like language, setting etc.
 public class Score : BaseEntity
 {
     public int Wpm { get; init; }
@@ -11,6 +10,8 @@ public class Score : BaseEntity
     public string Mode { get; init; } = null!; // "time", "words", "quote"
 
     public int ModeSetting { get; init; } // "time" -> 15; "words" -> 25 etc.
+
+    public string Content { get; init; } = null!;
 
     public string Language { get; init; } = null!; // "english" 🥸
     

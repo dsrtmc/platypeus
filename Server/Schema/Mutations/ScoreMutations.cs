@@ -15,17 +15,18 @@ public static class ScoreMutations
     /// <param name="wpm">The score's Average WPM</param>
     /// <param name="rawWpm">The score's Raw WPM</param>
     /// <param name="mode">The test's mode</param>
+    /// <param name="modeSetting">The test's mode's setting</param>
+    /// <param name="content">The test's content in text form</param>
     /// <param name="accuracy">The test's accuracy</param>
     /// <param name="wpmStats">The test's words-per-minute value</param>
     /// <param name="rawStats">The test's raw words-per-minute value</param>
-    /// <param name="modeSetting">The test's mode's setting</param>
     /// <param name="language">The test's language</param>
     /// <param name="db">The database context</param>
     /// <param name="accessor">Provides access to the current <see cref="HttpContext"/>, if one is available</param>
     /// <returns>The created score</returns>
     public static async Task<Score> CreateScore(
-        int wpm, int rawWpm, string mode, float accuracy, List<int> wpmStats, List<int> rawStats,
-        int modeSetting, string language, DatabaseContext db,
+        int wpm, int rawWpm, string mode, int modeSetting, string content, float accuracy, List<int> wpmStats, List<int> rawStats,
+        string language, DatabaseContext db,
         [Service] IHttpContextAccessor accessor
     ) {
         var score = new Score
@@ -37,6 +38,7 @@ public static class ScoreMutations
             RawStats = rawStats,
             Mode = mode,
             ModeSetting = modeSetting,
+            Content = content,
             Language = language,
         };
         

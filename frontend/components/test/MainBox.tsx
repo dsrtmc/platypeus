@@ -13,9 +13,10 @@ const initialScore: ScoreType = {
   id: undefined,
   wpm: 0,
   rawWpm: 0,
-  mode: "",
   accuracy: 0,
+  mode: "",
   modeSetting: 0,
+  content: "",
   wpmStats: [],
   rawStats: [],
   language: "",
@@ -30,8 +31,6 @@ export const MainBox: FC<Props> = ({}) => {
   const [createScore] = useMutation(CreateScoreDocument);
 
   async function handleSaveScore(score: ScoreType) {
-    setShowScore(true);
-    setScoreData(score);
     // TODO: some validation of course, anti-cheat (LONG SHOT)
     // TODO: Probably use a GraphQL fragment so I can do { input: { ...score } } or something alike
     // TODO: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -45,11 +44,14 @@ export const MainBox: FC<Props> = ({}) => {
           rawStats: score.rawStats,
           mode: score.mode,
           modeSetting: score.modeSetting,
+          content: score.content,
           language: score.language,
         },
       },
     });
     console.log("response:", response);
+    setShowScore(true);
+    setScoreData(score);
   }
 
   function handleStartNextTest() {
