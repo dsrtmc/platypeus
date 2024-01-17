@@ -21,6 +21,7 @@ type CreateChatboxPayload {
 
 type CreateRacePayload {
   race: Race
+  errors: [CreateRaceError!]
 }
 
 type CreateScorePayload {
@@ -36,6 +37,10 @@ type IncorrectCredentialsError implements Error {
 }
 
 type InvalidFieldError implements Error {
+  message: String!
+}
+
+type InvalidRaceError implements Error {
   message: String!
 }
 
@@ -84,6 +89,14 @@ type Mutation {
   createChatbox: CreateChatboxPayload!
 }
 
+type NotAuthenticatedError implements Error {
+  message: String!
+}
+
+type NotAuthorizedError implements Error {
+  message: String!
+}
+
 "Information about pagination in a connection."
 type PageInfo {
   "Indicates whether more edges exist following the set defined by the clients arguments."
@@ -114,10 +127,13 @@ type Query {
 }
 
 type Race {
+  host: User!
   racers: [User!]!
   mode: String!
   modeSetting: Int!
   content: String!
+  running: Boolean!
+  finished: Boolean!
   private: Boolean!
   password: String
   chatboxId: UUID!
@@ -199,6 +215,7 @@ type SendMessagePayload {
 
 type StartRacePayload {
   race: Race
+  errors: [StartRaceError!]
 }
 
 type Subscription {
@@ -220,9 +237,13 @@ type UsernameTakenError implements Error {
   message: String!
 }
 
+union CreateRaceError = NotAuthenticatedError
+
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
 union RegisterError = InvalidFieldError | UsernameTakenError
+
+union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
 
 input BooleanOperationFilterInput {
   eq: Boolean
@@ -376,10 +397,13 @@ input MessageFilterInput {
 input RaceFilterInput {
   and: [RaceFilterInput!]
   or: [RaceFilterInput!]
+  host: UserFilterInput
   racers: ListFilterInputTypeOfUserFilterInput
   mode: StringOperationFilterInput
   modeSetting: IntOperationFilterInput
   content: StringOperationFilterInput
+  running: BooleanOperationFilterInput
+  finished: BooleanOperationFilterInput
   private: BooleanOperationFilterInput
   password: StringOperationFilterInput
   chatboxId: UuidOperationFilterInput
@@ -390,9 +414,12 @@ input RaceFilterInput {
 }
 
 input RaceSortInput {
+  host: UserSortInput
   mode: SortEnumType
   modeSetting: SortEnumType
   content: SortEnumType
+  running: SortEnumType
+  finished: SortEnumType
   private: SortEnumType
   password: SortEnumType
   chatboxId: SortEnumType

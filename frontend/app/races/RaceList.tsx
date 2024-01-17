@@ -11,7 +11,7 @@ export async function RaceList({}) {
   return (
     <div>
       {response.data.races?.edges?.map((edge) => (
-        <RaceCard race={edge.node} />
+        <RaceCard node={edge.node} />
       ))}
       hello that is a race lista<code>sadkljfasdfjkl</code>
     </div>

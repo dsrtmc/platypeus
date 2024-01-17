@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
 using Server.Models;
+using Server.Schema.Types.Errors;
 using Server.Services;
 
 namespace Server.Schema.Mutations;
@@ -14,12 +16,26 @@ public static class RaceMutations
         
     }
 
-    // lol
-    public static async Task<Race?> StartRace(Guid raceId, DatabaseContext db)
+    public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> StartRace(
+        Guid raceId, DatabaseContext db,
+        IHttpContextAccessor accessor)
     {
+        var userIdClaim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim is null)
+            return new NotAuthenticatedError();
+
+        var user = await db.Users.FindAsync(new Guid(userIdClaim.Value));
+        if (user is null)
+            return new NotAuthenticatedError();
+        
         var race = await db.Races.FindAsync(raceId);
         if (race is null)
-            return null;
+            return new InvalidRaceError(raceId);
+
+        if (race.Host.Id != user.Id)
+            return new NotAuthorizedError();
+
+        race.Running = true;
 
         foreach (var racer in race.Racers)
         {
@@ -31,6 +47,8 @@ public static class RaceMutations
             };
             db.RacerStatistics.Add(stats);
         }
+
+        await db.SaveChangesAsync();
 
         return race;
     }
@@ -88,18 +106,27 @@ public static class RaceMutations
         return race;
     }
     
-    public static async Task<Race> CreateRace(
+    public static async Task<MutationResult<Race, NotAuthenticatedError>> CreateRace(
         bool isPrivate,
         string mode,
         int modeSetting,
         string content, 
         string? password,
         DatabaseContext db,
-        [Service] IHttpContextAccessor accessor)
+        IHttpContextAccessor accessor)
     {
-        // if (unlisted) password = null; // could be funny to add that, seems like it'd make sense.
+        var userIdClaim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim is null)
+            return new NotAuthenticatedError();
+
+        var user = await db.Users.FindAsync(new Guid(userIdClaim.Value));
+        if (user is null)
+            return new NotAuthenticatedError();
+            
+        // if (!isPrivate) password = null; // could be funny to add that, seems like it'd make sense.
         var race = new Race
         {
+            Host = user,
             Racers = new List<User>(),
             Private = isPrivate,
             Mode = mode,

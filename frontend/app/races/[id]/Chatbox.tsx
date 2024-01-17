@@ -8,7 +8,7 @@ import {
   OnRaceJoinLeaveSubscription,
   SendMessageDocument,
 } from "@/graphql/generated/graphql";
-import { useMutation, useSubscription } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { IoSend } from "react-icons/io5";
 import { Message } from "@/app/races/[id]/Message";
@@ -83,7 +83,8 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
       <div className={styles.bottom}>
         <TextareaAutosize
           maxRows={3}
-          placeholder={"Message the group"}
+          placeholder={meData.me ? "Message the group" : "Log in to use the chat"}
+          disabled={!meData.me}
           onKeyDown={handleKeyDown}
           {...register("content" as FieldPath<FormValues>, {
             required: true,

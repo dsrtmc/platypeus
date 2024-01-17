@@ -11,7 +11,7 @@ import { Score as ScoreType } from "@/graphql/generated/graphql";
 import { Mode } from "@/components/test/Mode";
 import { HiMiniLanguage } from "react-icons/hi2";
 import { generateWord } from "@/utils/generateWords";
-import { generateInitialWordPool } from "@/utils/generateInitialWordPool";
+import { generateRandomWords } from "@/utils/generateRandomWords";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -32,17 +32,20 @@ export function TestBox({ handleSaveScore }: Props) {
   const restartButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Not sure whether it's a great idea to have a function like that here and in `Test.tsx` itself
-  function handleKeyDown(e: globalThis.MouseEvent) {
+  function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (e.key === "Tab") {
       e.preventDefault();
       if (restartButtonRef && restartButtonRef.current) {
         restartButtonRef.current!.focus();
       }
     } else if (e.key.length === 1) {
+      if (finished || !focused) return 1;
+      if (!running) handleStart();
       if (restartButtonRef && restartButtonRef.current) {
         restartButtonRef.current!.blur();
       }
     }
+    return 0;
   }
 
   function handleClick(e: globalThis.MouseEvent) {
@@ -156,11 +159,10 @@ export function TestBox({ handleSaveScore }: Props) {
             time={time}
             timeSetting={timeSetting}
             handleChangeWpm={handleChangeWpm}
-            handleStart={handleStart}
             onKeyDown={handleKeyDown}
             ref={testRef}
             onSaveScore={handleSaveScore}
-            initialContent={generateInitialWordPool(50)}
+            initialContent={generateRandomWords(50)}
             onPoolUpdate={onPoolUpdate}
           />
         </section>

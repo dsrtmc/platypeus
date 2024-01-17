@@ -7,6 +7,7 @@ import { Chatbox } from "@/app/races/[id]/Chatbox";
 import styles from "./Race.module.css";
 import { Test, TestMethods } from "@/components/test/Test";
 import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
+import { StartRaceButton } from "@/app/races/[id]/StartRaceButton";
 
 interface Props {
   raceId: string;
@@ -43,8 +44,13 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   }
   const [content, setContent] = useState([""]);
   const testRef = useRef<TestMethods | null>(null);
-  function handleKeyDown() {}
-  function handleStart() {}
+
+  function handleKeyDown(e: globalThis.MouseEvent): number {
+    if (e.key.length === 1) {
+      if (finished || !focused || !running) return 1;
+    }
+    return 0;
+  }
   function handleChangeWpm() {}
   function handleSaveScore() {}
   const [focused, setFocused] = useState(true);
@@ -80,8 +86,25 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       if (copy[i]) words.push(copy[i]);
     }
     setContent(copy);
+    console.log("it should reutrn those words?", words);
     return words;
   }
+  const [countdown, setCountdown] = useState(5);
+  const intervalRef: ReturnType<typeof setInterval | undefined> = useRef(undefined);
+  function onStart() {
+    intervalRef.current = setInterval(() => {
+      setCountdown((c) => c - 1);
+    }, 1000);
+  }
+  useEffect(() => {
+    if (countdown <= 0) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      setFocused(true);
+      setRunning(true);
+    }
+  }, [countdown]);
   // TODO: would probs make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
   return (
     <div className={styles.raceBox}>
@@ -96,7 +119,6 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
               time={data.onRaceJoinLeave.modeSetting}
               timeSetting={data.onRaceJoinLeave.modeSetting}
               handleChangeWpm={handleChangeWpm}
-              handleStart={handleStart}
               onKeyDown={handleKeyDown}
               ref={testRef}
               onSaveScore={handleSaveScore}
@@ -104,6 +126,10 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
               onPoolUpdate={onPoolUpdate}
             />
           </div>
+          <StartRaceButton handleStart={onStart} />
+          <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
+          <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
+          <h1 style={{ fontSize: "3rem" }}>running: {running ? "true" : "false"}</h1>
           <ul>
             users:
             {data.onRaceJoinLeave.racers.map((racer) => (

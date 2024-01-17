@@ -93,6 +93,14 @@ a:hover {
     cursor: pointer;
 }
 
+button:hover {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
 #contentWrapper {
     align-items: center;
     display: grid;

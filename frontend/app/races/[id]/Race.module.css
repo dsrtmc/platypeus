@@ -38,6 +38,7 @@
 
 .textarea:disabled {
     filter: opacity(50%);
+    cursor: not-allowed;
 }
 
 .textarea::placeholder {
@@ -156,7 +157,35 @@
     display: flex;
 }
 
+.startRaceButton {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+    color: var(--text-color);
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    padding: 4px 6px;
+    transition: color, background-color 200ms ease;
+}
+
+.startRaceButton:focus:enabled {
+    border: 2px solid var(--main-color);
+}
+
+.startRaceButton:hover:enabled {
+    color: var(--sub-alt-color);
+    background-color: var(--text-color);
+}
+
+.startRaceButton:disabled {
+    filter: opacity(50%);
+}
+
 .hr {
     height: 2px;
     background-image: linear-gradient(to right, transparent, var(--sub-alt-color), transparent);
+    margin: 1rem 0;
 }

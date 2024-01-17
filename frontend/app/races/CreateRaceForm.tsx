@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import styles from "./Races.module.css";
 import { BiLogIn } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
-import { generateInitialWordPool } from "@/utils/generateInitialWordPool";
+import { generateRandomWords } from "@/utils/generateRandomWords";
 import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
 
 interface Props {}
@@ -42,9 +42,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
   function generateContent(mode: "time" | "words", modeSetting: number): string {
     switch (mode) {
       case "time":
-        return generateInitialWordPool(6 * modeSetting).join(" ");
+        return generateRandomWords(6 * modeSetting).join(" ");
       case "words":
-        return generateInitialWordPool(modeSetting).join(" ");
+        return generateRandomWords(modeSetting).join(" ");
     }
   }
 

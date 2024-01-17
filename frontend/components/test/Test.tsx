@@ -20,8 +20,6 @@ import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
-import { remove } from "ts-invariant/process";
-import { generateInitialWordPool } from "@/utils/generateInitialWordPool";
 
 interface Props {
   focused: boolean;
@@ -30,10 +28,16 @@ interface Props {
   time: number;
   timeSetting: number;
   handleChangeWpm: (wpm: number) => void;
-  handleStart: () => void;
-  onKeyDown: (e: globalThis.MouseEvent) => void;
+  /**
+   * Returns 0 if we're free to continue with our input handling;
+   * if we should prevent reading further inputs, returns a non-zero value.
+   * @param {KeyboardEvent} e - the global mouse event
+   * @returns {number} 0 if all OK, non-0 value if we should stop handling inputs
+   */
+  onKeyDown: (e: globalThis.KeyboardEvent) => number;
   onSaveScore: (score: Partial<ScoreType>) => void; // danger zone
   initialContent: string[];
+  // Supposed to return the elements by which to expand the pool
   onPoolUpdate: (count: number, index?: number) => string[];
 }
 
@@ -72,7 +76,6 @@ export const Test = forwardRef<TestMethods, Props>(
       time,
       timeSetting,
       handleChangeWpm,
-      handleStart,
       onKeyDown,
       onSaveScore,
       initialContent,
@@ -353,11 +356,11 @@ export const Test = forwardRef<TestMethods, Props>(
     // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
     const handleKeyDown = useCallback(
       (e: globalThis.KeyboardEvent) => {
-        onKeyDown(e);
-        if (finished || !focused) return;
+        // TODO: maybe name it better xd
+        const result = onKeyDown(e);
+        if (result) return;
         if (e.key.length === 1) {
           if (e.ctrlKey && e.key !== "a") return;
-          if (!running) handleStart();
           e.preventDefault();
           if (e.key === " ") {
             if (letterIndex) {
