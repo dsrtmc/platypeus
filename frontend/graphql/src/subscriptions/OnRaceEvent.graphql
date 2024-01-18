@@ -1,5 +1,6 @@
-subscription OnRaceJoinLeave($raceId: UUID!) {
-    onRaceJoinLeave(raceId: $raceId) {
+subscription OnRaceEvent($raceId: UUID!) {
+    onRaceEvent(raceId: $raceId) {
+        id
         mode
         modeSetting
         racers {

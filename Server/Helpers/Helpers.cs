@@ -46,6 +46,6 @@ public static class Helper
     }
 
     // TODO: rename to on race event
-    public static string EncodeOnRaceJoinLeaveToken(Guid raceId) => $"{nameof(Subscription.OnRaceJoinLeave)}_{raceId}";
+    public static string EncodeOnRaceEventToken(Guid raceId) => $"{nameof(Subscription.OnRaceEvent)}_{raceId}";
     public static string EncodeOnChatboxEventToken(Guid chatboxId) => $"{nameof(Subscription.OnChatboxEvent)}_{chatboxId}";
 }

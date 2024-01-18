@@ -43,7 +43,7 @@ public static class RaceMutations
         if (race is null)
             return new InvalidRaceError(raceId);
         
-        await eventSender.SendAsync(Helper.EncodeOnRaceJoinLeaveToken(raceId), race, cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
 
         var raceStatistics = await db.RacerStatistics.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.Racer.Id == userId, cancellationToken);
         if (raceStatistics is null)
@@ -82,7 +82,7 @@ public static class RaceMutations
 
         race.Running = true;
         
-        await eventSender.SendAsync(Helper.EncodeOnRaceJoinLeaveToken(raceId), race, cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
 
         foreach (var racer in race.Racers)
         {
@@ -124,7 +124,7 @@ public static class RaceMutations
         if (race.Racers.FirstOrDefault(racer => racer.Id == user.Id) is null)
             race.Racers.Add(user);
 
-        await eventSender.SendAsync(Helper.EncodeOnRaceJoinLeaveToken(raceId), race, cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
         
         await db.SaveChangesAsync(cancellationToken);
 
@@ -147,7 +147,7 @@ public static class RaceMutations
         if (race.Racers.FirstOrDefault(racer => racer.Id == user.Id) is not null)
             race.Racers.Remove(user);
     
-        await eventSender.SendAsync(Helper.EncodeOnRaceJoinLeaveToken(raceId), race, cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
         
         await db.SaveChangesAsync(cancellationToken);
     

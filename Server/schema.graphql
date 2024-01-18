@@ -239,7 +239,7 @@ type StartRacePayload {
 }
 
 type Subscription {
-  onRaceJoinLeave(raceId: UUID!): Race!
+  onRaceEvent(raceId: UUID!): Race!
   onChatboxEvent(chatboxId: UUID!): Chatbox!
 }
 

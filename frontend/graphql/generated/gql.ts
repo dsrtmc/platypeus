@@ -35,7 +35,7 @@ const documents = {
     "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}": types.GetUsersBestScoresDocument,
     "query Me {\n  me {\n    id\n    username\n    email\n    ...UserInfoFragment\n  }\n}": types.MeDocument,
     "subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      id\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}": types.OnChatboxEventDocument,
-    "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}": types.OnRaceJoinLeaveDocument,
+    "subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}": types.OnRaceEventDocument,
 };
 
 /**
@@ -143,7 +143,7 @@ export function graphql(source: "subscription OnChatboxEvent($chatboxId: UUID!) 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}"): (typeof documents)["subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}"];
+export function graphql(source: "subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}"): (typeof documents)["subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

@@ -5,7 +5,7 @@ import styles from "./Race.module.css";
 import {
   MeQuery,
   OnChatboxEventDocument,
-  OnRaceJoinLeaveSubscription,
+  OnRaceEventSubscription,
   SendMessageDocument,
 } from "@/graphql/generated/graphql";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
@@ -15,7 +15,7 @@ import { Message } from "@/app/races/[id]/Message";
 import TextareaAutosize from "react-textarea-autosize";
 
 interface Props {
-  chatboxId: OnRaceJoinLeaveSubscription["onRaceJoinLeave"]["chatboxId"];
+  chatboxId: OnRaceEventSubscription["onRaceEvent"]["chatboxId"];
   meData: MeQuery; // TODO: probably stupid? idk maybe not LOL idk maybe
 }
 
