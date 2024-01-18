@@ -1,3 +1,4 @@
+using HotChocolate.Execution;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 using Server.Models;
@@ -22,10 +23,11 @@ public class Subscription
     // TODO: some validation idk if needed u know like if race is null and stuff
     public async IAsyncEnumerable<Race> OnRaceJoinLeaveStream(
         Guid raceId, [Service] DatabaseContext db,
-        [Service] ITopicEventReceiver eventReceiver
-    ) {
+        [Service] ITopicEventReceiver eventReceiver)
+    {
         yield return (await db.Races
             .Include(r => r.Racers)
+            .Include(r => r.Host)
             .FirstOrDefaultAsync(r => r.Id == raceId))!;
         
         var sourceStream = await eventReceiver.SubscribeAsync<Race>(Helper.EncodeOnRaceJoinLeaveToken(raceId));
@@ -36,7 +38,30 @@ public class Subscription
     
     [Subscribe(With = nameof(OnRaceJoinLeaveStream))]
     public Race OnRaceJoinLeave([EventMessage] Race race) => race;
-    
+
+    //  /// <summary>
+    //  /// 
+    //  /// </summary>
+    //  /// <param name="raceId"></param>
+    //  /// <param name="db"></param>
+    //  /// <param name="eventReceiver"></param>
+    //  /// <returns></returns>
+    // public async IAsyncEnumerable<Race> OnRaceStartStream(
+    //     Guid raceId, [Service] DatabaseContext db,
+    //     [Service] ITopicEventReceiver eventReceiver)
+    // {
+    //     yield return (await db.Races.FirstOrDefaultAsync(r => r.Id == raceId))!;
+    //     
+    //     var sourceStream = await eventReceiver.SubscribeAsync<Race>(Helper.EncodeOnRaceStartToken(raceId));
+    //     
+    //     await foreach (var race in sourceStream.ReadEventsAsync())
+    //         yield return race;
+    // }
+    //
+    // // TODO: maybe just return a boolean? idk bro the data loader approach is a good thing to research eventually lol
+    // [Subscribe(With = nameof(OnRaceStartStream))]
+    // public Race OnRaceStart([EventMessage] Race race) => race;
+
     /// <summary>
     /// 
     /// </summary>

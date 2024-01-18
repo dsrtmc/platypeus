@@ -32,6 +32,15 @@ type DeleteUserPayload {
   boolean: Boolean
 }
 
+type FinishRaceForUserPayload {
+  race: Race
+  errors: [FinishRaceForUserError!]
+}
+
+type FlipRunningStatusPayload {
+  race: Race
+}
+
 type IncorrectCredentialsError implements Error {
   message: String!
 }
@@ -41,6 +50,14 @@ type InvalidFieldError implements Error {
 }
 
 type InvalidRaceError implements Error {
+  message: String!
+}
+
+type InvalidRacerStatisticsError implements Error {
+  message: String!
+}
+
+type InvalidUserError implements Error {
   message: String!
 }
 
@@ -80,6 +97,8 @@ type Mutation {
   login(input: LoginInput!): LoginPayload!
   logout: LogoutPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
+  flipRunningStatus(input: FlipRunningStatusInput!): FlipRunningStatusPayload!
+  finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload!
   startRace(input: StartRaceInput!): StartRacePayload!
   joinRace(input: JoinRaceInput!): JoinRacePayload!
   leaveRace(input: LeaveRaceInput!): LeaveRacePayload!
@@ -147,6 +166,7 @@ type RacerStatistics {
   race: Race!
   racer: User!
   wpm: Int!
+  finished: Boolean!
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -239,6 +259,8 @@ type UsernameTakenError implements Error {
 
 union CreateRaceError = NotAuthenticatedError
 
+union FinishRaceForUserError = InvalidRaceError | InvalidUserError | InvalidRacerStatisticsError
+
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
 union RegisterError = InvalidFieldError | UsernameTakenError
@@ -302,6 +324,15 @@ input DateTimeOperationFilterInput {
 
 input DeleteUserInput {
   userId: UUID!
+}
+
+input FinishRaceForUserInput {
+  userId: UUID!
+  raceId: UUID!
+}
+
+input FlipRunningStatusInput {
+  raceId: UUID!
 }
 
 input FloatOperationFilterInput {

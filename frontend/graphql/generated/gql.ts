@@ -16,6 +16,8 @@ const documents = {
     "fragment UserInfoFragment on User {\n  username\n  email\n}": types.UserInfoFragmentFragmentDoc,
     "mutation CreateRace($input: CreateRaceInput!) {\n  createRace(input: $input) {\n    race {\n      id\n      racers {\n        username\n      }\n      private\n    }\n  }\n}": types.CreateRaceDocument,
     "mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      content\n      language\n      user {\n        username\n      }\n    }\n  }\n}": types.CreateScoreDocument,
+    "mutation FinishRaceForUser($input: FinishRaceForUserInput!) {\n  finishRaceForUser(input: $input) {\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.FinishRaceForUserDocument,
+    "mutation FlipRunningStatus($input: FlipRunningStatusInput!) {\n  flipRunningStatus(input: $input) {\n    race {\n      running\n    }\n  }\n}": types.FlipRunningStatusDocument,
     "mutation JoinChatbox($input: JoinChatboxInput!) {\n  joinChatbox(input: $input) {\n    chatbox {\n      messages {\n        content\n      }\n    }\n  }\n}": types.JoinChatboxDocument,
     "mutation JoinRace($input: JoinRaceInput!) {\n  joinRace(input: $input) {\n    race {\n      racers {\n        username\n      }\n    }\n  }\n}": types.JoinRaceDocument,
     "mutation LeaveRace($input: LeaveRaceInput!) {\n  leaveRace(input: $input) {\n    race {\n      racers {\n        id\n        username\n      }\n    }\n  }\n}": types.LeaveRaceDocument,
@@ -23,6 +25,7 @@ const documents = {
     "mutation Logout {\n  logout {\n    boolean\n  }\n}": types.LogoutDocument,
     "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.RegisterDocument,
     "mutation SendMessage($input: SendMessageInput!) {\n  sendMessage(input: $input) {\n    boolean\n  }\n}": types.SendMessageDocument,
+    "mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.StartRaceDocument,
     "query Bye {\n  bye\n}": types.ByeDocument,
     "query GetAllUsers {\n  allUsers {\n    id\n    username\n    email\n  }\n}": types.GetAllUsersDocument,
     "query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order: [RaceSortInput!], $where: RaceFilterInput) {\n  races(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    order: $order\n    where: $where\n  ) {\n    edges {\n      node {\n        id\n        createdAt\n      }\n    }\n  }\n}": types.GetRacesDocument,
@@ -32,7 +35,7 @@ const documents = {
     "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}": types.GetUsersBestScoresDocument,
     "query Me {\n  me {\n    id\n    username\n    email\n    ...UserInfoFragment\n  }\n}": types.MeDocument,
     "subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      id\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}": types.OnChatboxEventDocument,
-    "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    content\n    chatboxId\n  }\n}": types.OnRaceJoinLeaveDocument,
+    "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}": types.OnRaceJoinLeaveDocument,
 };
 
 /**
@@ -64,6 +67,14 @@ export function graphql(source: "mutation CreateScore($input: CreateScoreInput!)
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "mutation FinishRaceForUser($input: FinishRaceForUserInput!) {\n  finishRaceForUser(input: $input) {\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation FinishRaceForUser($input: FinishRaceForUserInput!) {\n  finishRaceForUser(input: $input) {\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation FlipRunningStatus($input: FlipRunningStatusInput!) {\n  flipRunningStatus(input: $input) {\n    race {\n      running\n    }\n  }\n}"): (typeof documents)["mutation FlipRunningStatus($input: FlipRunningStatusInput!) {\n  flipRunningStatus(input: $input) {\n    race {\n      running\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "mutation JoinChatbox($input: JoinChatboxInput!) {\n  joinChatbox(input: $input) {\n    chatbox {\n      messages {\n        content\n      }\n    }\n  }\n}"): (typeof documents)["mutation JoinChatbox($input: JoinChatboxInput!) {\n  joinChatbox(input: $input) {\n    chatbox {\n      messages {\n        content\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -89,6 +100,10 @@ export function graphql(source: "mutation Register($input: RegisterInput!) {\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation SendMessage($input: SendMessageInput!) {\n  sendMessage(input: $input) {\n    boolean\n  }\n}"): (typeof documents)["mutation SendMessage($input: SendMessageInput!) {\n  sendMessage(input: $input) {\n    boolean\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -128,7 +143,7 @@ export function graphql(source: "subscription OnChatboxEvent($chatboxId: UUID!) 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    content\n    chatboxId\n  }\n}"): (typeof documents)["subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    content\n    chatboxId\n  }\n}"];
+export function graphql(source: "subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}"): (typeof documents)["subscription OnRaceJoinLeave($raceId: UUID!) {\n  onRaceJoinLeave(raceId: $raceId) {\n    mode\n    modeSetting\n    racers {\n      id\n      username\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

@@ -19,6 +19,7 @@ public static class UserQueries
             return null;
         }
         
+        Console.WriteLine("We get here ME QUERY");
         return db.Users.Find(new Guid(claim.Value));
     }
 

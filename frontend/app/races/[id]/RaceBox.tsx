@@ -1,8 +1,16 @@
 "use client";
 
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { Fragment, Ref, useEffect, useRef, useState } from "react";
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
-import { JoinRaceDocument, LeaveRaceDocument, MeDocument, OnRaceJoinLeaveDocument } from "@/graphql/generated/graphql";
+import {
+  FinishRaceForUserDocument,
+  FlipRunningStatusDocument,
+  JoinRaceDocument,
+  LeaveRaceDocument,
+  MeDocument,
+  OnRaceJoinLeaveDocument,
+  StartRaceDocument,
+} from "@/graphql/generated/graphql";
 import { Chatbox } from "@/app/races/[id]/Chatbox";
 import styles from "./Race.module.css";
 import { Test, TestMethods } from "@/components/test/Test";
@@ -23,7 +31,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     },
   });
   async function handleJoinRace() {
-    await joinRace({
+    const response = await joinRace({
       variables: {
         input: {
           userId: meData?.me?.id,
@@ -31,6 +39,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         },
       },
     });
+    console.log("RESPONSE FROM JOINING:::::::::::", response);
   }
   async function handleLeaveRace() {
     await leaveRace({
@@ -56,6 +65,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
+  const [finishRaceForUser, {}] = useMutation(FinishRaceForUserDocument);
   function handleClick(e: globalThis.MouseEvent) {
     if (ref && ref.current) {
       setFocused(ref.current!.contains(e.target));
@@ -90,12 +100,26 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     return words;
   }
   const [countdown, setCountdown] = useState(5);
-  const intervalRef: ReturnType<typeof setInterval | undefined> = useRef(undefined);
-  function onStart() {
-    intervalRef.current = setInterval(() => {
-      setCountdown((c) => c - 1);
-    }, 1000);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const [startRace, {}] = useMutation(StartRaceDocument);
+  const [flipRunningStatus, {}] = useMutation(FlipRunningStatusDocument);
+  async function startRaceFn() {
+    console.log("SJKHLDFJKYGSDFJSKDHFJ");
+    const response = await startRace({ variables: { input: { raceId } } });
+    console.log("Starting race response:", response);
   }
+  async function onStart() {
+    if (!data?.onRaceJoinLeave.running && !data?.onRaceJoinLeave.finished) {
+      await startRaceFn();
+    }
+  }
+  useEffect(() => {
+    if (data?.onRaceJoinLeave.running && !data?.onRaceJoinLeave.finished) {
+      intervalRef.current = setInterval(() => {
+        setCountdown((c) => c - 1);
+      }, 1000);
+    }
+  }, [data?.onRaceJoinLeave.running]);
   useEffect(() => {
     if (countdown <= 0) {
       if (intervalRef.current) {
@@ -106,6 +130,12 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     }
   }, [countdown]);
   // TODO: would probs make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
+  // TODO: maybe figure out a better error page? right now it shows an ugly "theres a funny error: {}" which is not too user-friendly in case-
+  // ^^^^^-some shit actually goes down
+  // ↓ dont read this
+  // NOTE: if you try to join the race twice from the same account on two different clients, funny shit happens and it throws you an error
+  // which i guess is good? idk probably
+  // ↑ dont read this
   return (
     <div className={styles.raceBox}>
       {data && meData && (
@@ -126,10 +156,32 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
               onPoolUpdate={onPoolUpdate}
             />
           </div>
-          <StartRaceButton handleStart={onStart} />
+          {data?.onRaceJoinLeave.host.id === meData.me?.id && <StartRaceButton handleStart={onStart} />}
+          {meData.me && (
+            <div>
+              finish the race{" "}
+              <button
+                onClick={async () => {
+                  await finishRaceForUser({ variables: { input: { userId: meData?.me?.id, raceId } } });
+                }}
+              >
+                click here
+              </button>
+            </div>
+          )}
           <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
           <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
           <h1 style={{ fontSize: "3rem" }}>running: {running ? "true" : "false"}</h1>
+          <h1 style={{ fontSize: "3rem" }}>running backend: {data?.onRaceJoinLeave.running ? "true" : "false"}</h1>
+          <h1 style={{ fontSize: "3rem" }}>THE HOST IS: {data?.onRaceJoinLeave.host.username}</h1>
+          <button
+            onClick={async () => {
+              const response = await flipRunningStatus({ variables: { input: { raceId } } });
+              console.log("The response:", response);
+            }}
+          >
+            flip running status
+          </button>
           <ul>
             users:
             {data.onRaceJoinLeave.racers.map((racer) => (

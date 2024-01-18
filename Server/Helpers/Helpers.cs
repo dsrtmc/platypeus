@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Schema.Types.Mutations;
@@ -44,6 +45,7 @@ public static class Helper
         return errors;
     }
 
+    // TODO: rename to on race event
     public static string EncodeOnRaceJoinLeaveToken(Guid raceId) => $"{nameof(Subscription.OnRaceJoinLeave)}_{raceId}";
     public static string EncodeOnChatboxEventToken(Guid chatboxId) => $"{nameof(Subscription.OnChatboxEvent)}_{chatboxId}";
 }

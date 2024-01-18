@@ -1,0 +1,14 @@
+mutation StartRace($input: StartRaceInput!) {
+    startRace(input: $input) {
+        race {
+            running
+            updatedAt
+        }
+        errors {
+            code: __typename
+            ... on Error {
+                message
+            }
+        }
+    }
+}

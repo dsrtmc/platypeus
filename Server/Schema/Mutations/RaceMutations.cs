@@ -16,9 +16,54 @@ public static class RaceMutations
         
     }
 
+    // Just for testing purposes
+    public static async Task<Race?> FlipRunningStatus(Guid raceId, DatabaseContext db)
+    {
+        var race = await db.Races.FindAsync(raceId);
+        if (race is null)
+            return null;
+        
+        race.Running = !race.Running;
+
+        await db.SaveChangesAsync();
+        
+        return race;
+    }
+    
+    public static async Task<MutationResult<Race, InvalidRaceError, InvalidUserError, InvalidRacerStatisticsError>> FinishRaceForUser(
+        Guid userId, Guid raceId, DatabaseContext db,
+        [Service] ITopicEventSender eventSender,
+        CancellationToken cancellationToken)
+    {
+        var user = await db.Users.FindAsync(userId);
+        if (user is null)
+            return new InvalidUserError(userId);
+        
+        var race = await db.Races.Include(r => r.Host).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        if (race is null)
+            return new InvalidRaceError(raceId);
+        
+        await eventSender.SendAsync(Helper.EncodeOnRaceJoinLeaveToken(raceId), race, cancellationToken);
+
+        var raceStatistics = await db.RacerStatistics.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.Racer.Id == userId, cancellationToken);
+        if (raceStatistics is null)
+        {
+            return new InvalidRacerStatisticsError(userId, raceId);
+        }
+
+        raceStatistics.Finished = true;
+
+        await db.SaveChangesAsync(cancellationToken);
+
+        return race;
+    }
+
+    // TODO: finally read up on what cancellation token does holy fuck this is ridiculous
     public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> StartRace(
         Guid raceId, DatabaseContext db,
-        IHttpContextAccessor accessor)
+        [Service] ITopicEventSender eventSender,
+        IHttpContextAccessor accessor,
+        CancellationToken cancellationToken)
     {
         var userIdClaim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
         if (userIdClaim is null)
@@ -28,7 +73,7 @@ public static class RaceMutations
         if (user is null)
             return new NotAuthenticatedError();
         
-        var race = await db.Races.FindAsync(raceId);
+        var race = await db.Races.Include(r => r.Host).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return new InvalidRaceError(raceId);
 
@@ -36,6 +81,8 @@ public static class RaceMutations
             return new NotAuthorizedError();
 
         race.Running = true;
+        
+        await eventSender.SendAsync(Helper.EncodeOnRaceJoinLeaveToken(raceId), race, cancellationToken);
 
         foreach (var racer in race.Racers)
         {
@@ -43,12 +90,13 @@ public static class RaceMutations
             {
                 Race = race,
                 Racer = racer,
-                Wpm = 0
+                Wpm = 0,
+                Finished = false
             };
             db.RacerStatistics.Add(stats);
         }
 
-        await db.SaveChangesAsync();
+        await db.SaveChangesAsync(cancellationToken);
 
         return race;
     }

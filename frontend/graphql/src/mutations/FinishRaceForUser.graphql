@@ -1,0 +1,10 @@
+mutation FinishRaceForUser($input: FinishRaceForUserInput!) {
+    finishRaceForUser(input: $input) {
+        errors {
+            code: __typename
+            ... on Error {
+                message
+            }
+        }
+    }
+}

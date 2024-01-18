@@ -6,6 +6,12 @@ subscription OnRaceJoinLeave($raceId: UUID!) {
             id
             username
         }
+        host {
+            id
+            username
+        }
+        running
+        finished
         content
         chatboxId
     }
