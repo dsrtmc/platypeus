@@ -98,6 +98,7 @@ type Mutation {
   logout: LogoutPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
   flipRunningStatus(input: FlipRunningStatusInput!): FlipRunningStatusPayload!
+  updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload!
   finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload!
   startRace(input: StartRaceInput!): StartRacePayload!
   joinRace(input: JoinRaceInput!): JoinRacePayload!
@@ -148,6 +149,7 @@ type Query {
 type Race {
   host: User!
   racers: [User!]!
+  racerStatistics: [RacerStatistics!]!
   mode: String!
   modeSetting: Int!
   content: String!
@@ -243,6 +245,11 @@ type Subscription {
   onChatboxEvent(chatboxId: UUID!): Chatbox!
 }
 
+type UpdateStatsForUserPayload {
+  race: Race
+  errors: [UpdateStatsForUserError!]
+}
+
 type User {
   username: String!
   email: String!
@@ -266,6 +273,8 @@ union LoginError = InvalidFieldError | IncorrectCredentialsError
 union RegisterError = InvalidFieldError | UsernameTakenError
 
 union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
+
+union UpdateStatsForUserError = InvalidUserError | InvalidRaceError | InvalidRacerStatisticsError
 
 input BooleanOperationFilterInput {
   eq: Boolean
@@ -388,6 +397,13 @@ input ListFilterInputTypeOfMessageFilterInput {
   any: Boolean
 }
 
+input ListFilterInputTypeOfRacerStatisticsFilterInput {
+  all: RacerStatisticsFilterInput
+  none: RacerStatisticsFilterInput
+  some: RacerStatisticsFilterInput
+  any: Boolean
+}
+
 input ListFilterInputTypeOfScoreFilterInput {
   all: ScoreFilterInput
   none: ScoreFilterInput
@@ -430,6 +446,7 @@ input RaceFilterInput {
   or: [RaceFilterInput!]
   host: UserFilterInput
   racers: ListFilterInputTypeOfUserFilterInput
+  racerStatistics: ListFilterInputTypeOfRacerStatisticsFilterInput
   mode: StringOperationFilterInput
   modeSetting: IntOperationFilterInput
   content: StringOperationFilterInput
@@ -458,6 +475,18 @@ input RaceSortInput {
   id: SortEnumType
   createdAt: SortEnumType
   updatedAt: SortEnumType
+}
+
+input RacerStatisticsFilterInput {
+  and: [RacerStatisticsFilterInput!]
+  or: [RacerStatisticsFilterInput!]
+  race: RaceFilterInput
+  racer: UserFilterInput
+  wpm: IntOperationFilterInput
+  finished: BooleanOperationFilterInput
+  id: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
 }
 
 input RegisterInput {
@@ -521,6 +550,12 @@ input StringOperationFilterInput {
   nstartsWith: String
   endsWith: String
   nendsWith: String
+}
+
+input UpdateStatsForUserInput {
+  userId: UUID!
+  raceId: UUID!
+  wpm: Int!
 }
 
 input UserFilterInput {

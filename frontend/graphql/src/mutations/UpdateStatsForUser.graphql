@@ -1,0 +1,18 @@
+mutation UpdateStatsForUser($input: UpdateStatsForUserInput!) {
+    updateStatsForUser(input: $input) {
+        race {
+            racerStatistics {
+                racer {
+                    username
+                }
+                wpm
+            }
+        }
+        errors {
+            code: __typename
+            ... on Error {
+                message
+            }
+        }
+    }
+}

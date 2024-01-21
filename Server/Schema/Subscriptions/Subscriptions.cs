@@ -28,6 +28,7 @@ public class Subscription
         yield return (await db.Races
             .Include(r => r.Racers)
             .Include(r => r.Host)
+            .Include(r => r.RacerStatistics)
             .FirstOrDefaultAsync(r => r.Id == raceId))!;
         
         var sourceStream = await eventReceiver.SubscribeAsync<Race>(Helper.EncodeOnRaceEventToken(raceId));

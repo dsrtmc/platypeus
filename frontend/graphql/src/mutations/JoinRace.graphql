@@ -4,6 +4,12 @@ mutation JoinRace($input: JoinRaceInput!) {
             racers {
                 username
             }
+            racerStatistics {
+                racer {
+                    username
+                }
+                wpm
+            }
         }
     }
 }

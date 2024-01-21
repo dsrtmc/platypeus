@@ -10,6 +10,7 @@ import {
   MeDocument,
   OnRaceEventDocument,
   StartRaceDocument,
+  UpdateStatsForUserDocument,
 } from "@/graphql/generated/graphql";
 import { Chatbox } from "@/app/races/[id]/Chatbox";
 import styles from "./Race.module.css";
@@ -27,11 +28,13 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   const { data: meData } = useQuery(MeDocument);
   const { data, loading, error } = useSubscription(OnRaceEventDocument, { variables: { raceId } });
   const [finishRaceForUser, {}] = useMutation(FinishRaceForUserDocument);
+  const [updateStatsForUser, {}] = useMutation(UpdateStatsForUserDocument);
 
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
   const [content, setContent] = useState([""]);
+  const [time, setTime] = useState(5);
   const [countdown, setCountdown] = useState(5);
   const testRef = useRef<TestMethods | null>(null);
 
@@ -43,7 +46,11 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     return 0;
   }
   // TODO: investigate those
-  function handleChangeWpm() {}
+  async function handleChangeWpm(wpm: number) {
+    // TODO: look over the `me` nullability here
+    const response = await updateStatsForUser({ variables: { input: { raceId, userId: meData?.me!.id, wpm } } });
+    console.log("Response from updating stats:", response);
+  }
   function handleSaveScore() {} // TODO: maybe rename to `handleFinishTest`? makes sense since the behavior changes based on where we're at
   function handleClick(e: globalThis.MouseEvent) {
     if (ref && ref.current) {
@@ -100,8 +107,24 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
 
   // TODO: ?XD?XD?XD?D?XD?XD?X?XD?
   useEffect(() => {
-    if (data) setContent(data.onRaceEvent.content.split(" "));
+    // TODO: this shit is being run on every single event/update, so it's doing this funny stuff for no reason
+    // TODO: ↑therefore we need to figure out a way to just do an initial load
+    if (data) {
+      console.log("How often does this shit run?");
+      setContent(data.onRaceEvent.content.split(" "));
+      // TODO: change the logic if the `mode` isn't `time` lol
+    }
   }, [data]);
+
+  useEffect(() => {
+    if (running) {
+      intervalRef.current = setInterval(() => {
+        setTime((time) => time - 1);
+        console.log("racer stats murzyn:", data?.onRaceEvent.racerStatistics);
+      }, 1000);
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [running]);
 
   useEffect(() => {
     document.addEventListener("click", handleClick);
@@ -124,7 +147,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
               focused={focused}
               running={running}
               finished={finished}
-              time={data.onRaceEvent.modeSetting}
+              time={time}
               timeSetting={data.onRaceEvent.modeSetting}
               handleChangeWpm={handleChangeWpm}
               onKeyDown={handleKeyDown}
@@ -147,7 +170,17 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
               </button>
             </div>
           )}
+          <div style={{ border: "1px solid red" }}>
+            <h1>racer stats:</h1>
+            {data.onRaceEvent.racerStatistics.map((stats) => (
+              <div key={stats.racer.username}>
+                {stats.racer.username}: {stats.wpm}wpm
+              </div>
+            ))}
+          </div>
           <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
+          {/* TODO: Consider adding a `startTime` field to a race? then it's easier to calculate the time left lol */}
+          <h1 style={{ fontSize: "3rem" }}>time left: {time}</h1>
           <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
           <h1 style={{ fontSize: "3rem" }}>running: {running ? "true" : "false"}</h1>
           <h1 style={{ fontSize: "3rem" }}>running backend: {data?.onRaceEvent.running ? "true" : "false"}</h1>

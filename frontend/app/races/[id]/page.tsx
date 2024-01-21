@@ -15,6 +15,7 @@ export default async function RacePage({ params }: { params: { id: string } }) {
   // });
   // console.log("THE RESPONSE ADOLF HITLER:", response);
   return (
+    // TODO: add a funny error page in case someone types in an ugly ID
     <div>
       <RaceBox raceId={params.id} />
     </div>
