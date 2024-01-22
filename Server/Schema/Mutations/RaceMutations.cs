@@ -56,6 +56,26 @@ public static class RaceMutations
         return race;
     }
     
+    public static async Task<MutationResult<Race, InvalidRaceError>> FinishRace(
+        Guid raceId, DatabaseContext db,
+        [Service] ITopicEventSender eventSender,
+        CancellationToken cancellationToken)
+    {
+        var race = await db.Races.Include(r => r.Host).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        if (race is null)
+            return new InvalidRaceError(raceId);
+
+        foreach (var racerStatistics in race.RacerStatistics)
+            racerStatistics.Finished = true;
+
+        race.Finished = true;
+
+        await db.SaveChangesAsync(cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+
+        return race;
+    }
+    
     public static async Task<MutationResult<Race, InvalidRaceError, InvalidUserError, InvalidRacerStatisticsError>> FinishRaceForUser(
         Guid userId, Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
@@ -69,8 +89,6 @@ public static class RaceMutations
         if (race is null)
             return new InvalidRaceError(raceId);
         
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
-
         var racerStatistics = await db.RacerStatistics.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.Racer.Id == userId, cancellationToken);
         if (racerStatistics is null)
             return new InvalidRacerStatisticsError(userId, raceId);
@@ -78,6 +96,7 @@ public static class RaceMutations
         racerStatistics.Finished = true;
 
         await db.SaveChangesAsync(cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
 
         return race;
     }

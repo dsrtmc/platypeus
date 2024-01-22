@@ -37,6 +37,11 @@ type FinishRaceForUserPayload {
   errors: [FinishRaceForUserError!]
 }
 
+type FinishRacePayload {
+  race: Race
+  errors: [FinishRaceError!]
+}
+
 type FlipRunningStatusPayload {
   race: Race
 }
@@ -99,6 +104,7 @@ type Mutation {
   createScore(input: CreateScoreInput!): CreateScorePayload!
   flipRunningStatus(input: FlipRunningStatusInput!): FlipRunningStatusPayload!
   updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload!
+  finishRace(input: FinishRaceInput!): FinishRacePayload!
   finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload!
   startRace(input: StartRaceInput!): StartRacePayload!
   joinRace(input: JoinRaceInput!): JoinRacePayload!
@@ -267,6 +273,8 @@ type UsernameTakenError implements Error {
 
 union CreateRaceError = NotAuthenticatedError
 
+union FinishRaceError = InvalidRaceError
+
 union FinishRaceForUserError = InvalidRaceError | InvalidUserError | InvalidRacerStatisticsError
 
 union LoginError = InvalidFieldError | IncorrectCredentialsError
@@ -338,6 +346,10 @@ input DeleteUserInput {
 
 input FinishRaceForUserInput {
   userId: UUID!
+  raceId: UUID!
+}
+
+input FinishRaceInput {
   raceId: UUID!
 }
 

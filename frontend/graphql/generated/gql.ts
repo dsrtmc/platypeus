@@ -16,6 +16,7 @@ const documents = {
     "fragment UserInfoFragment on User {\n  username\n  email\n}": types.UserInfoFragmentFragmentDoc,
     "mutation CreateRace($input: CreateRaceInput!) {\n  createRace(input: $input) {\n    race {\n      id\n      racers {\n        username\n      }\n      private\n    }\n  }\n}": types.CreateRaceDocument,
     "mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      content\n      language\n      user {\n        username\n      }\n    }\n  }\n}": types.CreateScoreDocument,
+    "mutation FinishRace($input: FinishRaceInput!) {\n  finishRace(input: $input) {\n    race {\n      finished\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.FinishRaceDocument,
     "mutation FinishRaceForUser($input: FinishRaceForUserInput!) {\n  finishRaceForUser(input: $input) {\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.FinishRaceForUserDocument,
     "mutation FlipRunningStatus($input: FlipRunningStatusInput!) {\n  flipRunningStatus(input: $input) {\n    race {\n      running\n    }\n  }\n}": types.FlipRunningStatusDocument,
     "mutation JoinChatbox($input: JoinChatboxInput!) {\n  joinChatbox(input: $input) {\n    chatbox {\n      messages {\n        content\n      }\n    }\n  }\n}": types.JoinChatboxDocument,
@@ -65,6 +66,10 @@ export function graphql(source: "mutation CreateRace($input: CreateRaceInput!) {
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      content\n      language\n      user {\n        username\n      }\n    }\n  }\n}"): (typeof documents)["mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      content\n      language\n      user {\n        username\n      }\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation FinishRace($input: FinishRaceInput!) {\n  finishRace(input: $input) {\n    race {\n      finished\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation FinishRace($input: FinishRaceInput!) {\n  finishRace(input: $input) {\n    race {\n      finished\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

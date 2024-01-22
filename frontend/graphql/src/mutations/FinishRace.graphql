@@ -1,0 +1,14 @@
+# TODO: change all error `__typename`s to `code: __typename`
+mutation FinishRace($input: FinishRaceInput!) {
+    finishRace(input: $input) {
+        race {
+            finished
+        }
+        errors {
+            code: __typename
+            ... on Error {
+                message
+            }
+        }
+    }
+}

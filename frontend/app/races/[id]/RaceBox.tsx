@@ -3,6 +3,7 @@
 import React, { Fragment, Ref, useEffect, useRef, useState } from "react";
 import { gql, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
+  FinishRaceDocument,
   FinishRaceForUserDocument,
   FlipRunningStatusDocument,
   GetRacesDocument,
@@ -45,9 +46,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
 
   // TODO: maybe just make it a bool xd idk why i did funny numbers
   function handleKeyDown(e: globalThis.MouseEvent): number {
-    if (e.key.length === 1) {
-      if (finished || !focused || !running) return 1;
-    }
+    if (finished || !focused || !running) return 1;
     return 0;
   }
   // TODO: investigate those
@@ -121,9 +120,10 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     }
   }, [data]);
 
+  const [finishRace, {}] = useMutation(FinishRaceDocument);
   useEffect(() => {
-    if (running) {
-      intervalRef.current = setInterval(() => {
+    if (running && !finished) {
+      intervalRef.current = setInterval(async () => {
         // TODO: check nullability lol xdd
         if (!data) return;
         const startTime = new Date(data?.onRaceEvent.startTime).getTime();
@@ -144,7 +144,8 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         const timeLeft = Math.max(data?.onRaceEvent.modeSetting - difference, 0);
         setTime(timeLeft);
         if (timeLeft <= 0) {
-          setFinished(true);
+          const response = await finishRace({ variables: { input: { raceId } } });
+          setFinished(response.data?.finishRace.race?.finished ?? false);
         }
       }, 1000);
     }
@@ -198,7 +199,9 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           >
             log the entire race object
           </button>
-          {data?.onRaceEvent.host.id === meData.me?.id && <StartRaceButton handleStart={onRaceStart} />}
+          {data?.onRaceEvent.host.id === meData.me?.id && (
+            <StartRaceButton handleStart={onRaceStart} hasError={data.onRaceEvent.racers.length <= 1} />
+          )}
           {meData.me && (
             <div>
               finish the race{" "}
@@ -223,7 +226,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           <h1 style={{ fontSize: "1.5rem" }}>current time: {JSON.stringify(new Date())}</h1>
           {/* TODO: Consider adding a `startTime` field to a race? then it's easier to calculate the time left lol */}
           <h1 style={{ fontSize: "3rem" }}>time left: {time}</h1>
-          <h1 style={{ fontSize: "3rem" }}>THE TEST {finished ? "IS" : "ISN'T"} finished</h1>
+          <h1 style={{ fontSize: "3rem" }}>FINISHED? {finished ? "☑️" : "❌"} finished</h1>
           <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
           <h1 style={{ fontSize: "3rem" }}>running: {running ? "true" : "false"}</h1>
           <h1 style={{ fontSize: "3rem" }}>running backend: {data?.onRaceEvent.running ? "true" : "false"}</h1>

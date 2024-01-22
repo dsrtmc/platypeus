@@ -1,6 +1,8 @@
 namespace Server.Models;
 
 // TODO: think whether a long ID like a GUID is worth it, maybe base64-ify it
+// TODO: maybe just don't have Racers && RacerStatistics? instead we could just do `public List<RacerStatistics> Racers` maybe?
+// ^^^^: it seems like it'd make sense, and really simplify our code as well. i think it even makes sense for a `Racer` to hold his stats? idk
 public class Race : BaseEntity
 {
     public User Host { get; set; } = null!;
