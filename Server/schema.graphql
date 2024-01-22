@@ -157,6 +157,7 @@ type Race {
   finished: Boolean!
   private: Boolean!
   password: String
+  startTime: DateTime!
   chatboxId: UUID!
   chatbox: Chatbox!
   id: UUID!
@@ -454,6 +455,7 @@ input RaceFilterInput {
   finished: BooleanOperationFilterInput
   private: BooleanOperationFilterInput
   password: StringOperationFilterInput
+  startTime: DateTimeOperationFilterInput
   chatboxId: UuidOperationFilterInput
   chatbox: ChatboxFilterInput
   id: UuidOperationFilterInput
@@ -470,6 +472,7 @@ input RaceSortInput {
   finished: SortEnumType
   private: SortEnumType
   password: SortEnumType
+  startTime: SortEnumType
   chatboxId: SortEnumType
   chatbox: ChatboxSortInput
   id: SortEnumType

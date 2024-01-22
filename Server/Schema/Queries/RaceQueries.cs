@@ -13,10 +13,10 @@ public static class RaceQueries
     }
 
     [UsePaging]
-    [UseProjection]
+    // [UseProjection] // TODO: Figure out how to use it while keeping `.Include()` (separate methods seems obvious)
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Race> GetRaces(DatabaseContext db) => db.Races;
+    public static IQueryable<Race> GetRaces(DatabaseContext db) => db.Races.Include(r => r.RacerStatistics).Include(r => r.Racers);
     
     public static List<Race> GetAllRaces(DatabaseContext db) => db.Races.Include(r => r.Racers).Include(r => r.Chatbox).ToList();
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { Fragment, Ref, useEffect, useRef, useState } from "react";
-import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
   FinishRaceForUserDocument,
   FlipRunningStatusDocument,
+  GetRacesDocument,
   JoinRaceDocument,
   LeaveRaceDocument,
   MeDocument,
@@ -19,10 +20,14 @@ import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
 import { StartRaceButton } from "@/app/races/[id]/StartRaceButton";
 import { JoinRaceButton } from "@/app/races/[id]/JoinRaceButton";
 import { LeaveRaceButton } from "@/app/races/[id]/LeaveRaceButton";
+import { setFlagsFromString } from "v8";
 
 interface Props {
   raceId: string;
 }
+
+// The length of race start countdown in seconds
+const COUNTDOWN_TIME = 5;
 
 export const RaceBox: React.FC<Props> = ({ raceId }) => {
   const { data: meData } = useQuery(MeDocument);
@@ -35,7 +40,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   const [running, setRunning] = useState(false);
   const [content, setContent] = useState([""]);
   const [time, setTime] = useState(5);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(COUNTDOWN_TIME);
   const testRef = useRef<TestMethods | null>(null);
 
   // TODO: maybe just make it a bool xd idk why i did funny numbers
@@ -119,17 +124,40 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   useEffect(() => {
     if (running) {
       intervalRef.current = setInterval(() => {
-        setTime((time) => time - 1);
-        console.log("racer stats murzyn:", data?.onRaceEvent.racerStatistics);
+        // TODO: check nullability lol xdd
+        if (!data) return;
+        const startTime = new Date(data?.onRaceEvent.startTime).getTime();
+        const nowTime = new Date().getTime();
+
+        // start time 60 + 5 (countdown)
+        // current time 65
+        // start time - current time == 65 - 65
+        // current time is 70
+        // start time - current time == -5
+        const difference = Math.round(Math.abs(startTime + COUNTDOWN_TIME * 1000 - nowTime) / 1000);
+        console.log("holy fucking shit differnece:", difference);
+        console.log(
+          "Stats:",
+          data.onRaceEvent.racerStatistics[0].racer.username,
+          data.onRaceEvent.racerStatistics[0].wpm
+        );
+        const timeLeft = Math.max(data?.onRaceEvent.modeSetting - difference, 0);
+        setTime(timeLeft);
+        if (timeLeft <= 0) {
+          setFinished(true);
+        }
       }, 1000);
     }
     return () => clearInterval(intervalRef.current);
   }, [running]);
 
+  // useEffect(() => {}, [time]);
+
   useEffect(() => {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
+  // TODO: the cache update is fucked whenever you do a `joinRace` so idk bro fix it i guess lol
   // TODO: would probs make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
   // TODO: maybe figure out a better error page? right now it shows an ugly "theres a funny error: {}" which is not too user-friendly in case-
   // ^^^^^-some shit actually goes down
@@ -137,6 +165,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   // NOTE: if you try to join the race twice from the same account on two different clients, funny shit happens and it throws you an error
   // which i guess is good? idk probably
   // ↑ dont read this
+  const [lazyGetRace, { data: lazyGetRaceData }] = useLazyQuery(GetRacesDocument);
   return (
     <div className={styles.raceBox}>
       {data && meData && (
@@ -157,6 +186,18 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
               onPoolUpdate={onPoolUpdate}
             />
           </div>
+          <button
+            onClick={async () => {
+              const response = await lazyGetRace({
+                variables: { where: { id: { eq: raceId } } },
+                fetchPolicy: "network-only",
+              });
+              // response.data?.races?.edges!.map((edge) => edge.node.)
+              console.log("the entire race object:", response);
+            }}
+          >
+            log the entire race object
+          </button>
           {data?.onRaceEvent.host.id === meData.me?.id && <StartRaceButton handleStart={onRaceStart} />}
           {meData.me && (
             <div>
@@ -179,8 +220,10 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
             ))}
           </div>
           <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
+          <h1 style={{ fontSize: "1.5rem" }}>current time: {JSON.stringify(new Date())}</h1>
           {/* TODO: Consider adding a `startTime` field to a race? then it's easier to calculate the time left lol */}
           <h1 style={{ fontSize: "3rem" }}>time left: {time}</h1>
+          <h1 style={{ fontSize: "3rem" }}>THE TEST {finished ? "IS" : "ISN'T"} finished</h1>
           <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
           <h1 style={{ fontSize: "3rem" }}>running: {running ? "true" : "false"}</h1>
           <h1 style={{ fontSize: "3rem" }}>running backend: {data?.onRaceEvent.running ? "true" : "false"}</h1>

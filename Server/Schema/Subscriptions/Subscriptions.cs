@@ -21,6 +21,7 @@ public class Subscription
     // TODO: a function that will encode our topic
     // TODO: maybe a better name xd but it's only internal so it's chill
     // TODO: some validation idk if needed u know like if race is null and stuff
+    // TODO: I'm getting race condition issues -> i need to figure out how to update just the user's score, without affecting other stats
     public async IAsyncEnumerable<Race> OnRaceEventStream(
         Guid raceId, [Service] DatabaseContext db,
         [Service] ITopicEventReceiver eventReceiver)
@@ -28,7 +29,7 @@ public class Subscription
         yield return (await db.Races
             .Include(r => r.Racers)
             .Include(r => r.Host)
-            .Include(r => r.RacerStatistics)
+            .Include(r => r.RacerStatistics).ThenInclude(r => r.Racer)
             .FirstOrDefaultAsync(r => r.Id == raceId))!;
         
         var sourceStream = await eventReceiver.SubscribeAsync<Race>(Helper.EncodeOnRaceEventToken(raceId));

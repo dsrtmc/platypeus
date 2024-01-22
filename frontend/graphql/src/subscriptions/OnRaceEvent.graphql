@@ -22,5 +22,6 @@ subscription OnRaceEvent($raceId: UUID!) {
         finished
         content
         chatboxId
+        startTime
     }
 }

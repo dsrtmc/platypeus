@@ -39,11 +39,10 @@ public static class RaceMutations
         if (user is null)
             return new InvalidUserError(userId);
         
-        var race = await db.Races.Include(r => r.RacerStatistics).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.RacerStatistics).ThenInclude(r => r.Racer).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return new InvalidRaceError(raceId);
         
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
 
         var racerStatistics = await db.RacerStatistics.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.Racer.Id == userId, cancellationToken);
         if (racerStatistics is null)
@@ -52,6 +51,7 @@ public static class RaceMutations
         racerStatistics.Wpm = wpm;
 
         await db.SaveChangesAsync(cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
         
         return race;
     }
@@ -106,6 +106,7 @@ public static class RaceMutations
             return new NotAuthorizedError();
 
         race.Running = true;
+        race.StartTime = DateTime.UtcNow;
         
         Console.WriteLine($"JOIN race.racers length: {race.Racers.Count}");
         // TODO: maybe just move it to join race, i think it makes more sense yea
@@ -140,7 +141,7 @@ public static class RaceMutations
         if (user is null)
             return null;
 
-        var race = await db.Races.Include(r => r.Racers).Include(r => r.Chatbox).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.Racers).Include(r => r.Host).Include(r => r.Chatbox).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return null;
 
@@ -149,6 +150,11 @@ public static class RaceMutations
 
         if (race.Racers.FirstOrDefault(racer => racer.Id == user.Id) is null)
             race.Racers.Add(user);
+        Console.WriteLine("PRE:");
+        foreach (var racerStats in race.RacerStatistics)
+        {
+            Console.WriteLine($"user: {racerStats.Racer.Username}");
+        }
         var racerStatistics = new RacerStatistics
         {
             Race = race,
@@ -161,13 +167,19 @@ public static class RaceMutations
         db.RacerStatistics.Add(racerStatistics);
         // race.RacerStatistics.Add(racerStatistics);
 
+        Console.WriteLine("POST:");
         foreach (var racerStats in race.RacerStatistics)
         {
             Console.WriteLine($"user: {racerStats.Racer.Username}");
         }
         
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+        Console.WriteLine("POST SAVE CHANGES:");
+        foreach (var racerStats in race.RacerStatistics)
+        {
+            Console.WriteLine($"user: {racerStats.Racer.Username}");
+        }
         Console.WriteLine($"race.racers length: {race.Racers.Count}");
 
         return race;
