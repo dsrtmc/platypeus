@@ -2,10 +2,7 @@ mutation JoinRace($input: JoinRaceInput!) {
     joinRace(input: $input) {
         race {
             racers {
-                username
-            }
-            racerStatistics {
-                racer {
+                user {
                     username
                 }
                 wpm

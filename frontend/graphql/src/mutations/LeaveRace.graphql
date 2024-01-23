@@ -3,7 +3,9 @@ mutation LeaveRace($input: LeaveRaceInput!) {
         race {
             racers {
                 id
-                username
+                user {
+                    username
+                }
             }
         }
     }

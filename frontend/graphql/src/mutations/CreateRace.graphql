@@ -3,7 +3,9 @@ mutation CreateRace($input: CreateRaceInput!) {
         race {
             id
             racers {
-                username
+                user {
+                    username
+                }
             }
             private
         }

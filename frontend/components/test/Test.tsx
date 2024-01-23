@@ -25,6 +25,7 @@ interface Props {
   focused: boolean;
   running: boolean;
   finished: boolean;
+  // TODO: change to `mode` and `modeSetting`
   time: number;
   timeSetting: number;
   handleChangeWpm: (wpm: number) => void;

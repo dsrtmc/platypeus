@@ -7,10 +7,7 @@ public class Race : BaseEntity
 {
     public User Host { get; set; } = null!;
     
-    // lowkey idk if needed
-    public List<User> Racers { get; set; } = new();
-
-    public List<RacerStatistics> RacerStatistics { get; set; } = new();
+    public List<Racer> Racers { get; set; } = new();
 
     public string Mode { get; init; } = null!; // "time", "words", "quote"
 

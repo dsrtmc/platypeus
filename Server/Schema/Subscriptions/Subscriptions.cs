@@ -27,9 +27,8 @@ public class Subscription
         [Service] ITopicEventReceiver eventReceiver)
     {
         yield return (await db.Races
-            .Include(r => r.Racers)
             .Include(r => r.Host)
-            .Include(r => r.RacerStatistics).ThenInclude(r => r.Racer)
+            .Include(r => r.Racers).ThenInclude(r => r.User)
             .FirstOrDefaultAsync(r => r.Id == raceId))!;
         
         var sourceStream = await eventReceiver.SubscribeAsync<Race>(Helper.EncodeOnRaceEventToken(raceId));

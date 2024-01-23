@@ -94,6 +94,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   useEffect(() => {
     if (data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
       intervalRef.current = setInterval(() => {
+        console.log("aaaaaaaaa");
         setCountdown((c) => c - 1);
       }, 1000);
     }
@@ -116,14 +117,17 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     if (data) {
       console.log("How often does this shit run?");
       setContent(data.onRaceEvent.content.split(" "));
+      setFinished(data.onRaceEvent.finished);
       // TODO: change the logic if the `mode` isn't `time` lol
     }
   }, [data]);
 
   const [finishRace, {}] = useMutation(FinishRaceDocument);
+  // TODO: i might be using 2 intervals in the same ref lol
   useEffect(() => {
     if (running && !finished) {
       intervalRef.current = setInterval(async () => {
+        console.log("bbbbbbbbbbbbbbbbbb");
         // TODO: check nullability lol xdd
         if (!data) return;
         const startTime = new Date(data?.onRaceEvent.startTime).getTime();
@@ -136,11 +140,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         // start time - current time == -5
         const difference = Math.round(Math.abs(startTime + COUNTDOWN_TIME * 1000 - nowTime) / 1000);
         console.log("holy fucking shit differnece:", difference);
-        console.log(
-          "Stats:",
-          data.onRaceEvent.racerStatistics[0].racer.username,
-          data.onRaceEvent.racerStatistics[0].wpm
-        );
+        console.log("Stats:", data.onRaceEvent.racers[0].user.username, data.onRaceEvent.racers[0].wpm);
         const timeLeft = Math.max(data?.onRaceEvent.modeSetting - difference, 0);
         setTime(timeLeft);
         if (timeLeft <= 0) {
@@ -158,7 +158,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
-  // TODO: the cache update is fucked whenever you do a `joinRace` so idk bro fix it i guess lol
+  // TODO: the cache update is fucked whenever you do a `joinRace` so idk bro fix it i guess lol // I GUESS IT GOT FIXED? LOL
   // TODO: would probs make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
   // TODO: maybe figure out a better error page? right now it shows an ugly "theres a funny error: {}" which is not too user-friendly in case-
   // ^^^^^-some shit actually goes down
@@ -200,25 +200,14 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
             log the entire race object
           </button>
           {data?.onRaceEvent.host.id === meData.me?.id && (
-            <StartRaceButton handleStart={onRaceStart} hasError={data.onRaceEvent.racers.length <= 1} />
-          )}
-          {meData.me && (
-            <div>
-              finish the race{" "}
-              <button
-                onClick={async () => {
-                  await finishRaceForUser({ variables: { input: { userId: meData?.me?.id, raceId } } });
-                }}
-              >
-                click here
-              </button>
-            </div>
+            // TODO: looks like the length doesn't get updated the way it should? useState??????? LOL!!!!!!!!!!! love react
+            <StartRaceButton handleStart={onRaceStart} hasError={finished || data.onRaceEvent.racers.length <= 1} />
           )}
           <div style={{ border: "1px solid red" }}>
             <h1>racer stats:</h1>
-            {data.onRaceEvent.racerStatistics.map((stats) => (
-              <div key={stats.racer.username}>
-                {stats.racer.username}: {stats.wpm}wpm
+            {data.onRaceEvent.racers.map((racer) => (
+              <div key={racer.user.username}>
+                {racer.user.username}: {racer.wpm}wpm {racer.finished ? "☑️" : "❎"} finished
               </div>
             ))}
           </div>
@@ -226,7 +215,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           <h1 style={{ fontSize: "1.5rem" }}>current time: {JSON.stringify(new Date())}</h1>
           {/* TODO: Consider adding a `startTime` field to a race? then it's easier to calculate the time left lol */}
           <h1 style={{ fontSize: "3rem" }}>time left: {time}</h1>
-          <h1 style={{ fontSize: "3rem" }}>FINISHED? {finished ? "☑️" : "❌"} finished</h1>
+          <h1 style={{ fontSize: "3rem" }}>FINISHED? {finished ? "☑️" : "❎"} finished</h1>
           <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
           <h1 style={{ fontSize: "3rem" }}>running: {running ? "true" : "false"}</h1>
           <h1 style={{ fontSize: "3rem" }}>running backend: {data?.onRaceEvent.running ? "true" : "false"}</h1>
@@ -234,7 +223,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           <ul>
             users:
             {data.onRaceEvent.racers.map((racer) => (
-              <li key={racer.username}>{racer.username}</li>
+              <li key={racer.user.username}>{racer.user.username}</li>
             ))}
           </ul>
           {/* TODO: do we actually need to pass the raceIds here? I think its just better to pass `handleJoin/Leave` functions hmm */}

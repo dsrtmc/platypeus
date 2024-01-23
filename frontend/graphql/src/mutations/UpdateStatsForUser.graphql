@@ -1,8 +1,8 @@
 mutation UpdateStatsForUser($input: UpdateStatsForUserInput!) {
     updateStatsForUser(input: $input) {
         race {
-            racerStatistics {
-                racer {
+            racers {
+                user {
                     username
                 }
                 wpm

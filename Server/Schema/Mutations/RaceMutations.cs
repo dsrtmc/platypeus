@@ -39,16 +39,15 @@ public static class RaceMutations
         if (user is null)
             return new InvalidUserError(userId);
         
-        var race = await db.Races.Include(r => r.RacerStatistics).ThenInclude(r => r.Racer).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return new InvalidRaceError(raceId);
-        
 
-        var racerStatistics = await db.RacerStatistics.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.Racer.Id == userId, cancellationToken);
-        if (racerStatistics is null)
+        var racer = await db.Racers.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.User.Id == userId, cancellationToken);
+        if (racer is null)
             return new InvalidRacerStatisticsError(userId, raceId);
 
-        racerStatistics.Wpm = wpm;
+        racer.Wpm = wpm;
 
         await db.SaveChangesAsync(cancellationToken);
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
@@ -61,12 +60,16 @@ public static class RaceMutations
         [Service] ITopicEventSender eventSender,
         CancellationToken cancellationToken)
     {
-        var race = await db.Races.Include(r => r.Host).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races
+            .Include(r => r.Host)
+            .Include(r => r.Racers).ThenInclude(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        
         if (race is null)
             return new InvalidRaceError(raceId);
 
-        foreach (var racerStatistics in race.RacerStatistics)
-            racerStatistics.Finished = true;
+        foreach (var racer in race.Racers)
+            racer.Finished = true;
 
         race.Finished = true;
 
@@ -89,7 +92,7 @@ public static class RaceMutations
         if (race is null)
             return new InvalidRaceError(raceId);
         
-        var racerStatistics = await db.RacerStatistics.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.Racer.Id == userId, cancellationToken);
+        var racerStatistics = await db.Racers.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.User.Id == userId, cancellationToken);
         if (racerStatistics is null)
             return new InvalidRacerStatisticsError(userId, raceId);
 
@@ -117,7 +120,7 @@ public static class RaceMutations
             return new NotAuthenticatedError();
         
         // TODO: fix funny includes
-        var race = await db.Races.Include(r => r.Host).Include(r => r.RacerStatistics).ThenInclude(rs => rs.Racer).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.Host).Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return new InvalidRaceError(raceId);
 
@@ -167,40 +170,20 @@ public static class RaceMutations
         if (race.Private && race.Password != password)
             return null;
 
-        if (race.Racers.FirstOrDefault(racer => racer.Id == user.Id) is null)
-            race.Racers.Add(user);
-        Console.WriteLine("PRE:");
-        foreach (var racerStats in race.RacerStatistics)
-        {
-            Console.WriteLine($"user: {racerStats.Racer.Username}");
-        }
-        var racerStatistics = new RacerStatistics
+        var racer = new Racer
         {
             Race = race,
-            Racer = user,
+            User = user,
             Wpm = 0,
             Finished = false
         };
-
-        // idk if duplicate? TODO
-        db.RacerStatistics.Add(racerStatistics);
-        // race.RacerStatistics.Add(racerStatistics);
-
-        Console.WriteLine("POST:");
-        foreach (var racerStats in race.RacerStatistics)
-        {
-            Console.WriteLine($"user: {racerStats.Racer.Username}");
-        }
+        
+        if (race.Racers.FirstOrDefault(r => r.User.Id == user.Id) is null)
+            race.Racers.Add(racer);
         
         await db.SaveChangesAsync(cancellationToken);
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
-        Console.WriteLine("POST SAVE CHANGES:");
-        foreach (var racerStats in race.RacerStatistics)
-        {
-            Console.WriteLine($"user: {racerStats.Racer.Username}");
-        }
-        Console.WriteLine($"race.racers length: {race.Racers.Count}");
-
+        
         return race;
     }
     
@@ -213,18 +196,15 @@ public static class RaceMutations
         if (user is null)
             return null;
     
-        var race = await db.Races.Include(r => r.Racers).Include(r => r.RacerStatistics).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.Racers).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return null;
 
-        if (race.Racers.FirstOrDefault(racer => racer.Id == user.Id) is not null)
-            race.Racers.Remove(user);
-
-        foreach (var racerStats in race.RacerStatistics)
+        foreach (var racer in race.Racers)
         {
-            // TODO: unnecessary O(n)
-            if (racerStats.Racer.Id == user.Id)
-                race.RacerStatistics.Remove(racerStats);
+            // TODO: fix unnecessary O(n)
+            if (racer.User.Id == user.Id)
+                race.Racers.Remove(racer);
         }
     
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
@@ -255,7 +235,7 @@ public static class RaceMutations
         var race = new Race
         {
             Host = user,
-            Racers = new List<User>(),
+            Racers = new List<Racer>(),
             Private = isPrivate,
             Mode = mode,
             ModeSetting = modeSetting,

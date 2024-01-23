@@ -2,6 +2,12 @@
 mutation FinishRace($input: FinishRaceInput!) {
     finishRace(input: $input) {
         race {
+            racers {
+                user {
+                    username
+                }
+                finished
+            }
             finished
         }
         errors {

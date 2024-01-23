@@ -145,7 +145,7 @@ type Query {
   allScores: [Score!]!
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
   score(id: UUID!): Score
-  racersStatistics(raceId: UUID!): [RacerStatistics!]!
+  racers(raceId: UUID!): [Racer!]!
   races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection
   allRaces: [Race!]!
   hello: String!
@@ -154,8 +154,7 @@ type Query {
 
 type Race {
   host: User!
-  racers: [User!]!
-  racerStatistics: [RacerStatistics!]!
+  racers: [Racer!]!
   mode: String!
   modeSetting: Int!
   content: String!
@@ -171,9 +170,9 @@ type Race {
   updatedAt: DateTime!
 }
 
-type RacerStatistics {
+type Racer {
   race: Race!
-  racer: User!
+  user: User!
   wpm: Int!
   finished: Boolean!
   id: UUID!
@@ -410,10 +409,10 @@ input ListFilterInputTypeOfMessageFilterInput {
   any: Boolean
 }
 
-input ListFilterInputTypeOfRacerStatisticsFilterInput {
-  all: RacerStatisticsFilterInput
-  none: RacerStatisticsFilterInput
-  some: RacerStatisticsFilterInput
+input ListFilterInputTypeOfRacerFilterInput {
+  all: RacerFilterInput
+  none: RacerFilterInput
+  some: RacerFilterInput
   any: Boolean
 }
 
@@ -421,13 +420,6 @@ input ListFilterInputTypeOfScoreFilterInput {
   all: ScoreFilterInput
   none: ScoreFilterInput
   some: ScoreFilterInput
-  any: Boolean
-}
-
-input ListFilterInputTypeOfUserFilterInput {
-  all: UserFilterInput
-  none: UserFilterInput
-  some: UserFilterInput
   any: Boolean
 }
 
@@ -458,8 +450,7 @@ input RaceFilterInput {
   and: [RaceFilterInput!]
   or: [RaceFilterInput!]
   host: UserFilterInput
-  racers: ListFilterInputTypeOfUserFilterInput
-  racerStatistics: ListFilterInputTypeOfRacerStatisticsFilterInput
+  racers: ListFilterInputTypeOfRacerFilterInput
   mode: StringOperationFilterInput
   modeSetting: IntOperationFilterInput
   content: StringOperationFilterInput
@@ -492,11 +483,11 @@ input RaceSortInput {
   updatedAt: SortEnumType
 }
 
-input RacerStatisticsFilterInput {
-  and: [RacerStatisticsFilterInput!]
-  or: [RacerStatisticsFilterInput!]
+input RacerFilterInput {
+  and: [RacerFilterInput!]
+  or: [RacerFilterInput!]
   race: RaceFilterInput
-  racer: UserFilterInput
+  user: UserFilterInput
   wpm: IntOperationFilterInput
   finished: BooleanOperationFilterInput
   id: UuidOperationFilterInput

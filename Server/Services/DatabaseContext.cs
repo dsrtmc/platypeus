@@ -41,7 +41,7 @@ public class DatabaseContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Score> Scores { get; set; } = null!;
     public DbSet<Race> Races { get; set; } = null!;
-    public DbSet<RacerStatistics> RacerStatistics { get; set; } = null!;
+    public DbSet<Racer> Racers { get; set; } = null!;
     public DbSet<Chatbox> Chatboxes { get; set; } = null!;
     public DbSet<Message> Messages { get; set; } = null!;
 }

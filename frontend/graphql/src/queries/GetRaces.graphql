@@ -4,12 +4,13 @@ query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order:
             node {
                 id
                 createdAt
-                racerStatistics {
-                    racer {
+                racers {
+                    user {
                         username
                     }
                     wpm
                 }
+                finished
             }
         }
     }

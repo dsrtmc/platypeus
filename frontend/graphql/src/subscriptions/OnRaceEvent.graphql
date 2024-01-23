@@ -6,12 +6,10 @@ subscription OnRaceEvent($raceId: UUID!) {
         modeSetting
         racers {
             id
-            username
-        }
-        racerStatistics {
-            racer {
+            user {
                 username
             }
+            finished
             wpm
         }
         host {
