@@ -6,7 +6,7 @@ interface Props {
   handleSelect: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export function TimeSettingButton({ children, selected, handleSelect }: PropsWithChildren<Props>) {
+export function ModeSettingButton({ children, selected, handleSelect }: PropsWithChildren<Props>) {
   return (
     <button onClick={handleSelect} className={`${styles.setting} ${selected && styles.selected}`}>
       {children}

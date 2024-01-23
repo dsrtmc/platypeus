@@ -26,9 +26,13 @@ interface Props {
   running: boolean;
   finished: boolean;
   // TODO: change to `mode` and `modeSetting`
-  time: number;
-  timeSetting: number;
+  timePassed: number;
+  mode: string; // "words" | "time"
+  modeSetting: number;
+  startTime: number;
   handleChangeWpm: (wpm: number) => void;
+  setWordCount: (value: ((prevState: number) => number) | number) => void;
+  handleFinish: () => void;
   /**
    * Returns 0 if we're free to continue with our input handling;
    * if we should prevent reading further inputs, returns a non-zero value.
@@ -36,7 +40,7 @@ interface Props {
    * @returns {number} 0 if all OK, non-0 value if we should stop handling inputs
    */
   onKeyDown: (e: globalThis.KeyboardEvent) => number;
-  onSaveScore: (score: Partial<ScoreType>) => void; // danger zone
+  handleSaveScore: (score: Partial<ScoreType>) => void; // danger zone // TODO: probably rename like handle finish Idk?
   initialContent: string[];
   // Supposed to return the elements by which to expand the pool
   onPoolUpdate: (count: number, index?: number) => string[];
@@ -74,11 +78,15 @@ export const Test = forwardRef<TestMethods, Props>(
       focused,
       running,
       finished,
-      time,
-      timeSetting,
+      timePassed,
+      handleFinish,
+      modeSetting,
+      mode,
+      startTime,
+      setWordCount,
       handleChangeWpm,
       onKeyDown,
-      onSaveScore,
+      handleSaveScore,
       initialContent,
       onPoolUpdate,
     }: Props,
@@ -205,6 +213,7 @@ export const Test = forwardRef<TestMethods, Props>(
       addWordToCount(currentWord);
 
       setWordIndex(wordIndex + 1);
+      setWordCount((wc) => wc + 1);
       setLetterIndex(0);
     }
 
@@ -221,6 +230,14 @@ export const Test = forwardRef<TestMethods, Props>(
       }
 
       setLetterIndex(letterIndex + 1);
+
+      // TODO: find a better spot for this? seems really really really really really really out of place
+      if (mode === "words") {
+        const nextWord = wordsRef.current[wordIndex + 1];
+        if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
+          handleFinish();
+        }
+      }
     }
 
     function moveBackOneWord() {
@@ -232,6 +249,7 @@ export const Test = forwardRef<TestMethods, Props>(
       let index = subtractWordFromCount(previousWord);
 
       setWordIndex(wordIndex - 1);
+      setWordCount((wc) => wc - 1);
       setLetterIndex(index);
     }
 
@@ -253,6 +271,7 @@ export const Test = forwardRef<TestMethods, Props>(
       clearWord(word);
 
       setWordIndex(newWordIndex);
+      setWordCount((wc) => (!letterIndex ? wc - 1 : wc));
       setLetterIndex(0);
     }
 
@@ -301,6 +320,8 @@ export const Test = forwardRef<TestMethods, Props>(
 
     function updateStats(delta: number) {
       const currentWord = wordsRef.current[wordIndex];
+      if (!currentWord) return;
+
       const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 
       const newCorrectCount = correctCharacters + correctCount;
@@ -308,6 +329,9 @@ export const Test = forwardRef<TestMethods, Props>(
 
       const wpm = calculateWpm(newCorrectCount, delta);
       const rawWpm = calculateWpm(newNonEmptyCount, delta);
+      console.log("Current wpm:", wpm);
+      console.log("Current correct count:", newCorrectCount);
+      console.log("Current delta:", delta);
 
       dispatch({ wpmStats: [...wpmStats, wpm] });
       dispatch({ rawStats: [...rawStats, rawWpm] });
@@ -345,12 +369,8 @@ export const Test = forwardRef<TestMethods, Props>(
       setWordIndex(0);
       setLetterIndex(0);
       setLineSkip(true);
-      let words = [];
       wordsRef.current = [];
-      for (let i = 0; i < 50; i++) {
-        words.push(createWordElement());
-      }
-      setWordPool(words);
+      setWordPool(createWordElements(initialContent));
       dispatch(initialState);
     }
 
@@ -391,15 +411,9 @@ export const Test = forwardRef<TestMethods, Props>(
     // Initialize the pool
     // TODO: code duplication? initialization is the same as resetting the test
     useEffect(() => {
-      console.log("The initial load should be the same:", initialContent);
-      const test = createWordElements(initialContent);
-      console.log("Test:", test);
-      setWordPool(test);
-      setWordIndex(0);
-      setLetterIndex(0);
+      reset();
     }, []);
 
-    // Caret movement
     useEffect(() => {
       const currentWord = wordsRef.current[wordIndex];
       if (!currentWord) return;
@@ -416,37 +430,42 @@ export const Test = forwardRef<TestMethods, Props>(
       }
     }, [wordIndex, letterIndex, windowSize, wordPool]);
 
-    function handleSaveScore(data: Partial<ScoreType>) {
-      onSaveScore(data);
-    }
-
     // NOTE: WPM only affects the visual real-time WPM counter, it does not change our state.
     // WpmStats and RawStats are affected, though - keep that in mind.
     // TODO: THIS ENTIRE FILE HAS TO BE CLEANED UP ONE DAY HOLY KAPPA CHUNGUS
     useEffect(() => {
-      const delta = timeSetting - time;
-      if (delta === timeSetting) return; // no need to recalculate here because the component will near-immediately unmount
-      if (delta > 0) {
-        updateStats(delta);
+      if (running) {
+        if (timePassed < modeSetting) {
+          console.log("TIME PASSED IN TEST>TSX:", timePassed);
+          updateStats(timePassed);
+        } else {
+          console.log("We should be finished now no?");
+          handleFinish();
+        }
       }
-    }, [time]);
+    }, [timePassed]);
 
+    // TODO: I think it keeps getting called if you re-enter the race.
+    // TODO: Also, it seems to run for people that haven't even joined the race, lol. not good.
     useEffect(() => {
       if (finished) {
+        console.log("Do we call it before the crash?");
         const currentWord = wordsRef.current[wordIndex];
         const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 
         const newCorrectCount = correctCharacters + correctCount;
         const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
 
-        const wpm = calculateWpm(newCorrectCount, timeSetting);
-        const rawWpm = calculateWpm(newNonEmptyCount, timeSetting);
+        const testDuration = (new Date().getTime() - startTime) / 1000;
+        console.log("Test duration at the end:", testDuration);
+        const wpm = calculateWpm(newCorrectCount, testDuration);
+        const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
 
         const score: Partial<ScoreType> = {
           wpm,
           rawWpm,
-          mode: "time",
-          modeSetting: timeSetting,
+          mode: mode,
+          modeSetting: modeSetting,
           accuracy: newCorrectCount / newNonEmptyCount,
           wpmStats: [...wpmStats, wpm],
           rawStats: [...rawStats, rawWpm],

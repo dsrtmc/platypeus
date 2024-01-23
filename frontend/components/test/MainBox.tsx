@@ -38,7 +38,7 @@ export const MainBox: FC<Props> = ({}) => {
       variables: {
         input: {
           wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
-          rawWpm: Math.round(score.rawWpm), // up
+          rawWpm: Math.round(score.rawWpm),
           accuracy: score.accuracy,
           wpmStats: score.wpmStats,
           rawStats: score.rawStats,
@@ -49,7 +49,6 @@ export const MainBox: FC<Props> = ({}) => {
         },
       },
     });
-    console.log("response:", response);
     setShowScore(true);
     setScoreData(score);
   }

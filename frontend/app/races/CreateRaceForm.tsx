@@ -42,7 +42,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
   function generateContent(mode: "time" | "words", modeSetting: number): string {
     switch (mode) {
       case "time":
-        return generateRandomWords(6 * modeSetting).join(" ");
+        return generateRandomWords(7 * modeSetting).join(" ");
       case "words":
         return generateRandomWords(modeSetting).join(" ");
     }
@@ -50,6 +50,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
 
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
+    console.log("Data.mode:", data.mode);
+    console.log("Data.modeSetting:", data.modeSetting);
+    // TODO: FIX THAT IT DOESN'T SELECT 25 AUTOMATICALLY (despite being highlighted) SO YOU HAVE TO CLICK IT MANUALLY
     const response = await createRace({
       variables: {
         input: {
@@ -58,6 +61,8 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           modeSetting: parseInt(data.modeSetting),
           // TODO: is that a good idea to just use a string? :/
           // the issue is that we have to de-stringify it later anyways, but idk another way to carry it over
+          // IF WE DO USE A STRING, REMEMBER TO ADJUST CSS FOR `Score.tsx` SO THAT IF SOMEONE'S MODE SETTING
+          // IS 1000, IT DOESN'T BREAK THE LAYOUT.
           content: generateContent(data.mode, parseInt(data.modeSetting)),
         },
       },

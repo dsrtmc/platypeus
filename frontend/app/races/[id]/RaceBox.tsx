@@ -3,6 +3,7 @@
 import React, { Fragment, Ref, useEffect, useRef, useState } from "react";
 import { gql, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
+  CreateScoreDocument,
   FinishRaceDocument,
   FinishRaceForUserDocument,
   FlipRunningStatusDocument,
@@ -11,6 +12,7 @@ import {
   LeaveRaceDocument,
   MeDocument,
   OnRaceEventDocument,
+  Score as ScoreType,
   StartRaceDocument,
   UpdateStatsForUserDocument,
 } from "@/graphql/generated/graphql";
@@ -30,12 +32,16 @@ interface Props {
 // The length of race start countdown in seconds
 const COUNTDOWN_TIME = 5;
 
+// TODO: Maybe we just load the race server-side first in `../page.tsx` and then we don't have to struggle w/ initial states here
+// TODO: add error handling whenever we execute a mutation (not just in this file)
 export const RaceBox: React.FC<Props> = ({ raceId }) => {
   const { data: meData } = useQuery(MeDocument);
   const { data, loading, error } = useSubscription(OnRaceEventDocument, { variables: { raceId } });
   const [finishRaceForUser, {}] = useMutation(FinishRaceForUserDocument);
   const [updateStatsForUser, {}] = useMutation(UpdateStatsForUserDocument);
-
+  const [testStartTime, setTestStartTime] = useState(0);
+  const [modeSetting, setModeSetting] = useState(0);
+  const [timePassed, setTimePassed] = useState(modeSetting);
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
@@ -55,7 +61,27 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     const response = await updateStatsForUser({ variables: { input: { raceId, userId: meData?.me!.id, wpm } } });
     console.log("Response from updating stats:", response);
   }
-  function handleSaveScore() {} // TODO: maybe rename to `handleFinishTest`? makes sense since the behavior changes based on where we're at
+  // TODO: maybe rename to `handleFinishTest`? makes sense since the behavior changes based on where we're at
+  const [createScore, {}] = useMutation(CreateScoreDocument);
+  async function handleSaveScore(score: ScoreType) {
+    // TODO: think whether i definitely want to save scores in races
+    console.log("The score we should be trying to save:", score);
+    await createScore({
+      variables: {
+        input: {
+          wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
+          rawWpm: Math.round(score.rawWpm),
+          accuracy: score.accuracy,
+          wpmStats: score.wpmStats,
+          rawStats: score.rawStats,
+          mode: score.mode,
+          modeSetting: score.modeSetting,
+          content: score.content,
+          language: score.language,
+        },
+      },
+    });
+  }
   function handleClick(e: globalThis.MouseEvent) {
     if (ref && ref.current) {
       setFocused(ref.current!.contains(e.target));
@@ -118,6 +144,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       console.log("How often does this shit run?");
       setContent(data.onRaceEvent.content.split(" "));
       setFinished(data.onRaceEvent.finished);
+      setModeSetting(data.onRaceEvent.modeSetting);
       // TODO: change the logic if the `mode` isn't `time` lol
     }
   }, [data]);
@@ -127,30 +154,37 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   useEffect(() => {
     if (running && !finished) {
       intervalRef.current = setInterval(async () => {
-        console.log("bbbbbbbbbbbbbbbbbb");
-        // TODO: check nullability lol xdd
         if (!data) return;
         const startTime = new Date(data?.onRaceEvent.startTime).getTime();
         const nowTime = new Date().getTime();
+        setTestStartTime(startTime);
 
-        // start time 60 + 5 (countdown)
-        // current time 65
-        // start time - current time == 65 - 65
-        // current time is 70
-        // start time - current time == -5
-        const difference = Math.round(Math.abs(startTime + COUNTDOWN_TIME * 1000 - nowTime) / 1000);
-        console.log("holy fucking shit differnece:", difference);
-        console.log("Stats:", data.onRaceEvent.racers[0].user.username, data.onRaceEvent.racers[0].wpm);
-        const timeLeft = Math.max(data?.onRaceEvent.modeSetting - difference, 0);
+        // 60 + 5
+        // 68
+        const duration = Math.round(Math.abs(startTime + COUNTDOWN_TIME * 1000 - nowTime) / 1000);
+        const timeLeft = Math.max(data?.onRaceEvent.modeSetting - duration, 0);
+        setTimePassed(duration);
+        console.log("The time passed:", duration);
         setTime(timeLeft);
+        // TODO: make it the handleSaveScore (or handleFinishTest or whatever)
         if (timeLeft <= 0) {
-          const response = await finishRace({ variables: { input: { raceId } } });
-          setFinished(response.data?.finishRace.race?.finished ?? false);
+          // TODO: idk if that's actually needed, could just
+          const finishResponse = await finishRace({ variables: { input: { raceId } } });
+          setFinished(finishResponse.data?.finishRace.race?.finished ?? false);
+          clearInterval(intervalRef.current);
         }
       }, 1000);
     }
     return () => clearInterval(intervalRef.current);
   }, [running]);
+
+  function handleFinish() {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    setRunning(false);
+    setFinished(true);
+  }
 
   // useEffect(() => {}, [time]);
 
@@ -167,6 +201,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   // which i guess is good? idk probably
   // ↑ dont read this
   const [lazyGetRace, { data: lazyGetRaceData }] = useLazyQuery(GetRacesDocument);
+  const [wordCount, setWordCount] = useState(0);
   return (
     <div className={styles.raceBox}>
       {data && meData && (
@@ -177,12 +212,16 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
               focused={focused}
               running={running}
               finished={finished}
-              time={time}
-              timeSetting={data.onRaceEvent.modeSetting}
+              timePassed={timePassed}
+              setWordCount={setWordCount}
+              modeSetting={data.onRaceEvent.modeSetting}
+              mode={data.onRaceEvent.mode}
               handleChangeWpm={handleChangeWpm}
               onKeyDown={handleKeyDown}
+              startTime={testStartTime}
+              handleFinish={handleFinish}
               ref={testRef}
-              onSaveScore={handleSaveScore}
+              handleSaveScore={handleSaveScore}
               initialContent={data.onRaceEvent.content.split(" ").slice(0, LOADED_WORDS_COUNT)}
               onPoolUpdate={onPoolUpdate}
             />
@@ -201,9 +240,11 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           </button>
           {data?.onRaceEvent.host.id === meData.me?.id && (
             // TODO: looks like the length doesn't get updated the way it should? useState??????? LOL!!!!!!!!!!! love react
-            <StartRaceButton handleStart={onRaceStart} hasError={finished || data.onRaceEvent.racers.length <= 1} />
+            // <StartRaceButton handleStart={onRaceStart} hasError={finished || data.onRaceEvent.racers.length <= 0} />
+            <StartRaceButton handleStart={onRaceStart} hasError={false} />
           )}
           <div style={{ border: "1px solid red" }}>
+            {/* TODO: Fix that it shows the actual stats after the race-ended, right now it shows arr[arr.size - 2] stats */}
             <h1>racer stats:</h1>
             {data.onRaceEvent.racers.map((racer) => (
               <div key={racer.user.username}>

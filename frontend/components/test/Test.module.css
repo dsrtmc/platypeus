@@ -65,6 +65,23 @@
     overflow: hidden;
 }
 
+/*@keyframes fade {*/
+/*    40% {*/
+/*        opacity: 0*/
+/*    }*/
+/*    50% {*/
+/*        opacity: 1*/
+/*    }*/
+/*    60% {*/
+/*        opacity: 0*/
+/*    }*/
+/*}*/
+
+/*.test {*/
+/*    opacity: 1;*/
+/*    animation: fade 2s linear;*/
+/*}*/
+
 .words:nth-col(2) {
     margin-top: 3rem;
 }

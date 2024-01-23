@@ -3,6 +3,6 @@ import styles from "./Test.module.css";
 
 interface Props {}
 
-export const Mode: React.FC<Props> = ({ children }: PropsWithChildren<Props>) => {
+export const LanguageSelection: React.FC<Props> = ({ children }: PropsWithChildren<Props>) => {
   return <div className={styles.mode}>{children}</div>;
 };
