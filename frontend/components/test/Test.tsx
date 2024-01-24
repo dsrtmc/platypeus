@@ -150,18 +150,13 @@ export const Test = forwardRef<TestMethods, Props>(
       dispatch({ allWordsLength: allWordsLength + letters.length + 1 });
     }
 
-    /* Returns the index which the cursor should be moved to.
-     * Not a good idea to have it here I think, but can't think of any other way
-     * to avoid duplicating the loop. */
-    function subtractWordFromCount(word: Element): number {
+    function subtractWordFromCount(word: Element) {
       const letters = word.children;
       let correct = true;
       let nonEmptyCount = 0;
-      let index = letters.length;
       for (let i = letters.length - 1; i >= 0; i--) {
         if (isEmpty(letters[i])) {
           correct = false;
-          index = i;
         } else {
           if (isIncorrect(letters[i])) {
             correct = false;
@@ -176,8 +171,6 @@ export const Test = forwardRef<TestMethods, Props>(
       }
       dispatch({ nonEmptyCharacters: nonEmptyCharacters - nonEmptyCount - 1 });
       dispatch({ allWordsLength: allWordsLength - letters.length - 1 });
-
-      return index;
     }
 
     // If the word is incorrect, the `correctCount` will return 0
@@ -235,7 +228,6 @@ export const Test = forwardRef<TestMethods, Props>(
       if (mode === "words") {
         const nextWord = wordsRef.current[wordIndex + 1];
         if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
-          console.log("WE SHOULD BE FINISHING NOWWWWWWWWW!!!!!!!!!!!!!!!!!!111");
           onFinished();
         }
       }
@@ -245,9 +237,16 @@ export const Test = forwardRef<TestMethods, Props>(
       const previousWord = wordsRef.current[wordIndex - 1];
       if (!previousWord) return;
 
+      subtractWordFromCount(previousWord);
       previousWord.classList.remove(styles.error);
 
-      let index = subtractWordFromCount(previousWord);
+      const letters = previousWord.children;
+      let index = letters.length;
+      for (let i = letters.length - 1; i >= 0; i--) {
+        if (isEmpty(letters[i])) {
+          index = i;
+        }
+      }
 
       setWordIndex(wordIndex - 1);
       setWordCount((wc) => wc - 1);
@@ -267,8 +266,13 @@ export const Test = forwardRef<TestMethods, Props>(
     function deletePreviousWord() {
       // if we're at letter index 0, then we clear all the way back to the previous word's front
       let newWordIndex = !letterIndex ? wordIndex - 1 : wordIndex;
+
       let word = wordsRef.current[newWordIndex];
       if (!word) return;
+
+      if (newWordIndex < wordIndex) {
+        subtractWordFromCount(word);
+      }
       clearWord(word);
 
       setWordIndex(newWordIndex);
@@ -323,28 +327,24 @@ export const Test = forwardRef<TestMethods, Props>(
       const currentWord = wordsRef.current[wordIndex];
       if (!currentWord) return;
 
-      const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
+      // const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 
-      const newCorrectCount = correctCharacters + correctCount;
-      const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
+      const newCorrectCount = correctCharacters;
+      const newNonEmptyCount = nonEmptyCharacters;
 
       const wpm = calculateWpm(newCorrectCount, delta);
       const rawWpm = calculateWpm(newNonEmptyCount, delta);
-      console.log("Current wpm:", wpm);
-      console.log("Current correct count:", newCorrectCount);
-      console.log("Current delta:", delta);
 
       dispatch({ wpmStats: [...wpmStats, wpm] });
       dispatch({ rawStats: [...rawStats, rawWpm] });
 
       dispatch({ correctCharacters: newCorrectCount });
       dispatch({ nonEmptyCharacters: newNonEmptyCount });
-      dispatch({ allWordsLength: allWordsLength + nonEmptyCount });
+      dispatch({ allWordsLength: allWordsLength });
 
       // if we ever somehow divide by 0 here we're in bigger trouble
       dispatch({ accuracy: newCorrectCount / newNonEmptyCount });
 
-      console.log("The wpm we're setting:", wpm);
       handleChangeWpm(wpm);
     }
 
@@ -468,7 +468,7 @@ export const Test = forwardRef<TestMethods, Props>(
 
     useEffect(() => {
       if (running) {
-        console.log("Running:", running);
+        console.log("Correct chars:", correctCharacters);
         updateStats(timePassed);
         if (mode === "time" && timePassed >= modeSetting) {
           onFinished();

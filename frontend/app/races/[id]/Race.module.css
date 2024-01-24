@@ -188,3 +188,35 @@
     background-image: linear-gradient(to right, transparent, var(--sub-alt-color), transparent);
     margin: 1rem 0;
 }
+
+.scoreboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.racerCard {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    width: 100%;
+}
+
+.progressBar {
+    width: 100%;
+    height: 2px;
+    background-color: red;
+}
+
+.left {
+    flex: 1;
+}
+
+.right {
+    flex: 0;
+    min-width: 10ch;
+    background-color: slategray;
+}

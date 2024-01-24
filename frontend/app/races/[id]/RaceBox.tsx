@@ -27,6 +27,9 @@ import { setFlagsFromString } from "v8";
 import { Timer } from "@/components/test/Timer";
 import { WordProgress } from "@/components/test/WordProgress";
 import { count } from "rxjs";
+import { RacerProgressCard } from "@/app/races/[id]/RacerProgressCard";
+import { RacerScoreCard } from "@/app/races/[id]/RacerScoreCard";
+import { RaceScoreboard } from "@/app/races/[id]/RaceScoreboard";
 
 interface Props {
   raceId: string;
@@ -63,7 +66,9 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   async function handleChangeWpm(wpm: number) {
     if (!meData?.me) return;
     if (finishedForUser) return;
-    const response = await updateStatsForUser({ variables: { input: { raceId, userId: meData.me.id, wpm } } });
+    const response = await updateStatsForUser({
+      variables: { input: { raceId, userId: meData.me.id, wpm, wordsTyped: wordCount } },
+    });
     console.log("Response from updating stats:", response);
   }
   // TODO: maybe rename to `handleFinishTest`? makes sense since the behavior changes based on where we're at
@@ -266,15 +271,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
             // <StartRaceButton handleStart={onRaceStart} hasError={finished || data.onRaceEvent.racers.length <= 0} />
             <StartRaceButton handleStart={onRaceStart} hasError={false} />
           )}
-          <div style={{ border: "1px solid red" }}>
-            {/* TODO: Fix that it shows the actual stats after the race-ended, right now it shows arr[arr.size - 2] stats */}
-            <h1>racer stats:</h1>
-            {data.onRaceEvent.racers.map((racer) => (
-              <div key={racer.user.username}>
-                {racer.user.username}: {racer.wpm}wpm {racer.finished ? "☑️" : "❎"} finished
-              </div>
-            ))}
-          </div>
+          <RaceScoreboard racers={data.onRaceEvent.racers} modeSetting={modeSetting} timePassed={timePassed} />
           <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
           <h1 style={{ fontSize: "1.5rem" }}>current time: {JSON.stringify(new Date())}</h1>
           {/* TODO: Consider adding a `startTime` field to a race? then it's easier to calculate the time left lol */}

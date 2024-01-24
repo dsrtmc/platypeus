@@ -11,6 +11,7 @@ subscription OnRaceEvent($raceId: UUID!) {
             }
             finished
             wpm
+            wordsTyped
         }
         host {
             id

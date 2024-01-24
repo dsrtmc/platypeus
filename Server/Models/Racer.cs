@@ -8,5 +8,7 @@ public class Racer : BaseEntity
     
     public int Wpm { get; set; }
     
+    public int WordsTyped { get; set; }
+    
     public bool Finished { get; set; }
 }

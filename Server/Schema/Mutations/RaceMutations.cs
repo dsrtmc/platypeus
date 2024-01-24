@@ -32,7 +32,7 @@ public static class RaceMutations
 
     // TODO: i don't even know if we have to return anything here. i mean, why not I guess, but then again, why should we?
     public static async Task<MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacerStatisticsError>> UpdateStatsForUser(
-        Guid userId, Guid raceId, DatabaseContext db, int wpm,
+        Guid userId, Guid raceId, DatabaseContext db, int wpm, int wordsTyped,
         [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
         var user = await db.Users.FindAsync(userId);
@@ -48,6 +48,7 @@ public static class RaceMutations
             return new InvalidRacerStatisticsError(userId, raceId);
 
         racer.Wpm = wpm;
+        racer.WordsTyped = wordsTyped;
 
         await db.SaveChangesAsync(cancellationToken);
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
@@ -175,6 +176,7 @@ public static class RaceMutations
             Race = race,
             User = user,
             Wpm = 0,
+            WordsTyped = 0,
             Finished = false
         };
         

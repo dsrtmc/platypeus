@@ -174,6 +174,7 @@ type Racer {
   race: Race!
   user: User!
   wpm: Int!
+  wordsTyped: Int!
   finished: Boolean!
   id: UUID!
   createdAt: DateTime!
@@ -489,6 +490,7 @@ input RacerFilterInput {
   race: RaceFilterInput
   user: UserFilterInput
   wpm: IntOperationFilterInput
+  wordsTyped: IntOperationFilterInput
   finished: BooleanOperationFilterInput
   id: UuidOperationFilterInput
   createdAt: DateTimeOperationFilterInput
@@ -562,6 +564,7 @@ input UpdateStatsForUserInput {
   userId: UUID!
   raceId: UUID!
   wpm: Int!
+  wordsTyped: Int!
 }
 
 input UserFilterInput {

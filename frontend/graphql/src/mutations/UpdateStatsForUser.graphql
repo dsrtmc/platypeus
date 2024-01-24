@@ -6,6 +6,7 @@ mutation UpdateStatsForUser($input: UpdateStatsForUserInput!) {
                     username
                 }
                 wpm
+                wordsTyped
             }
         }
         errors {
