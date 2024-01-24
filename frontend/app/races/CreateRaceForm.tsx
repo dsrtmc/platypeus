@@ -71,6 +71,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     console.log("The response we got:", response);
     router.push(`/races/${response.data?.createRace.race?.id}`);
   };
+  // TODO: require authentication
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <h1>Create a race</h1>
@@ -110,6 +111,8 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           // ^^^^^ and it stays at 5. FIX THIS FIX THIS VERY IMPORTANT!
           // words
           <>
+            <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"5"} />
+            <label htmlFor={"5"}>5</label>
             <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"25"} />
             <label htmlFor={"25"}>25</label>
             <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"50"} />

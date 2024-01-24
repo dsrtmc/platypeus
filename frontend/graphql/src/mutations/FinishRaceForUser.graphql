@@ -1,5 +1,12 @@
 mutation FinishRaceForUser($input: FinishRaceForUserInput!) {
     finishRaceForUser(input: $input) {
+#        race {
+#            racers {
+#                user {
+#                    username
+#                }
+#            }
+#        }
         errors {
             code: __typename
             ... on Error {

@@ -83,7 +83,7 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
       <div className={styles.bottom}>
         <TextareaAutosize
           maxRows={3}
-          placeholder={meData.me ? "Message the group" : "Log in to use the chat"}
+          placeholder={meData.me ? "Message the group" : "Log in to use the chatroom"}
           disabled={!meData.me}
           onKeyDown={handleKeyDown}
           {...register("content" as FieldPath<FormValues>, {
@@ -93,7 +93,7 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
           aria-invalid={errors.content ? "true" : "false"}
           className={styles.textarea}
         />
-        <button type={"submit"} className={styles.sendButton}>
+        <button type={"submit"} className={styles.sendButton} disabled={!meData.me}>
           <IoSend />
         </button>
       </div>

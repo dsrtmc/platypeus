@@ -13,6 +13,7 @@ import { generateWord } from "@/utils/generateWords";
 import { generateRandomWords } from "@/utils/generateRandomWords";
 import { ModeSelection } from "@/components/test/ModeSelection";
 import { LanguageSelection } from "@/components/test/LanguageSelection";
+import { WordProgress } from "@/components/test/WordProgress";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -142,7 +143,8 @@ export function TestBox({ handleSaveScore }: Props) {
   // }, [time]);
 
   useEffect(() => {
-    if (!running && !finished) {
+    // not sure if that condition is necessary
+    if (!finished) {
       handleReset();
     }
   }, [mode, modeSetting]);
@@ -171,18 +173,18 @@ export function TestBox({ handleSaveScore }: Props) {
   if (visible) {
     return (
       <div className={styles.box} ref={ref}>
-        <button onClick={() => console.log(modeSetting)}>log current mode setting</button>
-        <button onClick={() => handleReset()}>"Reset" test</button>
-        <button onClick={() => setDisableTest(!disableTest)}>disable/enable test</button>
         <section>
           Current mode: {mode}
           <ModeSelection handleSelectMode={handleSelectMode} />
         </section>
         <section className={styles.top}>
           <section className={styles.left}>
-            {/* TODO: make it so that it shows e.g. `3/25` words */}
-            {/* TODO: FIx because now it shows time passed rather than time left */}
-            {mode === "time" ? <Timer time={modeSetting - timePassed} /> : `${wordCount}/${modeSetting}`}
+            {/* TODO: Is there a better way to handle checking the mode? */}
+            {mode === "time" ? (
+              <Timer time={modeSetting - timePassed} />
+            ) : (
+              <WordProgress count={wordCount} setting={modeSetting} />
+            )}
             <Counter count={wpm} />
           </section>
           {/* HOW CAN I CENTER A DIV LOL */}

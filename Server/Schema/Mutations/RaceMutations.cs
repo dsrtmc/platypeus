@@ -88,7 +88,7 @@ public static class RaceMutations
         if (user is null)
             return new InvalidUserError(userId);
         
-        var race = await db.Races.Include(r => r.Host).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).Include(r => r.Host).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return new InvalidRaceError(raceId);
         
@@ -163,7 +163,7 @@ public static class RaceMutations
         if (user is null)
             return null;
 
-        var race = await db.Races.Include(r => r.Racers).Include(r => r.Host).Include(r => r.Chatbox).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).Include(r => r.Host).Include(r => r.Chatbox).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return null;
 

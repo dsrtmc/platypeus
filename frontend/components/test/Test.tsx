@@ -235,7 +235,8 @@ export const Test = forwardRef<TestMethods, Props>(
       if (mode === "words") {
         const nextWord = wordsRef.current[wordIndex + 1];
         if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
-          handleFinish();
+          console.log("WE SHOULD BE FINISHING NOWWWWWWWWW!!!!!!!!!!!!!!!!!!111");
+          onFinished();
         }
       }
     }
@@ -343,6 +344,7 @@ export const Test = forwardRef<TestMethods, Props>(
       // if we ever somehow divide by 0 here we're in bigger trouble
       dispatch({ accuracy: newCorrectCount / newNonEmptyCount });
 
+      console.log("The wpm we're setting:", wpm);
       handleChangeWpm(wpm);
     }
 
@@ -433,47 +435,78 @@ export const Test = forwardRef<TestMethods, Props>(
     // NOTE: WPM only affects the visual real-time WPM counter, it does not change our state.
     // WpmStats and RawStats are affected, though - keep that in mind.
     // TODO: THIS ENTIRE FILE HAS TO BE CLEANED UP ONE DAY HOLY KAPPA CHUNGUS
+
+    function onFinished() {
+      handleFinish();
+      console.log("We just called handleFinish()");
+      console.log("Do we call it before the crash?");
+      const currentWord = wordsRef.current[wordIndex];
+      const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
+
+      const newCorrectCount = correctCharacters + correctCount;
+      const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
+
+      const testDuration = (new Date().getTime() - startTime) / 1000;
+      console.log("Test duration at the end:", testDuration);
+      const wpm = calculateWpm(newCorrectCount, testDuration);
+      const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
+
+      const score: Partial<ScoreType> = {
+        wpm,
+        rawWpm,
+        mode: mode,
+        modeSetting: modeSetting,
+        accuracy: newCorrectCount / newNonEmptyCount,
+        wpmStats: [...wpmStats, wpm],
+        rawStats: [...rawStats, rawWpm],
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        language: "english",
+      };
+      handleSaveScore(score);
+    }
+
     useEffect(() => {
       if (running) {
-        if (timePassed < modeSetting) {
-          console.log("TIME PASSED IN TEST>TSX:", timePassed);
-          updateStats(timePassed);
-        } else {
-          console.log("We should be finished now no?");
-          handleFinish();
+        console.log("Running:", running);
+        updateStats(timePassed);
+        if (mode === "time" && timePassed >= modeSetting) {
+          onFinished();
         }
+        // TODO: (if mode === "words" && timePassed > 60) or something like that
       }
     }, [timePassed]);
 
     // TODO: I think it keeps getting called if you re-enter the race.
     // TODO: Also, it seems to run for people that haven't even joined the race, lol. not good.
+    // TODO: mayhaps unnecessary? :D
     useEffect(() => {
       if (finished) {
-        console.log("Do we call it before the crash?");
-        const currentWord = wordsRef.current[wordIndex];
-        const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
-
-        const newCorrectCount = correctCharacters + correctCount;
-        const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
-
-        const testDuration = (new Date().getTime() - startTime) / 1000;
-        console.log("Test duration at the end:", testDuration);
-        const wpm = calculateWpm(newCorrectCount, testDuration);
-        const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
-
-        const score: Partial<ScoreType> = {
-          wpm,
-          rawWpm,
-          mode: mode,
-          modeSetting: modeSetting,
-          accuracy: newCorrectCount / newNonEmptyCount,
-          wpmStats: [...wpmStats, wpm],
-          rawStats: [...rawStats, rawWpm],
-          content:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-          language: "english",
-        };
-        handleSaveScore(score);
+        // console.log("Do we call it before the crash?");
+        // const currentWord = wordsRef.current[wordIndex];
+        // const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
+        //
+        // const newCorrectCount = correctCharacters + correctCount;
+        // const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
+        //
+        // const testDuration = (new Date().getTime() - startTime) / 1000;
+        // console.log("Test duration at the end:", testDuration);
+        // const wpm = calculateWpm(newCorrectCount, testDuration);
+        // const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
+        //
+        // const score: Partial<ScoreType> = {
+        //   wpm,
+        //   rawWpm,
+        //   mode: mode,
+        //   modeSetting: modeSetting,
+        //   accuracy: newCorrectCount / newNonEmptyCount,
+        //   wpmStats: [...wpmStats, wpm],
+        //   rawStats: [...rawStats, rawWpm],
+        //   content:
+        //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        //   language: "english",
+        // };
+        // handleSaveScore(score);
       }
     }, [finished]);
 

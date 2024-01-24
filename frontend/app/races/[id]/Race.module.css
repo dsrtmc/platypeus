@@ -70,7 +70,6 @@
 
 .sendButton:hover {
     color: var(--text-color);
-    cursor: pointer;
 }
 
 .sendButton:active {
