@@ -451,12 +451,16 @@ export const Test = forwardRef<TestMethods, Props>(
       const wpm = calculateWpm(newCorrectCount, testDuration);
       const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
 
+      // Prevent dividing by 0
+      let acc = newCorrectCount / nonEmptyCount;
+      if (!Number.isFinite(acc)) acc = 0;
+      console.log("ACC:", acc);
       const score: Partial<ScoreType> = {
         wpm,
         rawWpm,
         mode: mode,
         modeSetting: modeSetting,
-        accuracy: newCorrectCount / newNonEmptyCount,
+        accuracy: acc,
         wpmStats: [...wpmStats, wpm],
         rawStats: [...rawStats, rawWpm],
         content:
@@ -467,7 +471,7 @@ export const Test = forwardRef<TestMethods, Props>(
     }
 
     useEffect(() => {
-      if (running) {
+      if (running && !finished) {
         console.log("Correct chars:", correctCharacters);
         updateStats(timePassed);
         if (mode === "time" && timePassed >= modeSetting) {

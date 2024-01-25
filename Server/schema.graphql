@@ -106,6 +106,7 @@ type Mutation {
   updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload!
   finishRace(input: FinishRaceInput!): FinishRacePayload!
   finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload!
+  runRace(input: RunRaceInput!): RunRacePayload!
   startRace(input: StartRaceInput!): StartRacePayload!
   joinRace(input: JoinRaceInput!): JoinRacePayload!
   leaveRace(input: LeaveRaceInput!): LeaveRacePayload!
@@ -158,6 +159,7 @@ type Race {
   mode: String!
   modeSetting: Int!
   content: String!
+  started: Boolean!
   running: Boolean!
   finished: Boolean!
   private: Boolean!
@@ -202,6 +204,11 @@ type RacesEdge {
 type RegisterPayload {
   user: User
   errors: [RegisterError!]
+}
+
+type RunRacePayload {
+  race: Race
+  errors: [RunRaceError!]
 }
 
 type Score {
@@ -280,6 +287,8 @@ union FinishRaceForUserError = InvalidRaceError | InvalidUserError | InvalidRace
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
 union RegisterError = InvalidFieldError | UsernameTakenError
+
+union RunRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
 
 union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
 
@@ -455,6 +464,7 @@ input RaceFilterInput {
   mode: StringOperationFilterInput
   modeSetting: IntOperationFilterInput
   content: StringOperationFilterInput
+  started: BooleanOperationFilterInput
   running: BooleanOperationFilterInput
   finished: BooleanOperationFilterInput
   private: BooleanOperationFilterInput
@@ -472,6 +482,7 @@ input RaceSortInput {
   mode: SortEnumType
   modeSetting: SortEnumType
   content: SortEnumType
+  started: SortEnumType
   running: SortEnumType
   finished: SortEnumType
   private: SortEnumType
@@ -501,6 +512,10 @@ input RegisterInput {
   username: String
   email: String
   password: String
+}
+
+input RunRaceInput {
+  raceId: UUID!
 }
 
 input ScoreFilterInput {

@@ -25,8 +25,9 @@ const documents = {
     "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    user {\n      id\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.LoginDocument,
     "mutation Logout {\n  logout {\n    boolean\n  }\n}": types.LogoutDocument,
     "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    user {\n      ...UserInfoFragment\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.RegisterDocument,
+    "mutation RunRace($input: RunRaceInput!) {\n  runRace(input: $input) {\n    race {\n      running\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.RunRaceDocument,
     "mutation SendMessage($input: SendMessageInput!) {\n  sendMessage(input: $input) {\n    boolean\n  }\n}": types.SendMessageDocument,
-    "mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.StartRaceDocument,
+    "mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      started\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.StartRaceDocument,
     "mutation UpdateStatsForUser($input: UpdateStatsForUserInput!) {\n  updateStatsForUser(input: $input) {\n    race {\n      racers {\n        user {\n          username\n        }\n        wpm\n        wordsTyped\n      }\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.UpdateStatsForUserDocument,
     "query Bye {\n  bye\n}": types.ByeDocument,
     "query GetAllUsers {\n  allUsers {\n    id\n    username\n    email\n  }\n}": types.GetAllUsersDocument,
@@ -37,7 +38,7 @@ const documents = {
     "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}": types.GetUsersBestScoresDocument,
     "query Me {\n  me {\n    id\n    username\n    email\n    ...UserInfoFragment\n  }\n}": types.MeDocument,
     "subscription OnChatboxEvent($chatboxId: UUID!) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages {\n      id\n      author {\n        username\n      }\n      content\n      createdAt\n    }\n  }\n}": types.OnChatboxEventDocument,
-    "subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      user {\n        username\n      }\n      finished\n      wpm\n      wordsTyped\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n    startTime\n  }\n}": types.OnRaceEventDocument,
+    "subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      user {\n        id\n        username\n      }\n      finished\n      wpm\n      wordsTyped\n    }\n    host {\n      id\n      username\n    }\n    started\n    running\n    finished\n    content\n    chatboxId\n    startTime\n  }\n}": types.OnRaceEventDocument,
 };
 
 /**
@@ -105,11 +106,15 @@ export function graphql(source: "mutation Register($input: RegisterInput!) {\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "mutation RunRace($input: RunRaceInput!) {\n  runRace(input: $input) {\n    race {\n      running\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation RunRace($input: RunRaceInput!) {\n  runRace(input: $input) {\n    race {\n      running\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "mutation SendMessage($input: SendMessageInput!) {\n  sendMessage(input: $input) {\n    boolean\n  }\n}"): (typeof documents)["mutation SendMessage($input: SendMessageInput!) {\n  sendMessage(input: $input) {\n    boolean\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
+export function graphql(source: "mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      started\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation StartRace($input: StartRaceInput!) {\n  startRace(input: $input) {\n    race {\n      started\n      running\n      updatedAt\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -153,7 +158,7 @@ export function graphql(source: "subscription OnChatboxEvent($chatboxId: UUID!) 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      user {\n        username\n      }\n      finished\n      wpm\n      wordsTyped\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n    startTime\n  }\n}"): (typeof documents)["subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      user {\n        username\n      }\n      finished\n      wpm\n      wordsTyped\n    }\n    host {\n      id\n      username\n    }\n    running\n    finished\n    content\n    chatboxId\n    startTime\n  }\n}"];
+export function graphql(source: "subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      user {\n        id\n        username\n      }\n      finished\n      wpm\n      wordsTyped\n    }\n    host {\n      id\n      username\n    }\n    started\n    running\n    finished\n    content\n    chatboxId\n    startTime\n  }\n}"): (typeof documents)["subscription OnRaceEvent($raceId: UUID!) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers {\n      id\n      user {\n        id\n        username\n      }\n      finished\n      wpm\n      wordsTyped\n    }\n    host {\n      id\n      username\n    }\n    started\n    running\n    finished\n    content\n    chatboxId\n    startTime\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

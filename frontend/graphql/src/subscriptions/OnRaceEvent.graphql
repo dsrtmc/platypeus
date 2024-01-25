@@ -7,6 +7,7 @@ subscription OnRaceEvent($raceId: UUID!) {
         racers {
             id
             user {
+                id
                 username
             }
             finished
@@ -17,6 +18,7 @@ subscription OnRaceEvent($raceId: UUID!) {
             id
             username
         }
+        started
         running
         finished
         content

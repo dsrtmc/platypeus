@@ -104,6 +104,25 @@ public static class RaceMutations
 
         return race;
     }
+    
+    public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> RunRace(
+        Guid raceId, DatabaseContext db,
+        [Service] ITopicEventSender eventSender,
+        IHttpContextAccessor accessor,
+        CancellationToken cancellationToken)
+    {
+        // TODO: fix funny includes
+        var race = await db.Races.Include(r => r.Host).Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        if (race is null)
+            return new InvalidRaceError(raceId);
+        
+        race.Running = true;
+
+        await db.SaveChangesAsync(cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+
+        return race;
+    }
 
     // TODO: finally read up on what cancellation token does holy fuck this is ridiculous
     public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> StartRace(
@@ -112,6 +131,7 @@ public static class RaceMutations
         IHttpContextAccessor accessor,
         CancellationToken cancellationToken)
     {
+        // TODO: maybe just take userId as a parameter? no reason to check for cookies i think maybe idk
         var userIdClaim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
         if (userIdClaim is null)
             return new NotAuthenticatedError();
@@ -124,29 +144,17 @@ public static class RaceMutations
         var race = await db.Races.Include(r => r.Host).Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return new InvalidRaceError(raceId);
+        
+        // TODO: if (race.racers.Count < 2) return new error
 
         if (race.Host.Id != user.Id)
             return new NotAuthorizedError();
 
-        race.Running = true;
+        race.Started = true;
         race.StartTime = DateTime.UtcNow;
         
-        Console.WriteLine($"JOIN race.racers length: {race.Racers.Count}");
-        // TODO: maybe just move it to join race, i think it makes more sense yea
-        // foreach (var racer in race.Racers)
-        // {
-        //     var stats = new RacerStatistics
-        //     {
-        //         Race = race,
-        //         Racer = racer,
-        //         Wpm = 0,
-        //         Finished = false
-        //     };
-        //     db.RacerStatistics.Add(stats);
-        // }
-
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
 
         return race;
     }
@@ -198,20 +206,16 @@ public static class RaceMutations
         if (user is null)
             return null;
     
-        var race = await db.Races.Include(r => r.Racers).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return null;
 
-        foreach (var racer in race.Racers)
-        {
-            // TODO: fix unnecessary O(n)
-            if (racer.User.Id == user.Id)
-                race.Racers.Remove(racer);
-        }
+        var racer = race.Racers.FirstOrDefault(r => r.User.Id == userId);
+        if (racer is not null)
+            db.Racers.Remove(racer);
     
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
-        
         await db.SaveChangesAsync(cancellationToken);
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
     
         return race;
     }

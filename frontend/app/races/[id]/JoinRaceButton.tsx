@@ -5,14 +5,9 @@ import { useMutation } from "@apollo/client";
 import { JoinRaceDocument } from "@/graphql/generated/graphql";
 
 interface Props {
-  raceId: string;
-  userId: string;
+  handleJoinRace: () => void;
 }
 
-export const JoinRaceButton: React.FC<Props> = ({ raceId, userId }) => {
-  const [joinRace, {}] = useMutation(JoinRaceDocument);
-  async function handleJoinRace() {
-    await joinRace({ variables: { input: { raceId, userId } } });
-  }
+export const JoinRaceButton: React.FC<Props> = ({ handleJoinRace }) => {
   return <button onClick={handleJoinRace}>Join race</button>;
 };

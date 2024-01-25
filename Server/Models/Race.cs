@@ -16,6 +16,8 @@ public class Race : BaseEntity
     // TODO: maybe change name xd `race content` sounds shit
     public string Content { get; init; } = null!;
     
+    public bool Started { get; set; }
+    
     public bool Running { get; set; }
     
     public bool Finished { get; set; }

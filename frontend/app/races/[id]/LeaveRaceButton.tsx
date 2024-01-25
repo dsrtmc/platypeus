@@ -5,14 +5,9 @@ import { useMutation } from "@apollo/client";
 import { LeaveRaceDocument } from "@/graphql/generated/graphql";
 
 interface Props {
-  raceId: string;
-  userId: string;
+  handleLeaveRace: () => void;
 }
 
-export const LeaveRaceButton: React.FC<Props> = ({ raceId, userId }) => {
-  const [leaveRace, {}] = useMutation(LeaveRaceDocument);
-  async function handleLeaveRace() {
-    await leaveRace({ variables: { input: { raceId, userId } } });
-  }
+export const LeaveRaceButton: React.FC<Props> = ({ handleLeaveRace }) => {
   return <button onClick={handleLeaveRace}>Leave race</button>;
 };

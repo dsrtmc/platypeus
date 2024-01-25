@@ -5,20 +5,19 @@ import { RacerScoreCard } from "@/app/races/[id]/RacerScoreCard";
 
 interface Props {
   racers: OnRaceEventSubscription["onRaceEvent"]["racers"];
+  mode: string;
   modeSetting: number;
-  timePassed: number;
 }
 
-export const RaceScoreboard: React.FC<Props> = ({ racers, modeSetting, timePassed }) => {
+export const RaceScoreboard: React.FC<Props> = ({ racers, mode, modeSetting }) => {
   return (
     <div className={styles.scoreboard}>
       <h1>racer stats:</h1>
       {racers.map((racer) => {
-        // 120wpm in 1st second
-        // return Math.round((characters / 5) * (60 / time));
-        // 200wpm in 5seconds means that we should do 60 / 5 and divide wpm by this right?
-        const progress = racer.wordsTyped / modeSetting;
-        return <RacerScoreCard racer={racer} progress={progress} />;
+        let divisor = modeSetting;
+        if (mode === "time") divisor *= 6;
+        const progress = racer.wordsTyped / divisor;
+        return <RacerScoreCard racer={racer} progress={progress} key={racer.id} />;
       })}
     </div>
   );

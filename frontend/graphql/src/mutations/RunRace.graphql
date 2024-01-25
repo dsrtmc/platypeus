@@ -1,9 +1,7 @@
-mutation StartRace($input: StartRaceInput!) {
-    startRace(input: $input) {
+mutation RunRace($input: RunRaceInput!) {
+    runRace(input: $input) {
         race {
-            started
             running
-            updatedAt
         }
         errors {
             code: __typename
