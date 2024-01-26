@@ -62,6 +62,7 @@ tr td:last-child {
     overflow-x: auto;
     overflow-y: scroll;
     width: 100%;
+    max-width: calc(var(--wrapper-width) / 2 - 1rem); /* 1rem => .tables { gap } */
 }
 
 .head {

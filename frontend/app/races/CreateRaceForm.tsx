@@ -10,6 +10,7 @@ import { BiLogIn } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
 import { generateRandomWords } from "@/utils/generateRandomWords";
 import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
+import { WORD_LISTS } from "@/utils/wordLists";
 
 interface Props {}
 
@@ -39,12 +40,13 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
   });
 
   // TODO: move it somewhere else?
+  // TODO: Add different languages for races
   function generateContent(mode: "time" | "words", modeSetting: number): string {
     switch (mode) {
       case "time":
-        return generateRandomWords(7 * modeSetting).join(" ");
+        return generateRandomWords(WORD_LISTS["english"], 7 * modeSetting).join(" ");
       case "words":
-        return generateRandomWords(modeSetting).join(" ");
+        return generateRandomWords(WORD_LISTS["english"], modeSetting).join(" ");
     }
   }
 

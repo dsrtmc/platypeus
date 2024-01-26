@@ -26,24 +26,28 @@ interface Props {
   focused: boolean;
   running: boolean;
   finished: boolean;
+
   timePassed: number;
-  mode: string; // "words" | "time"
   modeSetting: number;
   startTime: number;
-  handleChangeWpm: (wpm: number) => void;
-  setWordCount: (value: ((prevState: number) => number) | number) => void;
-  handleFinish: () => void;
+
+  mode: string;
+  language: string;
+
   /**
    * Returns 0 if we're free to continue with our input handling;
    * if we should prevent reading further inputs, returns a non-zero value.
-   * @param {KeyboardEvent} e - the global mouse event
+   * @param {KeyboardEvent} e - the global keyboard event
    * @returns {number} 0 if all OK, non-0 value if we should stop handling inputs
    */
   onKeyDown: (e: globalThis.KeyboardEvent) => number;
-  handleSaveScore: (score: Partial<ScoreType>) => void; // danger zone // TODO: probably rename like handle finish Idk?
-  initialContent: string[];
-  // Supposed to return the elements by which to expand the pool
   onPoolUpdate: (count: number, index?: number) => string[];
+  handleFinish: () => void;
+  handleChangeWpm: (wpm: number) => void;
+  handleSaveScore: (score: Partial<ScoreType>) => void;
+  setWordCount: (value: ((prevState: number) => number) | number) => void;
+
+  initialContent: string[];
 }
 
 export interface TestMethods {
@@ -79,33 +83,33 @@ export const Test = forwardRef<TestMethods, Props>(
       running,
       finished,
       timePassed,
-      handleFinish,
       modeSetting,
-      mode,
       startTime,
-      setWordCount,
-      handleChangeWpm,
+      mode,
+      language,
       onKeyDown,
-      handleSaveScore,
-      initialContent,
       onPoolUpdate,
+      handleFinish,
+      handleChangeWpm,
+      handleSaveScore,
+      setWordCount,
+      initialContent,
     }: Props,
     ref
   ) => {
     // TODO: for some reason raw seems weird on 30s test || NOTE: could not replicate, it all seems fine.
+    const caretRef = useRef<HTMLDivElement | null>(null);
+    const wordsRef = useRef<Array<HTMLDivElement>>([]);
+
     const [wordIndex, setWordIndex] = useState(-1);
     const [letterIndex, setLetterIndex] = useState(-1);
     const [lineSkip, setLineSkip] = useState(true);
     const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-
     const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
     const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
 
     const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
       useReducer(reducer, initialState as ReducerState<State>);
-
-    const caretRef = useRef<HTMLDivElement | null>(null);
-    const wordsRef = useRef<Array<HTMLDivElement>>([]);
 
     function addToRefs(el: (typeof wordsRef.current)[number]) {
       if (el) {
@@ -172,7 +176,6 @@ export const Test = forwardRef<TestMethods, Props>(
       dispatch({ allWordsLength: allWordsLength - letters.length - 1 });
     }
 
-    // If the word is incorrect, the `correctCount` will return 0
     function calculateCurrentWord(word: Element) {
       let correctCount = 0;
       let nonEmptyCount = 0;
@@ -225,11 +228,9 @@ export const Test = forwardRef<TestMethods, Props>(
 
       // TODO: find a better spot for this? seems really really really really really really out of place
       // could technically remove the `if` because it's never supposed to happen on a time-based test
-      if (mode === "words") {
-        const nextWord = wordsRef.current[wordIndex + 1];
-        if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
-          onFinished();
-        }
+      const nextWord = wordsRef.current[wordIndex + 1];
+      if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
+        onFinished();
       }
     }
 
@@ -326,8 +327,6 @@ export const Test = forwardRef<TestMethods, Props>(
       const currentWord = wordsRef.current[wordIndex];
       if (!currentWord) return;
 
-      // const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
-
       const newCorrectCount = correctCharacters;
       const newNonEmptyCount = nonEmptyCharacters;
 
@@ -345,15 +344,6 @@ export const Test = forwardRef<TestMethods, Props>(
       dispatch({ accuracy: newCorrectCount / newNonEmptyCount });
 
       handleChangeWpm(wpm);
-    }
-
-    function createWordElement() {
-      // funny type idk if correct
-      return createElement(Word as FunctionComponent<Word>, {
-        word: generateWord(),
-        ref: addToRefs,
-        key: `word-${generateRandomString(7)}`,
-      });
     }
 
     function createWordElements(words: string[]) {
@@ -379,8 +369,8 @@ export const Test = forwardRef<TestMethods, Props>(
     // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
     const handleKeyDown = useCallback(
       (e: globalThis.KeyboardEvent) => {
-        // TODO: maybe name it better xd
         if (e.key === "Space") e.preventDefault();
+        // TODO: maybe name it better xd
         const result = onKeyDown(e);
         if (result) return;
         if (e.key.length === 1) {
@@ -398,12 +388,10 @@ export const Test = forwardRef<TestMethods, Props>(
           if (e.key === "Backspace") {
             if (e.ctrlKey) {
               deletePreviousWord();
+            } else if (!letterIndex) {
+              moveBackOneWord();
             } else {
-              if (!letterIndex) {
-                moveBackOneWord();
-              } else {
-                moveBackOneLetter();
-              }
+              moveBackOneLetter();
             }
           }
         }
@@ -411,8 +399,6 @@ export const Test = forwardRef<TestMethods, Props>(
       [wordIndex, letterIndex, focused, running]
     );
 
-    // Initialize the pool
-    // TODO: code duplication? initialization is the same as resetting the test
     useEffect(() => {
       reset();
     }, []);
@@ -433,14 +419,9 @@ export const Test = forwardRef<TestMethods, Props>(
       }
     }, [wordIndex, letterIndex, windowSize, wordPool]);
 
-    // NOTE: WPM only affects the visual real-time WPM counter, it does not change our state.
-    // WpmStats and RawStats are affected, though - keep that in mind.
-    // TODO: THIS ENTIRE FILE HAS TO BE CLEANED UP ONE DAY HOLY KAPPA CHUNGUS
-
     function onFinished() {
       handleFinish();
-      console.log("We just called handleFinish()");
-      console.log("Do we call it before the crash?");
+
       const currentWord = wordsRef.current[wordIndex];
       const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 
@@ -452,70 +433,37 @@ export const Test = forwardRef<TestMethods, Props>(
       const wpm = calculateWpm(newCorrectCount, testDuration);
       const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
 
-      // Prevent dividing by 0
-      console.log("new correct count:", newCorrectCount);
+      // Prevent division by 0
       let acc = newCorrectCount / newNonEmptyCount;
       if (!Number.isFinite(acc)) acc = 0;
-      console.log("ACC:", acc);
+
       const score: Partial<ScoreType> = {
         wpm,
         rawWpm,
-        mode: mode,
-        modeSetting: modeSetting,
+        mode,
+        modeSetting,
         accuracy: acc,
         wpmStats: [...wpmStats, wpm],
         rawStats: [...rawStats, rawWpm],
         content: content.join(" "),
-        language: "english",
+        language,
       };
-      console.log("The content we're saving:", score.content);
       handleSaveScore(score);
     }
 
     useEffect(() => {
       if (running && !finished) {
-        console.log("Correct chars:", correctCharacters);
         updateStats(timePassed);
+
+        // TODO: again, not sure if mode checking here is a good thing to do
+        // TODO: ↑ if we go with that, then -> (if mode === "words" && timePassed > 60) or something like that
         if (mode === "time" && timePassed >= modeSetting) {
           onFinished();
         }
-        // TODO: (if mode === "words" && timePassed > 60) or something like that
       }
     }, [timePassed]);
 
-    // TODO: I think it keeps getting called if you re-enter the race.
-    // TODO: Also, it seems to run for people that haven't even joined the race, lol. not good.
-    // TODO: mayhaps unnecessary? :D
-    useEffect(() => {
-      if (finished) {
-        // console.log("Do we call it before the crash?");
-        // const currentWord = wordsRef.current[wordIndex];
-        // const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
-        //
-        // const newCorrectCount = correctCharacters + correctCount;
-        // const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
-        //
-        // const testDuration = (new Date().getTime() - startTime) / 1000;
-        // console.log("Test duration at the end:", testDuration);
-        // const wpm = calculateWpm(newCorrectCount, testDuration);
-        // const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
-        //
-        // const score: Partial<ScoreType> = {
-        //   wpm,
-        //   rawWpm,
-        //   mode: mode,
-        //   modeSetting: modeSetting,
-        //   accuracy: newCorrectCount / newNonEmptyCount,
-        //   wpmStats: [...wpmStats, wpm],
-        //   rawStats: [...rawStats, rawWpm],
-        //   content:
-        //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-        //   language: "english",
-        // };
-        // handleSaveScore(score);
-      }
-    }, [finished]);
-
+    // TODO: not sure if the window size here affects stuff like dev tools etc. do research
     const handleResize = useCallback(() => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     }, [windowSize]);

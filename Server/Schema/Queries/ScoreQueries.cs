@@ -13,7 +13,7 @@ public static class ScoreQueries
     }
     
     [UsePaging]
-    [UseProjection]
+    // [UseProjection] // TODO: again, projection with `.Include()`
     [UseFiltering]
     [UseSorting]
     // DUPLICATION????????????? STUPID BUG

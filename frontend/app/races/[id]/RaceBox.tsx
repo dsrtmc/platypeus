@@ -103,8 +103,13 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
 
   function handleClick(e: globalThis.MouseEvent) {
     if (!meData?.me || !data?.onRaceEvent) return;
-    if (ref && ref.current && data.onRaceEvent.racers.find((racer) => racer.id === meData.me!.id)) {
-      setFocused(!data?.onRaceEvent.finished && ref.current!.contains(e.target));
+    console.log(
+      data.onRaceEvent.racers.find((racer) => racer.user.id === meData.me!.id)
+        ? "you are in the race"
+        : "you are not in the race"
+    );
+    if (ref && ref.current && data.onRaceEvent.racers.find((racer) => racer.user.id === meData.me!.id)) {
+      setFocused(!data.onRaceEvent.finished && ref.current!.contains(e.target));
     }
   }
 
@@ -115,7 +120,8 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
    * @param {string} count - The count of elements to add to the pool
    * @param {number} index - If using a static word pool, the index from which to start adding words
    */
-  function onPoolUpdate(count: number, index: number) {
+  function onPoolUpdate(count: number, index: number): string[] {
+    if (!content) return [];
     const copy = content.slice(count);
     const words: string[] = [];
     for (let i = LOADED_WORDS_COUNT - count; i < LOADED_WORDS_COUNT; i++) {
@@ -189,7 +195,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       }, 1000);
     }
     return () => clearInterval(timerIntervalRef.current);
-  }, [data?.onRaceEvent.running]);
+  }, [data?.onRaceEvent.running]); // perhaps it's just better to do `[data]` at this point
 
   useEffect(() => {
     if (!data) return;
@@ -208,7 +214,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   useEffect(() => {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
-  }, [data?.onRaceEvent.finished]);
+  }, [data?.onRaceEvent.finished, data?.onRaceEvent.racers]);
   // TODO: the cache update is fucked whenever you do a `joinRace` so idk bro fix it i guess lol // I GUESS IT GOT FIXED? LOL
   // TODO: would probably make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
   // TODO: maybe figure out a better error page? right now it shows an ugly "theres a funny error: {}" which is not too user-friendly in case-
@@ -235,23 +241,25 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
       )}
       {/* TODO: maybe an unnecessary ref idk */}
+      <h1>FOCUSED: {focused ? " True" : " False"}</h1>
       <div ref={ref}>
         <Test
           focused={focused}
           running={data.onRaceEvent.running}
           finished={userHasFinished}
           timePassed={timePassed}
-          setWordCount={setWordCount}
           modeSetting={data.onRaceEvent.modeSetting}
-          mode={data.onRaceEvent.mode}
-          handleChangeWpm={handleChangeWpm}
-          onKeyDown={handleKeyDown}
           startTime={testStartTime}
-          handleFinish={handleFinishForUser}
-          ref={testRef}
-          handleSaveScore={handleSaveScore}
-          initialContent={data.onRaceEvent.content.split(" ").slice(0, LOADED_WORDS_COUNT)}
+          mode={data.onRaceEvent.mode}
+          language={"english"}
+          onKeyDown={handleKeyDown}
           onPoolUpdate={onPoolUpdate}
+          handleFinish={handleFinishForUser}
+          handleChangeWpm={handleChangeWpm}
+          handleSaveScore={handleSaveScore}
+          setWordCount={setWordCount}
+          initialContent={data.onRaceEvent.content.split(" ").slice(0, LOADED_WORDS_COUNT)}
+          ref={testRef}
         />
       </div>
       {data?.onRaceEvent.host.id === meData?.me?.id && (
