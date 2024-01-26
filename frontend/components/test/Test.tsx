@@ -20,12 +20,12 @@ import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
+import { setContext } from "@apollo/client/link/context";
 
 interface Props {
   focused: boolean;
   running: boolean;
   finished: boolean;
-  // TODO: change to `mode` and `modeSetting`
   timePassed: number;
   mode: string; // "words" | "time"
   modeSetting: number;
@@ -52,7 +52,7 @@ export interface TestMethods {
 
 type State = {
   correctCharacters: number;
-  nonEmptyCharacters: number; // correct && incorrect, used for calculating raw
+  nonEmptyCharacters: number;
   allWordsLength: number;
   accuracy: number;
   content: string[];
@@ -92,13 +92,12 @@ export const Test = forwardRef<TestMethods, Props>(
     }: Props,
     ref
   ) => {
-    // TODO: for some reason raw seems weird on 30s test, idk if im just testing incorrectly or Xd
+    // TODO: for some reason raw seems weird on 30s test || NOTE: could not replicate, it all seems fine.
     const [wordIndex, setWordIndex] = useState(-1);
     const [letterIndex, setLetterIndex] = useState(-1);
     const [lineSkip, setLineSkip] = useState(true);
     const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
-    // A funny type, but I think correct nonetheless
     const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
     const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
 
@@ -225,6 +224,7 @@ export const Test = forwardRef<TestMethods, Props>(
       setLetterIndex(letterIndex + 1);
 
       // TODO: find a better spot for this? seems really really really really really really out of place
+      // could technically remove the `if` because it's never supposed to happen on a time-based test
       if (mode === "words") {
         const nextWord = wordsRef.current[wordIndex + 1];
         if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
@@ -262,9 +262,8 @@ export const Test = forwardRef<TestMethods, Props>(
       setLetterIndex(letterIndex - 1);
     }
 
-    // TODO: Figure out a better name for the function that reflects its purpose more clearly
     function deletePreviousWord() {
-      // if we're at letter index 0, then we clear all the way back to the previous word's front
+      // If we're at letter index 0, then we clear all the way back to the previous word's front
       let newWordIndex = !letterIndex ? wordIndex - 1 : wordIndex;
 
       let word = wordsRef.current[newWordIndex];
@@ -297,7 +296,6 @@ export const Test = forwardRef<TestMethods, Props>(
       const nextWord = wordsRef.current[wordIndex + 1];
       if (!nextWord) return;
       if (currentWord.getBoundingClientRect().y < nextWord.getBoundingClientRect().y) {
-        // There might be a better way to do this line skip but oh well
         if (lineSkip) {
           setLineSkip(false);
           return;
@@ -312,14 +310,15 @@ export const Test = forwardRef<TestMethods, Props>(
         wordsRef.current.splice(0, numberOfWordsToAddToPool);
 
         const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
-        newWordPool.push(...createWordElements(onPoolUpdate(numberOfWordsToAddToPool, wordIndex)));
+        const newWords = onPoolUpdate(numberOfWordsToAddToPool, wordIndex);
+        newWordPool.push(...createWordElements(newWords));
 
         setWordPool(newWordPool);
         const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
         setWordIndex(newIndex);
 
         // TODO: FIX ACTUALLY UPDATING THE CONTENT
-        // dispatch({ content: content.concat([]) });
+        dispatch({ content: content.concat(newWords) });
       }
     }
 
@@ -372,14 +371,16 @@ export const Test = forwardRef<TestMethods, Props>(
       setLetterIndex(0);
       setLineSkip(true);
       wordsRef.current = [];
-      setWordPool(createWordElements(initialContent));
       dispatch(initialState);
+      setWordPool(createWordElements(initialContent));
+      dispatch({ content: initialContent });
     }
 
     // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
     const handleKeyDown = useCallback(
       (e: globalThis.KeyboardEvent) => {
         // TODO: maybe name it better xd
+        if (e.key === "Space") e.preventDefault();
         const result = onKeyDown(e);
         if (result) return;
         if (e.key.length === 1) {
@@ -452,7 +453,8 @@ export const Test = forwardRef<TestMethods, Props>(
       const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
 
       // Prevent dividing by 0
-      let acc = newCorrectCount / nonEmptyCount;
+      console.log("new correct count:", newCorrectCount);
+      let acc = newCorrectCount / newNonEmptyCount;
       if (!Number.isFinite(acc)) acc = 0;
       console.log("ACC:", acc);
       const score: Partial<ScoreType> = {
@@ -463,10 +465,10 @@ export const Test = forwardRef<TestMethods, Props>(
         accuracy: acc,
         wpmStats: [...wpmStats, wpm],
         rawStats: [...rawStats, rawWpm],
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+        content: content.join(" "),
         language: "english",
       };
+      console.log("The content we're saving:", score.content);
       handleSaveScore(score);
     }
 

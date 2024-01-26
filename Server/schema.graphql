@@ -42,10 +42,6 @@ type FinishRacePayload {
   errors: [FinishRaceError!]
 }
 
-type FlipRunningStatusPayload {
-  race: Race
-}
-
 type IncorrectCredentialsError implements Error {
   message: String!
 }
@@ -102,7 +98,6 @@ type Mutation {
   login(input: LoginInput!): LoginPayload!
   logout: LogoutPayload!
   createScore(input: CreateScoreInput!): CreateScorePayload!
-  flipRunningStatus(input: FlipRunningStatusInput!): FlipRunningStatusPayload!
   updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload!
   finishRace(input: FinishRaceInput!): FinishRacePayload!
   finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload!
@@ -259,6 +254,10 @@ type Subscription {
   onChatboxEvent(chatboxId: UUID!): Chatbox!
 }
 
+type TooFewRacersError implements Error {
+  message: String!
+}
+
 type UpdateStatsForUserPayload {
   race: Race
   errors: [UpdateStatsForUserError!]
@@ -290,7 +289,7 @@ union RegisterError = InvalidFieldError | UsernameTakenError
 
 union RunRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
 
-union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
+union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError | TooFewRacersError
 
 union UpdateStatsForUserError = InvalidUserError | InvalidRaceError | InvalidRacerStatisticsError
 
@@ -359,10 +358,6 @@ input FinishRaceForUserInput {
 }
 
 input FinishRaceInput {
-  raceId: UUID!
-}
-
-input FlipRunningStatusInput {
   raceId: UUID!
 }
 

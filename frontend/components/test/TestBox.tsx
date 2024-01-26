@@ -14,6 +14,7 @@ import { generateRandomWords } from "@/utils/generateRandomWords";
 import { ModeSelection } from "@/components/test/ModeSelection";
 import { LanguageSelection } from "@/components/test/LanguageSelection";
 import { WordProgress } from "@/components/test/WordProgress";
+import { WORD_LISTS } from "@/utils/wordLists";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -24,6 +25,7 @@ export function TestBox({ handleSaveScore }: Props) {
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
+  const [language, setLanguage] = useState("english");
   const [testStartTime, setTestStartTime] = useState(0);
   const [mode, setMode] = useState<string>("words");
   const [testKey, setTestKey] = useState(0); // useful for easy re-mounting
@@ -65,9 +67,11 @@ export function TestBox({ handleSaveScore }: Props) {
   }
 
   function handleSelectModeSetting(setting: number) {
-    return () => {
-      setModeSetting(setting);
-    };
+    return () => setModeSetting(setting);
+  }
+
+  function handleSelectLanguage(language: string) {
+    setLanguage(language);
   }
 
   function handleChangeWpm(wpm: number) {
@@ -84,10 +88,10 @@ export function TestBox({ handleSaveScore }: Props) {
     // TODO: fix code duplication
     switch (mode) {
       case "words":
-        setInitialContent(generateRandomWords(modeSetting));
+        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting));
         break;
       case "time":
-        setInitialContent(generateRandomWords(modeSetting * 7));
+        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting * 7));
         break;
     }
     setTestKey((k) => k + 1);
@@ -101,10 +105,10 @@ export function TestBox({ handleSaveScore }: Props) {
     setVisible(true);
     switch (mode) {
       case "words":
-        setInitialContent(generateRandomWords(modeSetting));
+        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting));
         break;
       case "time":
-        setInitialContent(generateRandomWords(modeSetting * 7));
+        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting * 7));
         break;
     }
   }, []);
@@ -147,7 +151,7 @@ export function TestBox({ handleSaveScore }: Props) {
     if (!finished) {
       handleReset();
     }
-  }, [mode, modeSetting]);
+  }, [mode, modeSetting, language]);
 
   /**
    * Returns the elements to be added to the word pool.
@@ -177,6 +181,7 @@ export function TestBox({ handleSaveScore }: Props) {
           Current mode: {mode}
           <ModeSelection handleSelectMode={handleSelectMode} />
         </section>
+        selected language: {language}
         <section className={styles.top}>
           <section className={styles.left}>
             {/* TODO: Is there a better way to handle checking the mode? */}
@@ -191,9 +196,7 @@ export function TestBox({ handleSaveScore }: Props) {
           <section className={styles.center}>
             {/* that should actually be called Language lol */}
             {/* TODO ???????? XD wtf is this name */}
-            <LanguageSelection>
-              <HiMiniLanguage /> english
-            </LanguageSelection>
+            <LanguageSelection handleSelectLanguage={handleSelectLanguage} />
           </section>
           <section className={styles.right}>
             <ModeSettingSelection mode={mode} selectedSetting={modeSetting} handleSelect={handleSelectModeSetting} />

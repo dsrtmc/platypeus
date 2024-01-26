@@ -59,7 +59,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
-  const [focused, setFocused] = useState(true);
+  const [focused, setFocused] = useState(false);
   const [testStartTime, setTestStartTime] = useState(0);
   const [timePassed, setTimePassed] = useState(0);
   const [userHasFinished, setUserHasFinished] = useState(false);
@@ -102,7 +102,8 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   }
 
   function handleClick(e: globalThis.MouseEvent) {
-    if (ref && ref.current) {
+    if (!meData?.me || !data?.onRaceEvent) return;
+    if (ref && ref.current && data.onRaceEvent.racers.find((racer) => racer.id === meData.me!.id)) {
       setFocused(!data?.onRaceEvent.finished && ref.current!.contains(e.target));
     }
   }
@@ -258,6 +259,9 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         // <StartRaceButton handleStart={onRaceStart} hasError={finished || data.onRaceEvent.racers.length <= 0} />
         <StartRaceButton handleStart={handleStart} hasError={false} />
       )}
+      {!data.onRaceEvent.running && !data.onRaceEvent.finished && (
+        <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
+      )}
       <RaceScoreboard
         racers={data.onRaceEvent.racers}
         mode={data.onRaceEvent.mode}
@@ -267,7 +271,6 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       <h1 style={{ fontSize: "1.5rem" }}>current time: {JSON.stringify(new Date())}</h1>
       {/* TODO: Consider adding a `startTime` field to a race? then it's easier to calculate the time left lol */}
       <h1 style={{ fontSize: "3rem" }}>FINISHED? {data.onRaceEvent.finished ? "☑️" : "❎"} finished</h1>
-      <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
       <h1 style={{ fontSize: "3rem" }}>running backend: {data?.onRaceEvent.running ? "true" : "false"}</h1>
       <h1 style={{ fontSize: "3rem" }}>THE HOST IS: {data?.onRaceEvent.host.username}</h1>
       <div className={styles.hr} />

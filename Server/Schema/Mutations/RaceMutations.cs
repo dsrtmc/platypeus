@@ -11,25 +11,6 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class RaceMutations
 {
-    public static async Task AddRacerStatisticToRace()
-    {
-        
-    }
-
-    // Just for testing purposes
-    public static async Task<Race?> FlipRunningStatus(Guid raceId, DatabaseContext db)
-    {
-        var race = await db.Races.FindAsync(raceId);
-        if (race is null)
-            return null;
-        
-        race.Running = !race.Running;
-
-        await db.SaveChangesAsync();
-        
-        return race;
-    }
-
     // TODO: i don't even know if we have to return anything here. i mean, why not I guess, but then again, why should we?
     public static async Task<MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacerStatisticsError>> UpdateStatsForUser(
         Guid userId, Guid raceId, DatabaseContext db, int wpm, int wordsTyped,
@@ -108,7 +89,6 @@ public static class RaceMutations
     public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> RunRace(
         Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
-        IHttpContextAccessor accessor,
         CancellationToken cancellationToken)
     {
         // TODO: fix funny includes
@@ -125,7 +105,7 @@ public static class RaceMutations
     }
 
     // TODO: finally read up on what cancellation token does holy fuck this is ridiculous
-    public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> StartRace(
+    public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError,NotAuthorizedError, TooFewRacersError>> StartRace(
         Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
         IHttpContextAccessor accessor,
@@ -145,7 +125,9 @@ public static class RaceMutations
         if (race is null)
             return new InvalidRaceError(raceId);
         
-        // TODO: if (race.racers.Count < 2) return new error
+        // TODO: uncomment that in prod
+        // if (race.Racers.Count < 2)
+        //     return new TooFewRacersError(raceId);
 
         if (race.Host.Id != user.Id)
             return new NotAuthorizedError();
@@ -221,13 +203,8 @@ public static class RaceMutations
     }
     
     public static async Task<MutationResult<Race, NotAuthenticatedError>> CreateRace(
-        bool isPrivate,
-        string mode,
-        int modeSetting,
-        string content, 
-        string? password,
-        DatabaseContext db,
-        IHttpContextAccessor accessor)
+        bool isPrivate, string mode, int modeSetting, string content, 
+        string? password, DatabaseContext db, IHttpContextAccessor accessor)
     {
         var userIdClaim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
         if (userIdClaim is null)
@@ -237,7 +214,7 @@ public static class RaceMutations
         if (user is null)
             return new NotAuthenticatedError();
             
-        // if (!isPrivate) password = null; // could be funny to add that, seems like it'd make sense.
+        // if (!isPrivate) password = null; // TODO: could be funny to add that, seems like it'd make sense.
         var race = new Race
         {
             Host = user,
