@@ -17,6 +17,7 @@ import { WordProgress } from "@/components/test/WordProgress";
 import { WORD_LISTS } from "@/utils/wordLists";
 import { TestComponent } from "@/app/about/TestComponent";
 import { TestConfig } from "@/components/test/TestConfig";
+import { CSSTransition } from "react-transition-group";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;

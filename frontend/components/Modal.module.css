@@ -4,10 +4,28 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.overlayEnter {
+    opacity: 0;
+}
+
+.overlayEnterActive {
+    opacity: 1;
+    transition: opacity 100ms;
+}
+
+.overlayExit {
+    opacity: 1;
+}
+
+.overlayExitActive {
+    opacity: 0;
+    transition: opacity 100ms;
 }
 
 /* I don't really know why it's pointer by default */
@@ -17,7 +35,8 @@
 
 .content {
     display: flex;
-    background-color: blue;
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
     flex-direction: column;
     align-items: center;
     justify-content: center;

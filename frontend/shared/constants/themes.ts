@@ -1,11 +1,12 @@
 export const THEMES = {
   default: {
-    "--bg-color": "#121520",
-    "--main-color": "#fff",
-    "--sub-color": "#676e8a",
-    "--sub-alt-color": "#1b1e2c",
-    "--text-color": "#fff",
-    "--error-color": "#da3333",
-    "--error-extra-color": "#791717",
+    "--bg-color": "#242933",
+    "--main-color": "#ec4c56",
+    "--caret-color": "#ec4c56",
+    "--sub-color": "#596172",
+    "--sub-alt-color": "#1c222d",
+    "--text-color": "#f6f0e9",
+    "--error-color": "#ec4c56",
+    "--error-extra-color": "#9b333a",
   },
 };

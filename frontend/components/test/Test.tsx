@@ -20,7 +20,9 @@ import { generateWord } from "@/utils/generateWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
+import { CSSTransition } from "react-transition-group";
 import { setContext } from "@apollo/client/link/context";
+import { run } from "node:test";
 
 interface Props {
   focused: boolean;
@@ -107,6 +109,7 @@ export const Test = forwardRef<TestMethods, Props>(
     const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
     const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
     const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
+    const [visible, setVisible] = useState(false);
 
     const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
       useReducer(reducer, initialState as ReducerState<State>);
@@ -481,9 +484,27 @@ export const Test = forwardRef<TestMethods, Props>(
       reset,
     }));
 
+    // TODO: figure it out. the issue right now is that the component unmounts instantly without performing the animation which makes perfect sense, but that's not what we want.
+    useEffect(() => {
+      setVisible(true);
+      return () => setVisible(false);
+    }, []);
+
+    // TODO: not sure if I should keep it here, it kinda looks funky during races, so I guess move it to `TestBox`?
     return (
       <>
-        <div className={styles.words}>{wordPool.map((word) => word)}</div>
+        <CSSTransition
+          in={visible}
+          timeout={500}
+          classNames={{
+            enter: styles.wordsEnter,
+            enterActive: styles.wordsEnterActive,
+            exit: styles.wordsExit,
+            exitActive: styles.wordsExitActive,
+          }}
+        >
+          <div className={styles.words}>{wordPool.map((word) => word)}</div>
+        </CSSTransition>
         <Caret x={caretPosition.x} y={caretPosition.y} running={running} focused={focused} ref={caretRef} />
       </>
     );

@@ -13,7 +13,7 @@ interface Props {
 export const ScoreBox: FC<Props> = ({ score, handleStartNextTest }) => {
   const restartButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  function handleKeyDown(e: globalThis.MouseEvent) {
+  function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (e.key === "Tab") {
       e.preventDefault();
       if (restartButtonRef && restartButtonRef.current) {
