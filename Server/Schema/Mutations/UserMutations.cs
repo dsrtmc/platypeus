@@ -15,6 +15,11 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class UserMutations
 {
+    /// <summary>
+    /// Deletes the user from the database.
+    /// </summary>
+    /// <param name="userId">The ID of the user to be deleted.</param>
+    /// <returns><c>true</c> if the user is successfully removed from the database, <c>false</c> otherwise.</returns>
     public static async Task<bool> DeleteUser(Guid userId, DatabaseContext db)
     {
         var user = await db.Users.FindAsync(userId);

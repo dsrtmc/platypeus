@@ -18,7 +18,6 @@ const documents = {
     "mutation CreateScore($input: CreateScoreInput!) {\n  createScore(input: $input) {\n    score {\n      id\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      content\n      language\n      user {\n        username\n      }\n    }\n  }\n}": types.CreateScoreDocument,
     "mutation FinishRace($input: FinishRaceInput!) {\n  finishRace(input: $input) {\n    race {\n      racers {\n        user {\n          username\n        }\n        wpm\n        finished\n      }\n      finished\n    }\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.FinishRaceDocument,
     "mutation FinishRaceForUser($input: FinishRaceForUserInput!) {\n  finishRaceForUser(input: $input) {\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}": types.FinishRaceForUserDocument,
-    "mutation FlipRunningStatus($input: FlipRunningStatusInput!) {\n  flipRunningStatus(input: $input) {\n    race {\n      running\n    }\n  }\n}": types.FlipRunningStatusDocument,
     "mutation JoinChatbox($input: JoinChatboxInput!) {\n  joinChatbox(input: $input) {\n    chatbox {\n      messages {\n        content\n      }\n    }\n  }\n}": types.JoinChatboxDocument,
     "mutation JoinRace($input: JoinRaceInput!) {\n  joinRace(input: $input) {\n    race {\n      racers {\n        user {\n          username\n        }\n        wpm\n      }\n    }\n  }\n}": types.JoinRaceDocument,
     "mutation LeaveRace($input: LeaveRaceInput!) {\n  leaveRace(input: $input) {\n    race {\n      racers {\n        id\n        user {\n          username\n        }\n      }\n    }\n  }\n}": types.LeaveRaceDocument,
@@ -75,10 +74,6 @@ export function graphql(source: "mutation FinishRace($input: FinishRaceInput!) {
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation FinishRaceForUser($input: FinishRaceForUserInput!) {\n  finishRaceForUser(input: $input) {\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"): (typeof documents)["mutation FinishRaceForUser($input: FinishRaceForUserInput!) {\n  finishRaceForUser(input: $input) {\n    errors {\n      code: __typename\n      ... on Error {\n        message\n      }\n    }\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "mutation FlipRunningStatus($input: FlipRunningStatusInput!) {\n  flipRunningStatus(input: $input) {\n    race {\n      running\n    }\n  }\n}"): (typeof documents)["mutation FlipRunningStatus($input: FlipRunningStatusInput!) {\n  flipRunningStatus(input: $input) {\n    race {\n      running\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

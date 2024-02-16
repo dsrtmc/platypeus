@@ -19,6 +19,11 @@ export type Scalars = {
   UUID: { input: any; output: any; }
 };
 
+export type AlreadyJoinedRaceError = Error & {
+  __typename?: 'AlreadyJoinedRaceError';
+  message: Scalars['String']['output'];
+};
+
 export enum ApplyPolicy {
   AfterResolver = 'AFTER_RESOLVER',
   BeforeResolver = 'BEFORE_RESOLVER',
@@ -144,15 +149,6 @@ export type FinishRacePayload = {
   race?: Maybe<Race>;
 };
 
-export type FlipRunningStatusInput = {
-  raceId: Scalars['UUID']['input'];
-};
-
-export type FlipRunningStatusPayload = {
-  __typename?: 'FlipRunningStatusPayload';
-  race?: Maybe<Race>;
-};
-
 export type FloatOperationFilterInput = {
   eq?: InputMaybe<Scalars['Float']['input']>;
   gt?: InputMaybe<Scalars['Float']['input']>;
@@ -188,6 +184,11 @@ export type IntOperationFilterInput = {
   nlte?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type InvalidChatboxError = Error & {
+  __typename?: 'InvalidChatboxError';
+  message: Scalars['String']['output'];
+};
+
 export type InvalidFieldError = Error & {
   __typename?: 'InvalidFieldError';
   message: Scalars['String']['output'];
@@ -195,6 +196,11 @@ export type InvalidFieldError = Error & {
 
 export type InvalidRaceError = Error & {
   __typename?: 'InvalidRaceError';
+  message: Scalars['String']['output'];
+};
+
+export type InvalidRacePasswordError = Error & {
+  __typename?: 'InvalidRacePasswordError';
   message: Scalars['String']['output'];
 };
 
@@ -208,6 +214,8 @@ export type InvalidUserError = Error & {
   message: Scalars['String']['output'];
 };
 
+export type JoinChatboxError = InvalidChatboxError | InvalidUserError;
+
 export type JoinChatboxInput = {
   chatboxId: Scalars['UUID']['input'];
   userId: Scalars['UUID']['input'];
@@ -216,18 +224,24 @@ export type JoinChatboxInput = {
 export type JoinChatboxPayload = {
   __typename?: 'JoinChatboxPayload';
   chatbox?: Maybe<Chatbox>;
+  errors?: Maybe<Array<JoinChatboxError>>;
 };
+
+export type JoinRaceError = AlreadyJoinedRaceError | InvalidRaceError | InvalidRacePasswordError | InvalidUserError;
 
 export type JoinRaceInput = {
   password?: InputMaybe<Scalars['String']['input']>;
-  raceId: Scalars['UUID']['input'];
+  raceId?: InputMaybe<Scalars['UUID']['input']>;
   userId?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 export type JoinRacePayload = {
   __typename?: 'JoinRacePayload';
+  errors?: Maybe<Array<JoinRaceError>>;
   race?: Maybe<Race>;
 };
+
+export type LeaveRaceError = InvalidRaceError | InvalidUserError | RaceIsRunningError;
 
 export type LeaveRaceInput = {
   raceId: Scalars['UUID']['input'];
@@ -236,6 +250,7 @@ export type LeaveRaceInput = {
 
 export type LeaveRacePayload = {
   __typename?: 'LeaveRacePayload';
+  errors?: Maybe<Array<LeaveRaceError>>;
   race?: Maybe<Race>;
 };
 
@@ -314,7 +329,6 @@ export type Mutation = {
   deleteUser: DeleteUserPayload;
   finishRace: FinishRacePayload;
   finishRaceForUser: FinishRaceForUserPayload;
-  flipRunningStatus: FlipRunningStatusPayload;
   joinChatbox: JoinChatboxPayload;
   joinRace: JoinRacePayload;
   leaveRace: LeaveRacePayload;
@@ -350,11 +364,6 @@ export type MutationFinishRaceArgs = {
 
 export type MutationFinishRaceForUserArgs = {
   input: FinishRaceForUserInput;
-};
-
-
-export type MutationFlipRunningStatusArgs = {
-  input: FlipRunningStatusInput;
 };
 
 
@@ -527,6 +536,11 @@ export type RaceFilterInput = {
   startTime?: InputMaybe<DateTimeOperationFilterInput>;
   started?: InputMaybe<BooleanOperationFilterInput>;
   updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type RaceIsRunningError = Error & {
+  __typename?: 'RaceIsRunningError';
+  message: Scalars['String']['output'];
 };
 
 export type RaceSortInput = {
@@ -703,7 +717,7 @@ export enum SortEnumType {
   Desc = 'DESC'
 }
 
-export type StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError;
+export type StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError | TooFewRacersError;
 
 export type StartRaceInput = {
   raceId: Scalars['UUID']['input'];
@@ -744,6 +758,11 @@ export type SubscriptionOnChatboxEventArgs = {
 
 export type SubscriptionOnRaceEventArgs = {
   raceId: Scalars['UUID']['input'];
+};
+
+export type TooFewRacersError = Error & {
+  __typename?: 'TooFewRacersError';
+  message: Scalars['String']['output'];
 };
 
 export type UpdateStatsForUserError = InvalidRaceError | InvalidRacerStatisticsError | InvalidUserError;
@@ -843,13 +862,6 @@ export type FinishRaceForUserMutationVariables = Exact<{
 
 export type FinishRaceForUserMutation = { __typename?: 'Mutation', finishRaceForUser: { __typename?: 'FinishRaceForUserPayload', errors?: Array<{ __typename?: 'InvalidRaceError', message: string, code: 'InvalidRaceError' } | { __typename?: 'InvalidRacerStatisticsError', message: string, code: 'InvalidRacerStatisticsError' } | { __typename?: 'InvalidUserError', message: string, code: 'InvalidUserError' }> | null } };
 
-export type FlipRunningStatusMutationVariables = Exact<{
-  input: FlipRunningStatusInput;
-}>;
-
-
-export type FlipRunningStatusMutation = { __typename?: 'Mutation', flipRunningStatus: { __typename?: 'FlipRunningStatusPayload', race?: { __typename?: 'Race', running: boolean } | null } };
-
 export type JoinChatboxMutationVariables = Exact<{
   input: JoinChatboxInput;
 }>;
@@ -915,7 +927,7 @@ export type StartRaceMutationVariables = Exact<{
 }>;
 
 
-export type StartRaceMutation = { __typename?: 'Mutation', startRace: { __typename?: 'StartRacePayload', race?: { __typename?: 'Race', started: boolean, running: boolean, updatedAt: any } | null, errors?: Array<{ __typename?: 'InvalidRaceError', message: string, code: 'InvalidRaceError' } | { __typename?: 'NotAuthenticatedError', message: string, code: 'NotAuthenticatedError' } | { __typename?: 'NotAuthorizedError', message: string, code: 'NotAuthorizedError' }> | null } };
+export type StartRaceMutation = { __typename?: 'Mutation', startRace: { __typename?: 'StartRacePayload', race?: { __typename?: 'Race', started: boolean, running: boolean, updatedAt: any } | null, errors?: Array<{ __typename?: 'InvalidRaceError', message: string, code: 'InvalidRaceError' } | { __typename?: 'NotAuthenticatedError', message: string, code: 'NotAuthenticatedError' } | { __typename?: 'NotAuthorizedError', message: string, code: 'NotAuthorizedError' } | { __typename?: 'TooFewRacersError', message: string, code: 'TooFewRacersError' }> | null } };
 
 export type UpdateStatsForUserMutationVariables = Exact<{
   input: UpdateStatsForUserInput;
@@ -1006,7 +1018,6 @@ export const CreateRaceDocument = {"kind":"Document","definitions":[{"kind":"Ope
 export const CreateScoreDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateScore"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateScoreInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createScore"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"score"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"rawWpm"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"modeSetting"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreateScoreMutation, CreateScoreMutationVariables>;
 export const FinishRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FinishRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"FinishRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"finishRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"racers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"finished"}}]}},{"kind":"Field","name":{"kind":"Name","value":"finished"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"code"},"name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FinishRaceMutation, FinishRaceMutationVariables>;
 export const FinishRaceForUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FinishRaceForUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"FinishRaceForUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"finishRaceForUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"code"},"name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FinishRaceForUserMutation, FinishRaceForUserMutationVariables>;
-export const FlipRunningStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"FlipRunningStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"FlipRunningStatusInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"flipRunningStatus"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"running"}}]}}]}}]}}]} as unknown as DocumentNode<FlipRunningStatusMutation, FlipRunningStatusMutationVariables>;
 export const JoinChatboxDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"JoinChatbox"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JoinChatboxInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"joinChatbox"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chatbox"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"}}]}}]}}]}}]}}]} as unknown as DocumentNode<JoinChatboxMutation, JoinChatboxMutationVariables>;
 export const JoinRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"JoinRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JoinRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"joinRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"racers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}}]}}]}}]}}]}}]} as unknown as DocumentNode<JoinRaceMutation, JoinRaceMutationVariables>;
 export const LeaveRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LeaveRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LeaveRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"leaveRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"racers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<LeaveRaceMutation, LeaveRaceMutationVariables>;

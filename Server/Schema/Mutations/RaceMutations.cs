@@ -141,25 +141,31 @@ public static class RaceMutations
         return race;
     }
     
-    public static async Task<Race?> JoinRace(
-        Guid? userId, Guid raceId, string? password,
+    public static async Task<MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacePasswordError, AlreadyJoinedRaceError>> JoinRace(
+        Guid? userId, Guid? raceId, string? password,
         DatabaseContext db,
         [Service] ITopicEventSender eventSender,
         CancellationToken cancellationToken)
     {
         if (userId is null)
-            return null;
+            return new InvalidUserError(userId);
         
         var user = await db.Users.FindAsync(userId);
         if (user is null)
-            return null;
+            return new InvalidUserError(userId);
 
-        var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).Include(r => r.Host).Include(r => r.Chatbox).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races
+            .Include(r => r.Racers)
+                .ThenInclude(r => r.User)
+            .Include(r => r.Host)
+            .Include(r => r.Chatbox)
+            .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        
         if (race is null)
-            return null;
+            return new InvalidRaceError(raceId);
 
         if (race.Private && race.Password != password)
-            return null;
+            return new InvalidRacePasswordError(raceId, password);
 
         var racer = new Racer
         {
@@ -169,9 +175,11 @@ public static class RaceMutations
             WordsTyped = 0,
             Finished = false
         };
-        
-        if (race.Racers.FirstOrDefault(r => r.User.Id == user.Id) is null)
-            race.Racers.Add(racer);
+
+        if (race.Racers.FirstOrDefault(r => r.User.Id == user.Id) is not null)
+            return new AlreadyJoinedRaceError(raceId, userId);
+            
+        race.Racers.Add(racer);
         
         await db.SaveChangesAsync(cancellationToken);
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
@@ -179,18 +187,21 @@ public static class RaceMutations
         return race;
     }
     
-    public static async Task<Race?> LeaveRace(
+    public static async Task<MutationResult<Race?, InvalidUserError, InvalidRaceError, RaceIsRunningError>> LeaveRace(
         Guid userId, Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
         CancellationToken cancellationToken)
     {
         var user = await db.Users.FindAsync(userId);
         if (user is null)
-            return null;
+            return new InvalidUserError(userId);
     
         var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
-            return null;
+            return new InvalidRaceError(raceId);
+
+        if (race.Running)
+            return new RaceIsRunningError();
 
         var racer = race.Racers.FirstOrDefault(r => r.User.Id == userId);
         if (racer is not null)

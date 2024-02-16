@@ -1,7 +1,0 @@
-mutation FlipRunningStatus($input: FlipRunningStatusInput!) {
-    flipRunningStatus(input: $input) {
-        race {
-            running
-        }
-    }
-}

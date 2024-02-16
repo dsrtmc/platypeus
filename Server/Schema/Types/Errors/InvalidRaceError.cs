@@ -2,9 +2,9 @@ namespace Server.Schema.Types.Errors;
 
 public class InvalidRaceError
 {
-    public InvalidRaceError(Guid id)
+    public InvalidRaceError(Guid? raceId)
     {
-        Message = $"No race with id \"{id}\".";
+        Message = $"No race with id \"{raceId}\".";
     }
     
     public string Message { get; set; }

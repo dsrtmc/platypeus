@@ -22,6 +22,7 @@ public static class MessageMutations
             .Include(c => c.Messages.OrderBy(m => m.CreatedAt))
                 .ThenInclude(m => m.Author)
             .FirstOrDefaultAsync(c => c.Id == chatboxId, cancellationToken);
+        
         if (chatbox is null)
             return false;
 
