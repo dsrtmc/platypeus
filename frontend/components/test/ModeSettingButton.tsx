@@ -8,7 +8,7 @@ interface Props {
 
 export function ModeSettingButton({ children, selected, handleSelect }: PropsWithChildren<Props>) {
   return (
-    <button onClick={handleSelect} className={`${styles.setting} ${selected && styles.selected}`}>
+    <button onClick={handleSelect} className={`${styles.modeSettingButton} ${selected && styles.selected}`}>
       {children}
     </button>
   );

@@ -21,7 +21,7 @@ export function ModeSettingSelection({ mode, selectedSetting, handleSelect }: Pr
       modeSettings = [5, 15, 30];
   }
   return (
-    <div className={styles.selection}>
+    <div className={styles.modeSettingSelection}>
       {modeSettings.map((modeSetting) => (
         <ModeSettingButton
           handleSelect={handleSelect(modeSetting)}

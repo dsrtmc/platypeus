@@ -9,25 +9,25 @@
     position: relative;
     display: flex;
     gap: 1rem;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
 }
 
 .left {
     display: flex;
     gap: 1rem;
+    width: 100%;
+    justify-content: flex-start;
 }
 
 .center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     display: flex;
 }
 
 .right {
     display: flex;
+    justify-content: flex-end;
+    width: 100%;
 }
 
 .middle {
@@ -136,29 +136,24 @@
     text-decoration-color: var(--error-color);
 }
 
-.selection {
+.modeSettingSelection {
     display: flex;
     gap: 1rem;
 }
 
-.setting {
+.modeSettingButton {
     all: unset;
     color: var(--sub-color);
-    font-size: 1.5rem;
     transition: color, filter 200ms ease;
 }
 
-.setting:hover {
+.modeSettingButton:hover {
     cursor: pointer;
     color: var(--text-color);
 }
 
-.setting:active {
+.modeSettingButton:active {
     filter: opacity(75%);
-}
-
-.selected {
-    color: var(--text-color);
 }
 
 .timer {
@@ -204,4 +199,59 @@
     color: var(--text-color);
     border: 2px solid var(--text-color);
     border-radius: 10px;
+}
+
+.modeSelection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.languageButton {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1ch;
+    color: var(--sub-color);
+    transition: color 200ms ease;
+}
+
+.languageButton:hover {
+    color: var(--text-color);
+}
+
+.modeButton {
+    all: unset;
+    color: var(--sub-color);
+    transition: color 200ms ease;
+}
+
+.modeButton:hover {
+    color: var(--text-color);
+}
+
+.testConfig {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--sub-alt-color);
+    gap: 1rem;
+    height: 100%;
+    border-radius: 1rem;
+    padding: .25rem 1rem;
+    font-size: 0.75rem;
+}
+
+.spacer {
+    height: 75%;
+    width: 3px;
+    background-color: var(--sub-color);
+    filter: opacity(25%);
+    border-radius: var(--roundness);
+}
+
+.selected {
+    color: var(--main-color) !important;
 }

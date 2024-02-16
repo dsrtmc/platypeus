@@ -15,6 +15,8 @@ import { ModeSelection } from "@/components/test/ModeSelection";
 import { LanguageSelection } from "@/components/test/LanguageSelection";
 import { WordProgress } from "@/components/test/WordProgress";
 import { WORD_LISTS } from "@/utils/wordLists";
+import { TestComponent } from "@/app/about/TestComponent";
+import { TestConfig } from "@/components/test/TestConfig";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -165,10 +167,20 @@ export function TestBox({ handleSaveScore }: Props) {
     return (
       <div className={styles.box} ref={ref}>
         <section>
-          Current mode: {mode}
-          <ModeSelection handleSelectMode={handleSelectMode} />
+          <TestConfig
+            language={language}
+            mode={mode}
+            modeSetting={modeSetting}
+            handleSelectMode={handleSelectMode}
+            handleSelectLanguage={handleSelectLanguage}
+            handleSelectModeSetting={handleSelectModeSetting}
+          />
         </section>
-        selected language: {language}
+        {/*<section>*/}
+        {/*  Current mode: {mode}*/}
+        {/*  <ModeSelection handleSelectMode={handleSelectMode} />*/}
+        {/*</section>*/}
+        {/*selected language: {language}*/}
         <section className={styles.top}>
           <section className={styles.left}>
             {/* TODO: Is there a better way to handle checking the mode? */}
@@ -180,14 +192,12 @@ export function TestBox({ handleSaveScore }: Props) {
             <Counter count={wpm} />
           </section>
           {/* HOW CAN I CENTER A DIV LOL */}
-          <section className={styles.center}>
-            {/* that should actually be called Language lol */}
-            {/* TODO ???????? XD wtf is this name */}
-            <LanguageSelection handleSelectLanguage={handleSelectLanguage} />
-          </section>
-          <section className={styles.right}>
-            <ModeSettingSelection mode={mode} selectedSetting={modeSetting} handleSelect={handleSelectModeSetting} />
-          </section>
+          {/*<section className={styles.center}>*/}
+          {/*  <LanguageSelection selectedLanguage={language} handleSelectLanguage={handleSelectLanguage} />*/}
+          {/*</section>*/}
+          {/*<section className={styles.right}>*/}
+          {/*  <ModeSettingSelection mode={mode} selectedSetting={modeSetting} handleSelect={handleSelectModeSetting} />*/}
+          {/*</section>*/}
         </section>
         <section className={styles.middle}>
           <Test
