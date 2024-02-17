@@ -1,5 +1,6 @@
 import React, { FormEvent, KeyboardEvent, useEffect, useState } from "react";
 import styles from "./Settings.module.css";
+import { setConfig } from "@/utils/getConfig";
 
 interface Props {
   name: string;
@@ -9,7 +10,7 @@ interface Props {
 export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
   const [value, setValue] = useState("");
 
-  // NOTE: is it bad to getComputedStyle() per every component? maybe
+  // NOTE: is it bad to getComputedStyle() per every component? unlikely to cause performance issues but keep it in mind
   useEffect(() => {
     const root = document.documentElement;
     const cs = getComputedStyle(root);
@@ -41,7 +42,7 @@ export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
       return;
     }
     config.themeConfig = { ...config.themeConfig, [property]: val };
-    localStorage.setItem("config", JSON.stringify(config));
+    setConfig(config);
   }
 
   return (

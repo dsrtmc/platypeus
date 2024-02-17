@@ -3,6 +3,9 @@ export type ConfigType = {
   themeConfig: {
     [key: string]: string;
   };
+  time: number;
+  words: number;
+  mode: string;
 };
 
 export type ThemeCssVariablesType = {

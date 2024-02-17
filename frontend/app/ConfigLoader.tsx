@@ -3,12 +3,16 @@
 import React, { useEffect } from "react";
 import { ConfigType } from "@/shared/types/configTypes";
 import { THEMES } from "@/shared/constants/themes";
+import { getConfig, setConfig } from "@/utils/getConfig";
 
 interface Props {}
 
 const defaultConfig: ConfigType = {
   placeholder: "placeholder",
   themeConfig: THEMES.default,
+  time: 5,
+  words: 50,
+  mode: "time",
 };
 
 /*
@@ -18,15 +22,22 @@ const defaultConfig: ConfigType = {
  */
 export const ConfigLoader: React.FC<Props> = ({}) => {
   useEffect(() => {
-    console.log("Config loaded.");
-    let config: ConfigType = JSON.parse(localStorage.getItem("config"));
+    let config = getConfig();
     if (!config) {
       localStorage.setItem("config", JSON.stringify(defaultConfig));
       config = defaultConfig;
     }
+    // Updates the config in case there are fields on `ConfigType` that are not defined in the loaded config.
+    Object.keys(defaultConfig).forEach((key) => {
+      if (!config![key]) {
+        config![key] = defaultConfig[key];
+      }
+    });
     for (const property in config.themeConfig) {
       document.documentElement.style.setProperty(property, config.themeConfig[property]);
     }
+    setConfig(config);
+    console.log("Config loaded.");
   }, []);
   return null;
 };

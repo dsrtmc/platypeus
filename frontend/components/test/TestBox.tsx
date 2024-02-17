@@ -18,6 +18,8 @@ import { WORD_LISTS } from "@/utils/wordLists";
 import { TestComponent } from "@/app/about/TestComponent";
 import { TestConfig } from "@/components/test/TestConfig";
 import { CSSTransition } from "react-transition-group";
+import { ConfigType } from "@/shared/types/configTypes";
+import { setConfig, getConfig } from "@/utils/getConfig";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
@@ -69,8 +71,27 @@ export function TestBox({ handleSaveScore }: Props) {
     setRunning(true);
   }
 
+  // TODO: save selected modeSettings to localStorage config
+  function handleSelectMode(mode: string) {
+    const config = getConfig();
+    if (config && config[mode]) {
+      setModeSetting(config[mode]);
+      config.mode = mode;
+      setConfig(config);
+    }
+    setMode(mode);
+  }
+
   function handleSelectModeSetting(setting: number) {
-    return () => setModeSetting(setting);
+    return () => {
+      let config = getConfig();
+      if (config) {
+        config[mode] = setting;
+        setConfig(config);
+        console.log("The config we are setting:", config);
+      }
+      setModeSetting(setting);
+    };
   }
 
   function handleSelectLanguage(language: string) {
@@ -100,16 +121,50 @@ export function TestBox({ handleSaveScore }: Props) {
     setTestKey((k) => k + 1); // Does a re-mount of `Test`, therefore causing a reset
   }
 
+  /**
+   * Returns the elements to be added to the word pool.
+   * @param {string} count - The number of elements to add to the pool
+   */
+  function onPoolUpdate(count: number) {
+    // TODO: make it better
+    const words: string[] = [];
+    if (mode === "time") {
+      for (let i = 0; i < count; i++) {
+        words.push(generateWord(WORD_LISTS[language]));
+      }
+    }
+    return words;
+  }
+
+  function handleFinish() {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    setRunning(false);
+    setFinished(true);
+  }
+
   // TODO: sit down one day and think about those useEffect()s, some of them here and in `Test.tsx` are likely to be unnecessary.
   useEffect(() => {
     setVisible(true);
+    const config = getConfig();
+    // TODO: fix this funny code lol
+    let _mode = mode;
+    let _modeSetting = modeSetting;
+    if (config) {
+      _mode = config.mode;
+      setMode(_mode);
+      _modeSetting = config[_mode];
+      setModeSetting(_modeSetting);
+    }
+    console.log("we are loading mode:", _mode, "with setting:", _modeSetting);
     // TODO: Code duplication, could probably have a function `initializePool` or something alike
-    switch (mode) {
+    switch (_mode) {
       case "words":
-        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting));
+        setInitialContent(generateRandomWords(WORD_LISTS[language], _modeSetting));
         break;
       case "time":
-        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting * 7));
+        setInitialContent(generateRandomWords(WORD_LISTS[language], _modeSetting * 7));
         break;
     }
   }, []);
@@ -129,40 +184,12 @@ export function TestBox({ handleSaveScore }: Props) {
     return () => clearInterval(intervalRef.current);
   }, [running]);
 
-  function handleFinish() {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    setRunning(false);
-    setFinished(true);
-  }
-
   useEffect(() => {
     // TODO: THINK -> not sure if that condition is necessary
     if (!finished) {
       handleReset();
     }
   }, [mode, modeSetting, language]);
-
-  /**
-   * Returns the elements to be added to the word pool.
-   * @param {string} count - The number of elements to add to the pool
-   */
-  function onPoolUpdate(count: number) {
-    // TODO: make it better
-    const words: string[] = [];
-    if (mode === "time") {
-      for (let i = 0; i < count; i++) {
-        words.push(generateWord(WORD_LISTS[language]));
-      }
-    }
-    return words;
-  }
-
-  // TODO: save selected modeSettings to localStorage config
-  function handleSelectMode(mode: string) {
-    setMode(mode);
-  }
 
   if (visible) {
     return (
