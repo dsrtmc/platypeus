@@ -20,9 +20,10 @@ public class Score : BaseEntity
     public List<int> WpmStats { get; set; } = new();
 
     public List<int> RawStats { get; set; } = new();
-
-    public User? User { get; set; }
     
-    [GraphQLIgnore]
+    [IsProjected(true)]
     public Guid? UserId { get; set; }
+
+    [IsProjected(true)]
+    public User? User { get; set; }
 }

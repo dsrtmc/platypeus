@@ -53,7 +53,7 @@ export function Leaderboard({ queryResult }: Props) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(async (entry) => {
         if (entry.isIntersecting) {
-          // uncomment for infinite scroll
+          // TODO: uncomment for infinite scroll
           // await handleRefetch();
         }
       });

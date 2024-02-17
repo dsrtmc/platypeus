@@ -10,6 +10,9 @@ query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order:
                     }
                     wpm
                 }
+                host {
+                    username
+                }
                 finished
             }
         }

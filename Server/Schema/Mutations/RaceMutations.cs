@@ -141,7 +141,9 @@ public static class RaceMutations
         return race;
     }
     
-    public static async Task<MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacePasswordError, AlreadyJoinedRaceError>> JoinRace(
+    public static async Task<
+        MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacePasswordError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
+    > JoinRace(
         Guid? userId, Guid? raceId, string? password,
         DatabaseContext db,
         [Service] ITopicEventSender eventSender,
@@ -163,6 +165,9 @@ public static class RaceMutations
         
         if (race is null)
             return new InvalidRaceError(raceId);
+
+        if (race.Running)
+            return new RaceAlreadyRunningError((Guid) raceId!);
 
         if (race.Private && race.Password != password)
             return new InvalidRacePasswordError(raceId, password);

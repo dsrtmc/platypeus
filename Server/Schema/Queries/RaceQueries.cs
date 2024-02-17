@@ -16,7 +16,7 @@ public static class RaceQueries
     // [UseProjection] // TODO: Figure out how to use it while keeping `.Include()` (separate methods seems obvious)
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Race> GetRaces(DatabaseContext db) => db.Races.Include(r => r.Racers).ThenInclude(r => r.User);
+    public static IQueryable<Race> GetRaces(DatabaseContext db) => db.Races.Include(r => r.Racers).ThenInclude(r => r.User).Include(r => r.Host);
     
     public static List<Race> GetAllRaces(DatabaseContext db) => db.Races.Include(r => r.Racers).ThenInclude(r => r.User).Include(r => r.Chatbox).ToList();
 }

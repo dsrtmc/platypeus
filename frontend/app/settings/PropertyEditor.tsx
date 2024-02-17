@@ -56,7 +56,6 @@ export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
       />
       <input type={"color"} value={value} onInput={handleColorInput} id={`${name}-input`} />
       <label htmlFor={`#${name}-input`} />
-      <button onClick={() => localStorage.setItem("test", cssName)}>set local storage test</button>
     </div>
   );
 };

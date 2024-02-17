@@ -20,6 +20,16 @@ public static class ScoreQueries
     public static IQueryable<Score> GetScores(DatabaseContext db)
     {
         // TODO: Distinct on User, not necessarily here or make it opt-in
+        return db.Scores.Include(s => s.UserId).Include(s => s.User);
+    }
+    
+    [UsePaging]
+    // [UseProjection] // TODO: again, projection with `.Include()`
+    [UseFiltering]
+    [UseSorting]
+    // DUPLICATION????????????? STUPID BUG
+    public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db)
+    {
         return db.Scores.Include(s => s.User);
     }
     

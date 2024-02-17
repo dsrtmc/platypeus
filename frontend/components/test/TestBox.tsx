@@ -102,14 +102,7 @@ export function TestBox({ handleSaveScore }: Props) {
     setWpm(wpm);
   }
 
-  function handleReset() {
-    setFocused(true);
-    setFinished(false);
-    setRunning(false);
-    setTimePassed(0); // TODO: 0/25 words instead of timer
-    setWpm(0);
-    setWordCount(0);
-    // TODO: maybe make that better somehow heh xd
+  function initializePool(mode: string, modeSetting: number) {
     switch (mode) {
       case "words":
         setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting));
@@ -118,6 +111,17 @@ export function TestBox({ handleSaveScore }: Props) {
         setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting * 7));
         break;
     }
+  }
+
+  function handleReset() {
+    setFocused(true);
+    setFinished(false);
+    setRunning(false);
+    setTimePassed(0); // TODO: 0/25 words instead of timer
+    setWpm(0);
+    setWordCount(0);
+    // TODO: maybe make that better somehow heh xd
+    initializePool(mode, modeSetting);
     setTestKey((k) => k + 1); // Does a re-mount of `Test`, therefore causing a reset
   }
 
@@ -157,16 +161,8 @@ export function TestBox({ handleSaveScore }: Props) {
       _modeSetting = config[_mode];
       setModeSetting(_modeSetting);
     }
-    console.log("we are loading mode:", _mode, "with setting:", _modeSetting);
     // TODO: Code duplication, could probably have a function `initializePool` or something alike
-    switch (_mode) {
-      case "words":
-        setInitialContent(generateRandomWords(WORD_LISTS[language], _modeSetting));
-        break;
-      case "time":
-        setInitialContent(generateRandomWords(WORD_LISTS[language], _modeSetting * 7));
-        break;
-    }
+    initializePool(_mode, _modeSetting);
   }, []);
 
   useEffect(() => {

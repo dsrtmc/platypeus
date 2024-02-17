@@ -153,8 +153,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   }
 
   async function handleJoinRace() {
-    if (!meData || !meData.me) return;
-    await joinRace({ variables: { input: { raceId, userId: meData.me.id } } });
+    await joinRace({ variables: { input: { raceId, userId: meData!.me!.id } } });
   }
 
   async function handleLeaveRace() {
@@ -208,10 +207,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     }
   }, [data]);
 
-  // TODO: time 15 has too few words lol
-
-  // useEffect(() => {}, [time]);
-
+  // TODO: think about deleting the race when the host leaves? hmm
   useEffect(() => {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
@@ -231,6 +227,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     <div className={styles.raceBox}>
       {meData &&
         meData.me &&
+        !data.onRaceEvent.running &&
         (!data.onRaceEvent.racers.find((racer) => racer.user.id === meData.me!.id) ? (
           <JoinRaceButton handleJoinRace={handleJoinRace} />
         ) : (

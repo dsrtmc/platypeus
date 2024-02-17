@@ -1,7 +1,12 @@
 "use client";
 
 import { NoInfer, SuspenseQueryHookOptions, useSuspenseQuery } from "@apollo/client";
-import { GetScoresDocument, GetScoresQuery, GetScoresQueryVariables } from "@/graphql/generated/graphql";
+import {
+  GetScoresDocument,
+  GetScoresForLeaderboardDocument,
+  GetScoresQuery,
+  GetScoresQueryVariables,
+} from "@/graphql/generated/graphql";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
 import { Leaderboard } from "@/components/leaderboards/Leaderboard";
 
@@ -23,7 +28,7 @@ export default function LeaderboardsPage() {
     variables: {
       first: 25,
       where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 5 } }] },
-      order: [{ wpm: "DESC", user: { username: "DESC" } }],
+      order: [{ wpm: "DESC" }],
     },
     fetchPolicy: "network-only",
   } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);
@@ -31,7 +36,7 @@ export default function LeaderboardsPage() {
     variables: {
       first: 25,
       where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 15 } }] },
-      order: [{ wpm: "DESC", user: { username: "DESC" } }],
+      order: [{ wpm: "DESC" }],
     },
     fetchPolicy: "network-only",
   } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);

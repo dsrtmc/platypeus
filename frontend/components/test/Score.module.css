@@ -5,7 +5,7 @@
                          "stats2 stats2";
     align-items: center;
     gap: 1rem;
-    color: var(--text-color);
+    color: var(--main-color);
     width: 100%;
     overflow: visible;
 }
