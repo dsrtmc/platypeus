@@ -1,6 +1,7 @@
 using HotChocolate.Execution;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
+using Server.Schema.Types.Directives;
 using Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +41,15 @@ builder.Services.AddHttpContextAccessor();
 // GraphQL setup
 builder.Services
     .AddGraphQLServer()
+    .ModifyRequestOptions(o =>
+    {
+        o.Complexity.Enable = true;
+        o.Complexity.DefaultComplexity = 1;
+        o.Complexity.DefaultResolverComplexity = 5;
+        o.Complexity.MaximumAllowed = 1500;
+        // TODO: Configure the execution timeout for production
+        // o.ExecutionTimeout = TimeSpan.FromMilliseconds(300);
+    })
     .AddTypes()
     .AddAuthorization()
     .AddMutationConventions()

@@ -3,8 +3,12 @@ query GetUserByUsername($username: String!) {
         id
         username
         scores {
-            id
-            wpm
+            edges {
+                node {
+                    id
+                    wpm
+                }
+            }
         }
         createdAt
         updatedAt

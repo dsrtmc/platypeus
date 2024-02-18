@@ -25,7 +25,7 @@ type CreateChatboxPayload {
 
 type CreateRacePayload {
   race: Race
-  errors: [CreateRaceError!]
+  errors: [CreateRaceError!] @cost(complexity: 5)
 }
 
 type CreateScorePayload {
@@ -38,12 +38,12 @@ type DeleteUserPayload {
 
 type FinishRaceForUserPayload {
   race: Race
-  errors: [FinishRaceForUserError!]
+  errors: [FinishRaceForUserError!] @cost(complexity: 5)
 }
 
 type FinishRacePayload {
   race: Race
-  errors: [FinishRaceError!]
+  errors: [FinishRaceError!] @cost(complexity: 5)
 }
 
 type IncorrectCredentialsError implements Error {
@@ -76,22 +76,22 @@ type InvalidUserError implements Error {
 
 type JoinChatboxPayload {
   chatbox: Chatbox
-  errors: [JoinChatboxError!]
+  errors: [JoinChatboxError!] @cost(complexity: 5)
 }
 
 type JoinRacePayload {
   race: Race
-  errors: [JoinRaceError!]
+  errors: [JoinRaceError!] @cost(complexity: 5)
 }
 
 type LeaveRacePayload {
   race: Race
-  errors: [LeaveRaceError!]
+  errors: [LeaveRaceError!] @cost(complexity: 5)
 }
 
 type LoginPayload {
   user: User
-  errors: [LoginError!]
+  errors: [LoginError!] @cost(complexity: 5)
 }
 
 type LogoutPayload {
@@ -108,22 +108,22 @@ type Message {
 }
 
 type Mutation {
-  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
-  register(input: RegisterInput!): RegisterPayload!
-  login(input: LoginInput!): LoginPayload!
-  logout: LogoutPayload!
-  createScore(input: CreateScoreInput!): CreateScorePayload!
-  updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload!
-  finishRace(input: FinishRaceInput!): FinishRacePayload!
-  finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload!
-  runRace(input: RunRaceInput!): RunRacePayload!
-  startRace(input: StartRaceInput!): StartRacePayload!
-  joinRace(input: JoinRaceInput!): JoinRacePayload!
-  leaveRace(input: LeaveRaceInput!): LeaveRacePayload!
-  createRace(input: CreateRaceInput!): CreateRacePayload!
-  sendMessage(input: SendMessageInput!): SendMessagePayload!
-  joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload!
-  createChatbox: CreateChatboxPayload!
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(complexity: 5)
+  register(input: RegisterInput!): RegisterPayload! @cost(complexity: 5)
+  login(input: LoginInput!): LoginPayload! @cost(complexity: 5)
+  logout: LogoutPayload! @cost(complexity: 5)
+  createScore(input: CreateScoreInput!): CreateScorePayload! @cost(complexity: 5)
+  updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload! @cost(complexity: 5)
+  finishRace(input: FinishRaceInput!): FinishRacePayload! @cost(complexity: 5)
+  finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload! @cost(complexity: 5)
+  runRace(input: RunRaceInput!): RunRacePayload! @cost(complexity: 5)
+  startRace(input: StartRaceInput!): StartRacePayload! @cost(complexity: 5)
+  joinRace(input: JoinRaceInput!): JoinRacePayload! @cost(complexity: 5)
+  leaveRace(input: LeaveRaceInput!): LeaveRacePayload! @cost(complexity: 5)
+  createRace(input: CreateRaceInput!): CreateRacePayload! @cost(complexity: 5)
+  sendMessage(input: SendMessageInput!): SendMessagePayload! @cost(complexity: 5)
+  joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload! @cost(complexity: 5)
+  createChatbox: CreateChatboxPayload! @cost(complexity: 5)
 }
 
 type NotAuthenticatedError implements Error {
@@ -153,12 +153,13 @@ type Query {
   userById(id: UUID!): User
   bye: String! @authorize
   allUsers: [User!]!
-  allScores: [Score!]!
-  scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection
-  scoresForLeaderboard("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresForLeaderboardConnection
-  score(id: UUID!): Score
-  racers(raceId: UUID!): [Racer!]!
-  races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection
+  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): UsersConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  allScores: [Score!]! @cost(complexity: 5)
+  scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  scoresForLeaderboard("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  score(id: UUID!): Score @cost(complexity: 5)
+  racers(raceId: UUID!): [Racer!]! @cost(complexity: 5)
+  races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   allRaces: [Race!]!
   hello: String!
   allChatboxes: [Chatbox!]!
@@ -222,12 +223,12 @@ type RacesEdge {
 
 type RegisterPayload {
   user: User
-  errors: [RegisterError!]
+  errors: [RegisterError!] @cost(complexity: 5)
 }
 
 type RunRacePayload {
   race: Race
-  errors: [RunRaceError!]
+  errors: [RunRaceError!] @cost(complexity: 5)
 }
 
 type Score {
@@ -289,7 +290,7 @@ type SendMessagePayload {
 
 type StartRacePayload {
   race: Race
-  errors: [StartRaceError!]
+  errors: [StartRaceError!] @cost(complexity: 5)
 }
 
 type Subscription {
@@ -303,14 +304,14 @@ type TooFewRacersError implements Error {
 
 type UpdateStatsForUserPayload {
   race: Race
-  errors: [UpdateStatsForUserError!]
+  errors: [UpdateStatsForUserError!] @cost(complexity: 5)
 }
 
 type User {
+  scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): ScoresConnection @requirePagination(test: "TEST") @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   username: String!
   email: String!
   password: String!
-  scores: [Score!]!
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -318,6 +319,24 @@ type User {
 
 type UsernameTakenError implements Error {
   message: String!
+}
+
+"A connection to a list of items."
+type UsersConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [UsersEdge!]
+  "A flattened list of the nodes."
+  nodes: [User!]
+}
+
+"An edge in a connection."
+type UsersEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: User!
 }
 
 union CreateRaceError = NotAuthenticatedError
@@ -679,10 +698,18 @@ directive @allowAnonymous repeatable on FIELD_DEFINITION
 
 directive @authorize("The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!] "Defines when when the authorize directive shall be applied.By default the authorize directives are applied during the validation phase." apply: ApplyPolicy! = BEFORE_RESOLVER) repeatable on OBJECT | FIELD_DEFINITION
 
+"The cost directives is used to express the complexity of a field."
+directive @cost("Defines the complexity of the field." complexity: Int! = 1 "Defines field arguments that act as complexity multipliers." multipliers: [MultiplierPath!] defaultMultiplier: Int) on FIELD_DEFINITION
+
+directive @requirePagination(test: String!) on FIELD_DEFINITION
+
 "The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
 directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The multiplier path scalar represents a valid GraphQL multiplier path string."
+scalar MultiplierPath
 
 scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")

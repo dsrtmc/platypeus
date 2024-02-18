@@ -23,6 +23,7 @@ public static class UserQueries
         return db.Users.Find(new Guid(claim.Value));
     }
 
+    // TODO: move to scores? idk we can just use GetScores with filtering but rn i can only visualise separate requests which sucks
     public static List<Score?> GetUsersBestScores(Guid userId, DatabaseContext db)
     {
         var user = db.Users.Include(u => u.Scores).FirstOrDefault(u => u.Id == userId);
@@ -35,6 +36,8 @@ public static class UserQueries
         return scores;
     }
 
+    // TODO: also not needed, we can just GetUser({ where: { username: { eq: username } } });
+    // the issue will be the lack of Projections but I'm sure there's a way to keep `.Include()`s
     public static User? GetUserByUsername(string username, DatabaseContext db)
     {
         return db.Users.Include(u => u.Scores).FirstOrDefault(u => u.Username == username);
@@ -50,4 +53,7 @@ public static class UserQueries
     public static string Bye(IHttpContextAccessor accessor) => "goodbye";
     
     public static List<User> GetAllUsers(DatabaseContext db) => db.Users.ToList();
+    
+    [UsePaging]
+    public static List<User> GetUsers(DatabaseContext db) => db.Users.ToList();
 }
