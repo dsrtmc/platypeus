@@ -7,12 +7,13 @@ interface Props {
   progress: number;
 }
 
+// TODO: There's a flash where it starts at offset === 0 which is not desired, but it's not a biggie.
 export const RacerScoreCard: React.FC<Props> = ({ racer, progress }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [offset, setOffset] = useState(0);
-  const parentWidth = ref.current?.parentElement?.clientWidth;
   useEffect(() => {
-    setOffset((parentWidth - 250) * progress);
+    const parentWidth = ref.current?.parentElement?.clientWidth;
+    setOffset((parentWidth - 250 ?? 1) * progress);
   }, [racer]);
   return (
     // {racer.user.username}: {racer.wpm}wpm {racer.finished ? "☑️" : "❎"} finished

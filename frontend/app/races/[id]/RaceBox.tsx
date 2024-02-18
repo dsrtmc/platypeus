@@ -148,7 +148,8 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   // TODO: very likely this shit is causing race conditions; need to investigate how to avoid sending the entire race as the event
   async function handleFinishForUser() {
     if (!meData || !meData.me) return;
-    await finishRaceForUser({ variables: { input: { raceId, userId: meData?.me!.id } } });
+    const response = await finishRaceForUser({ variables: { input: { raceId, userId: meData?.me!.id } } });
+    console.log("Response from finishRaceForUser:", response);
     setUserHasFinished(true);
   }
 
@@ -244,7 +245,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
         <Test
           focused={focused}
           running={data.onRaceEvent.running}
-          finished={userHasFinished}
+          finished={data.onRaceEvent.finished ?? userHasFinished}
           timePassed={timePassed}
           modeSetting={data.onRaceEvent.modeSetting}
           startTime={testStartTime}

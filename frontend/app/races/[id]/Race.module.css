@@ -143,13 +143,15 @@
 }
 
 .author {
+    color: var(--sub-color);
 }
 
 .me {
-    color: var(--text-color);
+    color: var(--main-color);
 }
 
 .content {
+    color: var(--text-color);
 }
 
 .bottom {

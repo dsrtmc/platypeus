@@ -20,7 +20,7 @@ public static class ScoreQueries
     public static IQueryable<Score> GetScores(DatabaseContext db)
     {
         // TODO: Distinct on User, not necessarily here or make it opt-in
-        return db.Scores.Include(s => s.UserId).Include(s => s.User);
+        return db.Scores.Include(s => s.User);
     }
     
     [UsePaging]
@@ -30,7 +30,7 @@ public static class ScoreQueries
     // DUPLICATION????????????? STUPID BUG
     public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db)
     {
-        return db.Scores.Include(s => s.User);
+        return db.Scores.Include(s => s.User).DistinctBy(s => s.UserId);
     }
     
     public static async Task<Score?> GetScore(Guid id, DatabaseContext db)

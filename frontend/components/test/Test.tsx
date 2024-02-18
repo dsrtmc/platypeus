@@ -233,7 +233,7 @@ export const Test = forwardRef<TestMethods, Props>(
       // could technically remove the `if` because it's never supposed to happen on a time-based test
       const nextWord = wordsRef.current[wordIndex + 1];
       if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
-        onFinished();
+        onFinish();
       }
     }
 
@@ -422,7 +422,7 @@ export const Test = forwardRef<TestMethods, Props>(
       }
     }, [wordIndex, letterIndex, windowSize, wordPool]);
 
-    function onFinished() {
+    function onFinish() {
       handleFinish();
 
       const currentWord = wordsRef.current[wordIndex];
@@ -455,13 +455,16 @@ export const Test = forwardRef<TestMethods, Props>(
     }
 
     useEffect(() => {
+      console.log("Running:", running);
+      console.log("Finished:", finished);
       if (running && !finished) {
+        console.log("WE CALL IT EVEN THOUGH WE SHOULDN'T?");
         updateStats(timePassed);
 
         // TODO: again, not sure if mode checking here is a good thing to do
         // TODO: ↑ if we go with that, then -> (if mode === "words" && timePassed > 60) or something like that
         if (mode === "time" && timePassed >= modeSetting) {
-          onFinished();
+          onFinish();
         }
       }
     }, [timePassed]);
@@ -490,10 +493,14 @@ export const Test = forwardRef<TestMethods, Props>(
       return () => setVisible(false);
     }, []);
 
+    // TODO: type
+    const nodeRef = useRef<any>(null);
+
     // TODO: not sure if I should keep it here, it kinda looks funky during races, so I guess move it to `TestBox`?
     return (
       <>
         <CSSTransition
+          nodeRef={nodeRef}
           in={visible}
           timeout={500}
           classNames={{

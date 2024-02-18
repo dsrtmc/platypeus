@@ -24,7 +24,7 @@ function withLabel(Component) {
 }
 
 export default function LeaderboardsPage() {
-  const queryResult5 = useSuspenseQuery(GetScoresDocument, {
+  const queryResult5 = useSuspenseQuery(GetScoresForLeaderboardDocument, {
     variables: {
       first: 25,
       where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 5 } }] },
@@ -32,7 +32,7 @@ export default function LeaderboardsPage() {
     },
     fetchPolicy: "network-only",
   } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);
-  const queryResult15 = useSuspenseQuery(GetScoresDocument, {
+  const queryResult15 = useSuspenseQuery(GetScoresForLeaderboardDocument, {
     variables: {
       first: 25,
       where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 15 } }] },

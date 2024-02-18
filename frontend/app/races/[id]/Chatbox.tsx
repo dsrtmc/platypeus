@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, KeyboardEvent } from "react";
+import React, { FC, KeyboardEvent, useRef } from "react";
 import styles from "./Race.module.css";
 import {
   MeQuery,
@@ -81,6 +81,7 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
         </ul>
       </div>
       <div className={styles.bottom}>
+        {/* TODO: `.blur()` on Escape click, however if I pass a ref here some funny stuff happens and it crashes */}
         <TextareaAutosize
           maxRows={3}
           placeholder={meData.me ? "Message the group" : "Log in to use the chatroom"}

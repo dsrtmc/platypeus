@@ -15,5 +15,7 @@ public class User : BaseEntity
     
     public string Password { get; set; }
 
+    // TODO: wrong place for the TODO BUT read up on about paginated list types, it's simple when it comes to queries but how do we make sure that-
+    // TODO: ↑ every single list type like `user { scores }` is paginated?
     public List<Score> Scores { get; set; } = new();
 }
