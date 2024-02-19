@@ -13,7 +13,7 @@ type AlreadyJoinedRaceError implements Error {
 }
 
 type Chatbox {
-  messages: [Message!]!
+  messages("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): MessagesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -107,6 +107,24 @@ type Message {
   updatedAt: DateTime!
 }
 
+"A connection to a list of items."
+type MessagesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [MessagesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Message!]
+}
+
+"An edge in a connection."
+type MessagesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Message!
+}
+
 type Mutation {
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(complexity: 5)
   register(input: RegisterInput!): RegisterPayload! @cost(complexity: 5)
@@ -153,7 +171,8 @@ type Query {
   userById(id: UUID!): User
   bye: String! @authorize
   allUsers: [User!]!
-  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): UsersConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: UserFilterInput order: [UserSortInput!]): UsersConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  user(where: UserFilterInput): User @cost(complexity: 5)
   allScores: [Score!]! @cost(complexity: 5)
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   scoresForLeaderboard("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
@@ -167,7 +186,7 @@ type Query {
 
 type Race {
   host: User!
-  racers: [Racer!]!
+  racers("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): RacersConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   mode: String!
   modeSetting: Int!
   content: String!
@@ -201,6 +220,24 @@ type Racer {
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+"A connection to a list of items."
+type RacersConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [RacersEdge!]
+  "A flattened list of the nodes."
+  nodes: [Racer!]
+}
+
+"An edge in a connection."
+type RacersEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Racer!
 }
 
 "A connection to a list of items."
@@ -312,6 +349,7 @@ type User {
   email: String!
   password: String!
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  messages("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): MessagesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   id: UUID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -357,7 +395,7 @@ union RegisterError = InvalidFieldError | UsernameTakenError
 
 union RunRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
 
-union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError | TooFewRacersError
+union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError | RaceAlreadyRunningError | TooFewRacersError
 
 union UpdateStatsForUserError = InvalidUserError | InvalidRaceError | InvalidRacerStatisticsError
 
@@ -654,6 +692,7 @@ input UserFilterInput {
   email: StringOperationFilterInput
   password: StringOperationFilterInput
   scores: ListFilterInputTypeOfScoreFilterInput
+  messages: ListFilterInputTypeOfMessageFilterInput
   id: UuidOperationFilterInput
   createdAt: DateTimeOperationFilterInput
   updatedAt: DateTimeOperationFilterInput

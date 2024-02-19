@@ -12,6 +12,8 @@ export async function RaceList({}) {
     variables: {
       where: { and: [{ running: { eq: false } }, { finished: { eq: false } }] },
       order: { createdAt: "DESC" },
+      racesFirst: 5,
+      racersFirst: 5,
     } as GetRacesQueryVariables,
   });
   console.log("The response we got:", response);

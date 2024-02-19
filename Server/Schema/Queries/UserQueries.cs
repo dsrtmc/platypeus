@@ -55,5 +55,11 @@ public static class UserQueries
     public static List<User> GetAllUsers(DatabaseContext db) => db.Users.ToList();
     
     [UsePaging]
+    [UseFiltering]
+    [UseSorting]
     public static List<User> GetUsers(DatabaseContext db) => db.Users.ToList();
+
+    [UseFirstOrDefault]
+    [UseFiltering]
+    public static IQueryable<User> GetUser(DatabaseContext db) => db.Users;
 }

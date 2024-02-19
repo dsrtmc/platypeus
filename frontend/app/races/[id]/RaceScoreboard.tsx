@@ -4,20 +4,20 @@ import { OnRaceEventSubscription } from "@/graphql/generated/graphql";
 import { RacerScoreCard } from "@/app/races/[id]/RacerScoreCard";
 
 interface Props {
-  racers: OnRaceEventSubscription["onRaceEvent"]["racers"];
+  edges: OnRaceEventSubscription["onRaceEvent"]["racers"]["edges"];
   mode: string;
   modeSetting: number;
 }
 
-export const RaceScoreboard: React.FC<Props> = ({ racers, mode, modeSetting }) => {
+export const RaceScoreboard: React.FC<Props> = ({ edges, mode, modeSetting }) => {
   return (
     <div className={styles.scoreboard}>
       <h1>racer stats:</h1>
-      {racers.map((racer) => {
+      {edges.map((edge) => {
         let divisor = modeSetting;
         if (mode === "time") divisor *= 6;
-        const progress = racer.wordsTyped / divisor;
-        return <RacerScoreCard racer={racer} progress={progress} key={racer.id} />;
+        const progress = edge.node.wordsTyped / divisor;
+        return <RacerScoreCard racer={edge.node} progress={progress} key={edge.node.id} />;
       })}
     </div>
   );

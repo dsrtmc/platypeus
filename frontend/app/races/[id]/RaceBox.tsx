@@ -42,7 +42,7 @@ const COUNTDOWN_TIME = 5;
 // TODO: Maybe we just load the race server-side first in `../page.tsx` and then we don't have to struggle w/ initial states here
 // TODO: add error handling whenever we execute a mutation (not just in this file)
 export const RaceBox: React.FC<Props> = ({ raceId }) => {
-  const { data, loading, error } = useSubscription(OnRaceEventDocument, { variables: { raceId } });
+  const { data, loading, error } = useSubscription(OnRaceEventDocument, { variables: { raceId, racersFirst: 10 } });
   const { data: meData } = useQuery(MeDocument);
 
   const [finishRaceForUser, {}] = useMutation(FinishRaceForUserDocument);
@@ -104,11 +104,11 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   function handleClick(e: globalThis.MouseEvent) {
     if (!meData?.me || !data?.onRaceEvent) return;
     console.log(
-      data.onRaceEvent.racers.find((racer) => racer.user.id === meData.me!.id)
+      data.onRaceEvent.racers?.edges!.find((edge) => edge.node.id === meData.me!.id)
         ? "you are in the race"
         : "you are not in the race"
     );
-    if (ref && ref.current && data.onRaceEvent.racers.find((racer) => racer.user.id === meData.me!.id)) {
+    if (ref && ref.current && data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id)) {
       setFocused(!data.onRaceEvent.finished && ref.current!.contains(e.target));
     }
   }
@@ -202,7 +202,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     if (!data) return;
     if (!content) setContent(data.onRaceEvent.content.split(" "));
     if (data.onRaceEvent.running && !data.onRaceEvent.finished) {
-      if (data.onRaceEvent.racers.every((racer) => racer.finished)) {
+      if (data.onRaceEvent.racers?.edges!.every((edge) => edge.node.finished)) {
         (async () => await handleFinish())();
       }
     }
@@ -229,7 +229,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       {meData &&
         meData.me &&
         !data.onRaceEvent.running &&
-        (!data.onRaceEvent.racers.find((racer) => racer.user.id === meData.me!.id) ? (
+        (!data.onRaceEvent.racers?.edges!.find((edge) => edge.node.id === meData.me!.id) ? (
           <JoinRaceButton handleJoinRace={handleJoinRace} />
         ) : (
           <LeaveRaceButton handleLeaveRace={handleLeaveRace} />
@@ -264,13 +264,21 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       {data?.onRaceEvent.host.id === meData?.me?.id && (
         // TODO: looks like the length doesn't get updated the way it should? useState??????? LOL!!!!!!!!!!! love react
         // <StartRaceButton handleStart={onRaceStart} hasError={finished || data.onRaceEvent.racers.length <= 0} />
-        <StartRaceButton handleStart={handleStart} hasError={false} />
+        <StartRaceButton
+          disabled={
+            data.onRaceEvent.finished ||
+            data.onRaceEvent.running ||
+            data.onRaceEvent.started ||
+            data.onRaceEvent.racers?.edges?.length <= 0
+          }
+          handleStart={handleStart}
+        />
       )}
       {!data.onRaceEvent.running && !data.onRaceEvent.finished && (
         <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
       )}
       <RaceScoreboard
-        racers={data.onRaceEvent.racers}
+        edges={data.onRaceEvent.racers?.edges}
         mode={data.onRaceEvent.mode}
         modeSetting={data.onRaceEvent.modeSetting}
       />

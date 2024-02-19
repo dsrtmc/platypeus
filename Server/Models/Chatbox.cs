@@ -9,5 +9,6 @@ public class Chatbox : BaseEntity
     
     // public Race? Race { get; set; } = null!;
 
+    [UsePaging]
     public List<Message> Messages { get; set; } = new();
 }

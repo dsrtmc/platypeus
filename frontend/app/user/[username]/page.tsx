@@ -5,23 +5,30 @@ import {
   GetScoresQueryVariables,
   GetUserByUsernameDocument,
   GetUsersBestScoresDocument,
+  UserPage_GetUserDocument,
 } from "@/graphql/generated/graphql";
 import { PerformanceChart } from "@/app/user/[username]/PerformanceChart";
+import { gql } from "@apollo/client";
 
 export default async function UserPage({ params }: { params: { username: string } }) {
-  const { data: userData } = await getClient().query({
-    query: GetUserByUsernameDocument,
+  const { data } = await getClient().query({
+    query: UserPage_GetUserDocument,
     variables: {
-      username: params.username,
+      where: {
+        username: {
+          eq: params.username,
+        },
+      },
+      first: 1,
     },
   });
-  if (!userData.userByUsername) return <div>no such user</div>;
-  const { data: bestScoresData } = await getClient().query({
-    query: GetUsersBestScoresDocument,
-    variables: {
-      userId: userData.userByUsername?.id,
-    },
-  });
+  if (!data.user) return <div>no such user</div>;
+  // const { data: bestScoresData } = await getClient().query({
+  //   query: GetUsersBestScoresDocument,
+  //   variables: {
+  //     userId: userData.userByUsername?.id,
+  //   },
+  // });
   // TODO: this shit doesn't work, no clue why - it works on the backend
   // const { data: scoresData } = await getClient().query({
   //   query: GetScoresDocument,
@@ -38,17 +45,18 @@ export default async function UserPage({ params }: { params: { username: string 
   return (
     <div>
       <div>
-        this account has been created on<code>{JSON.stringify(new Date(userData.userByUsername.createdAt))}</code>
+        this account has been created on
+        <code>{JSON.stringify(new Date(data.user.createdAt))}</code>
       </div>
       <div className={styles.box}>
         {/* TODO: Fix nullable stuff here, we shouldn't have gaps */}
-        {bestScoresData.usersBestScores.map((score) => (
-          <div key={score?.modeSetting} className={styles.group}>
-            <div className={styles.test}>{score?.modeSetting} seconds</div>
-            <div className={styles.wpm}>{score?.wpm}</div>
-            <div className={styles.accuracy}>{score?.accuracy.toFixed(2) * 100}%</div>
-          </div>
-        ))}
+        {/*{bestScoresData.usersBestScores.map((score) => (*/}
+        {/*  <div key={score?.modeSetting} className={styles.group}>*/}
+        {/*    <div className={styles.test}>{score?.modeSetting} seconds</div>*/}
+        {/*    <div className={styles.wpm}>{score?.wpm}</div>*/}
+        {/*    <div className={styles.accuracy}>{score?.accuracy.toFixed(2) * 100}%</div>*/}
+        {/*  </div>*/}
+        {/*))}*/}
       </div>
       {/*<PerformanceChart scoresData={scoresData} />*/}
     </div>

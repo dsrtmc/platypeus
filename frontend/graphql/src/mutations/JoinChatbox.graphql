@@ -2,7 +2,11 @@ mutation JoinChatbox($input: JoinChatboxInput!) {
     joinChatbox(input: $input) {
         chatbox {
             messages {
-                content
+                edges {
+                    node {
+                        content
+                    }
+                }
             }
         }
     }

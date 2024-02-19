@@ -105,7 +105,9 @@ public static class RaceMutations
     }
 
     // TODO: finally read up on what cancellation token does holy fuck this is ridiculous
-    public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError,NotAuthorizedError, TooFewRacersError>> StartRace(
+    public static async Task<
+        MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError, RaceAlreadyRunningError, TooFewRacersError>
+    > StartRace(
         Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
         IHttpContextAccessor accessor,
@@ -124,6 +126,9 @@ public static class RaceMutations
         var race = await db.Races.Include(r => r.Host).Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
             return new InvalidRaceError(raceId);
+
+        if (race.Finished || race.Started || race.Running)
+            return new RaceAlreadyRunningError(raceId);
         
         // TODO: uncomment that in prod
         // if (race.Racers.Count < 2)

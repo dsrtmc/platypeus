@@ -1,18 +1,22 @@
 # TODO: see if this big query is optimized (no double-fetching of racer)
-subscription OnRaceEvent($raceId: UUID!) {
+subscription OnRaceEvent($raceId: UUID!, $racersFirst: Int) {
     onRaceEvent(raceId: $raceId) {
         id
         mode
         modeSetting
-        racers {
-            id
-            user {
-                id
-                username
+        racers(first: $racersFirst) {
+            edges {
+                node {
+                    id
+                    user {
+                        id
+                        username
+                    }
+                    finished
+                    wpm
+                    wordsTyped
+                }
             }
-            finished
-            wpm
-            wordsTyped
         }
         host {
             id

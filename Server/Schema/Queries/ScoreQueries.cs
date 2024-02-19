@@ -29,6 +29,7 @@ public static class ScoreQueries
     [UseFiltering]
     [UseSorting]
     // DUPLICATION????????????? STUPID BUG
+    // TODO: fix this stupid fucking distinct by thing
     public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db)
     {
         return db.Scores.Include(s => s.User).DistinctBy(s => s.UserId);

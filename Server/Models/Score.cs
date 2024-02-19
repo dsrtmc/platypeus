@@ -21,9 +21,7 @@ public class Score : BaseEntity
 
     public List<int> RawStats { get; set; } = new();
     
-    [IsProjected(true)]
     public Guid? UserId { get; set; }
 
-    [IsProjected(true)]
     public User? User { get; set; }
 }

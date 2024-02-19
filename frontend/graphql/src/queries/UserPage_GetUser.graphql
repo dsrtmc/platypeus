@@ -1,0 +1,10 @@
+query UserPage_GetUser(
+    $where: UserFilterInput
+) {
+    user(where: $where) {
+        id
+        username
+        createdAt
+        updatedAt
+    }
+}

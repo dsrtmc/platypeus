@@ -89,7 +89,7 @@ builder.Services
         // TODO: maybe make it dev only? ↓
         o.IncludeExceptionDetails = true;
         // TODO: Configure the execution timeout for production
-        // o.ExecutionTimeout = TimeSpan.FromMilliseconds(300);
+        o.ExecutionTimeout = TimeSpan.FromSeconds(30);
     })
     .AddTypes()
     .AddAuthorization()

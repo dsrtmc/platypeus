@@ -1,12 +1,16 @@
-subscription OnChatboxEvent($chatboxId: UUID!) {
+subscription OnChatboxEvent($chatboxId: UUID!, $messagesFirst: Int) {
     onChatboxEvent(chatboxId: $chatboxId) {
-        messages {
-            id
-            author {
-                username
+        messages(first: $messagesFirst) {
+            edges {
+                node {
+                    id
+                    author {
+                        username
+                    }
+                    content
+                    createdAt
+                }
             }
-            content
-            createdAt
         }
     }
 }

@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Server.Models;
 
+[Index(nameof(Username), IsUnique = true)]
 public class User : BaseEntity
 {
     public User(string username, string email, string password)
@@ -15,8 +18,9 @@ public class User : BaseEntity
     
     public string Password { get; set; }
 
-    // TODO: wrong place for the TODO BUT read up on about paginated list types, it's simple when it comes to queries but how do we make sure that-
-    // TODO: ↑ every single list type like `user { scores }` is paginated?
     [UsePaging]
     public List<Score> Scores { get; set; } = new();
+    
+    [UsePaging]
+    public List<Message> Messages { get; set; } = new();
 }

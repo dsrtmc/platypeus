@@ -2,14 +2,7 @@
 mutation FinishRace($input: FinishRaceInput!) {
     finishRace(input: $input) {
         race {
-            racers {
-                user {
-                    username
-                }
-                wpm
-                finished
-            }
-            finished
+            id
         }
         errors {
             code: __typename

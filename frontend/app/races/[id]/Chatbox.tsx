@@ -29,6 +29,7 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
   const { data, loading, error } = useSubscription(OnChatboxEventDocument, {
     variables: {
       chatboxId,
+      messagesFirst: 50,
     },
   });
 
@@ -74,9 +75,9 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
     <form onSubmit={handleSubmit(onSubmit)} className={styles.chatbox}>
       <div className={styles.messageListWrapper}>
         <ul className={styles.messageList}>
-          {data?.onChatboxEvent.messages.map((message) => (
+          {data?.onChatboxEvent.messages?.edges!.map((edge) => (
             // TODO: colors xd
-            <Message message={message} viewerName={meData.me?.username} key={message.id} />
+            <Message message={edge.node} viewerName={meData.me?.username} key={edge.node.id} />
           ))}
         </ul>
       </div>

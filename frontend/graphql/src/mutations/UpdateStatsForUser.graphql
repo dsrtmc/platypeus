@@ -1,13 +1,7 @@
 mutation UpdateStatsForUser($input: UpdateStatsForUserInput!) {
     updateStatsForUser(input: $input) {
         race {
-            racers {
-                user {
-                    username
-                }
-                wpm
-                wordsTyped
-            }
+            id
         }
         errors {
             code: __typename

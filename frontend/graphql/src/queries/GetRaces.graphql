@@ -1,14 +1,18 @@
-query GetRaces($after: String, $before: String, $first: Int, $last: Int, $order: [RaceSortInput!], $where: RaceFilterInput) {
-    races(after: $after, before: $before, first: $first, last: $last, order: $order, where: $where) {
+query GetRaces($after: String, $before: String, $racesFirst: Int, $racesLast: Int, $order: [RaceSortInput!], $where: RaceFilterInput, $racersFirst: Int) {
+    races(after: $after, before: $before, first: $racesFirst, last: $racesLast, order: $order, where: $where) {
         edges {
             node {
                 id
                 createdAt
-                racers {
-                    user {
-                        username
+                racers(first: $racersFirst) {
+                    edges {
+                        node {
+                            user {
+                                username
+                            }
+                            wpm
+                        }
                     }
-                    wpm
                 }
                 host {
                     username

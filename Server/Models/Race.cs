@@ -7,6 +7,7 @@ public class Race : BaseEntity
 {
     public User Host { get; set; } = null!;
     
+    [UsePaging]
     public List<Racer> Racers { get; set; } = new();
 
     public string Mode { get; init; } = null!; // "time", "words", "quote"

@@ -1,12 +1,8 @@
 mutation FinishRaceForUser($input: FinishRaceForUserInput!) {
     finishRaceForUser(input: $input) {
-#        race {
-#            racers {
-#                user {
-#                    username
-#                }
-#            }
-#        }
+        race {
+            id
+        }
         errors {
             code: __typename
             ... on Error {
