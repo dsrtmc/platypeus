@@ -27,7 +27,3 @@ public class Score : BaseEntity
     [IsProjected(true)]
     public User? User { get; set; }
 }
-
-public class ScoreType : ObjectType<Score>
-{
-}

@@ -1,5 +1,3 @@
-using Server.Schema.Types.Directives;
-
 namespace Server.Models;
 
 public class User : BaseEntity
@@ -19,17 +17,6 @@ public class User : BaseEntity
 
     // TODO: wrong place for the TODO BUT read up on about paginated list types, it's simple when it comes to queries but how do we make sure that-
     // TODO: ↑ every single list type like `user { scores }` is paginated?
-    [property: RequirePagination("TEST")]
+    [UsePaging]
     public List<Score> Scores { get; set; } = new();
-}
-
-public class UserType : ObjectType<User>
-{
-    protected override void Configure(IObjectTypeDescriptor<User> descriptor)
-    {
-        descriptor.Field(u => u.Scores)
-            .Type<NonNullType<ListType<NonNullType<ScoreType>>>>()
-            .UsePaging();
-        // .Directive<RequirePagination>();
-    }
 }

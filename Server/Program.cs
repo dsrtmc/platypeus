@@ -1,9 +1,9 @@
 using System.Threading.RateLimiting;
 using HotChocolate.Execution;
+using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
-using Server.Schema.Types.Directives;
 using Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,7 +76,7 @@ builder.Services
     .AddGraphQLServer()
     // TODO: read what this one does, what kind of validation it refers to
     .SetMaxAllowedValidationErrors(10)
-        // TODO: I guess disable introspection, we don't need it, even role-based
+    // TODO: I guess disable introspection, we don't need it, even role-based
     .AllowIntrospection(true) // !__prod__?
     .AddMaxExecutionDepthRule(10, skipIntrospectionFields: true)
     .ModifyRequestOptions(o =>
@@ -99,6 +99,10 @@ builder.Services
     .AddInMemorySubscriptions()
     .AddProjections()
     .AddFiltering()
+    .SetPagingOptions(new PagingOptions
+    {
+        RequirePagingBoundaries = true
+    })
     .AddSorting();
 
 var app = builder.Build();
