@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using HotChocolate.Data.Projections.Context;
 using HotChocolate.Execution.Configuration;
+using HotChocolate.Resolvers;
 using HotChocolate.Types.Descriptors;
 using Server.Models;
 
@@ -23,7 +24,7 @@ public class RequirePaginationMiddlewareAttribute : DirectiveTypeDescriptorAttri
 {
     protected override void OnConfigure(IDescriptorContext context, IDirectiveTypeDescriptor descriptor, Type type)
     {
-        descriptor.Use((next, directive) => ctx =>
+        descriptor.Use((next, directive) => async ctx =>
         {
             var fieldArguments = ctx.GetSelectedField().Selection.Arguments;
             
@@ -31,10 +32,12 @@ public class RequirePaginationMiddlewareAttribute : DirectiveTypeDescriptorAttri
             if (fieldArguments["first"].Value is null && fieldArguments["last"].Value is null)
             {
                 // TODO: return throw an error here :D \(^o^)/ this one FORCES pagination on list types \(^o^)/
-                Console.WriteLine("bad REQUEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                ctx.ReportError("REQUIRED PAGINATION");
             }
-
-            return next.Invoke(ctx);
+            else
+            {
+                await next(ctx);
+            }
         });
     }
 }
