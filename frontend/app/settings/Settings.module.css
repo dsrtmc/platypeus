@@ -1,7 +1,25 @@
-.box {
+.main {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     gap: 1rem;
+}
+
+.properties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.propertyBox {
+    display: flex;
     align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.name {
+    margin-right: auto;
 }
 
 .field {
@@ -14,6 +32,32 @@
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
     padding: 4px 6px;
+}
+
+.themeList {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+}
+
+.themeButton {
+    all: unset;
+    width: 8rem;
+    padding: 6px 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--roundness);
+    transition: scale 200ms ease;
+}
+
+.selected {
+    border: 3px solid var(--main-color);
+}
+
+.themeButton:hover {
+    scale: 120%;
 }
 
 #sub-input {

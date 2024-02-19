@@ -46,8 +46,8 @@ export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
   }
 
   return (
-    <div className={styles.box}>
-      {name}
+    <div className={styles.propertyBox}>
+      <div className={styles.name}>{name}</div>
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}

@@ -1,5 +1,6 @@
 export type ConfigType = {
   placeholder: string;
+  themeName: string;
   themeConfig: {
     [key: string]: string;
   };

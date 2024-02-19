@@ -229,7 +229,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
       {meData &&
         meData.me &&
         !data.onRaceEvent.running &&
-        (!data.onRaceEvent.racers?.edges!.find((edge) => edge.node.id === meData.me!.id) ? (
+        (!data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id) ? (
           <JoinRaceButton handleJoinRace={handleJoinRace} />
         ) : (
           <LeaveRaceButton handleLeaveRace={handleLeaveRace} />

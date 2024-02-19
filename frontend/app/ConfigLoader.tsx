@@ -9,6 +9,7 @@ interface Props {}
 
 const defaultConfig: ConfigType = {
   placeholder: "placeholder",
+  themeName: "default",
   themeConfig: THEMES.default,
   time: 5,
   words: 50,
