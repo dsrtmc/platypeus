@@ -126,11 +126,9 @@ type MessagesEdge {
 }
 
 type Mutation {
-  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(complexity: 5)
-  register(input: RegisterInput!): RegisterPayload! @cost(complexity: 5)
-  login(input: LoginInput!): LoginPayload! @cost(complexity: 5)
-  logout: LogoutPayload! @cost(complexity: 5)
-  createScore(input: CreateScoreInput!): CreateScorePayload! @cost(complexity: 5)
+  joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload! @cost(complexity: 5)
+  createChatbox: CreateChatboxPayload! @cost(complexity: 5)
+  sendMessage(input: SendMessageInput!): SendMessagePayload! @cost(complexity: 5)
   updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload! @cost(complexity: 5)
   finishRace(input: FinishRaceInput!): FinishRacePayload! @cost(complexity: 5)
   finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload! @cost(complexity: 5)
@@ -139,9 +137,11 @@ type Mutation {
   joinRace(input: JoinRaceInput!): JoinRacePayload! @cost(complexity: 5)
   leaveRace(input: LeaveRaceInput!): LeaveRacePayload! @cost(complexity: 5)
   createRace(input: CreateRaceInput!): CreateRacePayload! @cost(complexity: 5)
-  sendMessage(input: SendMessageInput!): SendMessagePayload! @cost(complexity: 5)
-  joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload! @cost(complexity: 5)
-  createChatbox: CreateChatboxPayload! @cost(complexity: 5)
+  createScore(input: CreateScoreInput!): CreateScorePayload! @cost(complexity: 5)
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(complexity: 5)
+  register(input: RegisterInput!): RegisterPayload! @cost(complexity: 5)
+  login(input: LoginInput!): LoginPayload! @cost(complexity: 5)
+  logout: LogoutPayload! @cost(complexity: 5)
 }
 
 type NotAuthenticatedError implements Error {
@@ -165,6 +165,15 @@ type PageInfo {
 }
 
 type Query {
+  allChatboxes: [Chatbox!]!
+  hello: String!
+  racers(raceId: UUID!): [Racer!]! @cost(complexity: 5)
+  races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  allRaces: [Race!]!
+  allScores: [Score!]! @cost(complexity: 5)
+  scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  scoresForLeaderboard("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  score(id: UUID!): Score @cost(complexity: 5)
   me: User
   usersBestScores(userId: UUID!): [Score]!
   userByUsername(username: String!): User
@@ -173,15 +182,6 @@ type Query {
   allUsers: [User!]!
   users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: UserFilterInput order: [UserSortInput!]): UsersConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   user(where: UserFilterInput): User @cost(complexity: 5)
-  allScores: [Score!]! @cost(complexity: 5)
-  scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
-  scoresForLeaderboard("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
-  score(id: UUID!): Score @cost(complexity: 5)
-  racers(raceId: UUID!): [Racer!]! @cost(complexity: 5)
-  races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
-  allRaces: [Race!]!
-  hello: String!
-  allChatboxes: [Chatbox!]!
 }
 
 type Race {
@@ -345,9 +345,8 @@ type UpdateStatsForUserPayload {
 }
 
 type User {
-  username: String!
   email: String!
-  password: String!
+  username: String!
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   messages("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): MessagesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   id: UUID!
@@ -690,7 +689,6 @@ input UserFilterInput {
   or: [UserFilterInput!]
   username: StringOperationFilterInput
   email: StringOperationFilterInput
-  password: StringOperationFilterInput
   scores: ListFilterInputTypeOfScoreFilterInput
   messages: ListFilterInputTypeOfMessageFilterInput
   id: UuidOperationFilterInput
@@ -701,7 +699,6 @@ input UserFilterInput {
 input UserSortInput {
   username: SortEnumType
   email: SortEnumType
-  password: SortEnumType
   id: SortEnumType
   createdAt: SortEnumType
   updatedAt: SortEnumType

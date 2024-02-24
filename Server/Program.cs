@@ -14,6 +14,7 @@ DotNetEnv.Env.Load();
 builder.Services.AddDbContextPool<DatabaseContext>(o =>
 {
     o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
+    o.EnableSensitiveDataLogging(); // TODO: DEV only?
 });
 
 // CORS setup
@@ -72,6 +73,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 // GraphQL setup
+// TODO: read on max byte size for documents?
 builder.Services
     .AddGraphQLServer()
     // TODO: read what this one does, what kind of validation it refers to
@@ -97,12 +99,12 @@ builder.Services
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>()
     .AddInMemorySubscriptions()
-    .AddProjections()
-    .AddFiltering()
     .SetPagingOptions(new PagingOptions
     {
         RequirePagingBoundaries = true
     })
+    .AddProjections()
+    .AddFiltering()
     .AddSorting();
 
 var app = builder.Build();

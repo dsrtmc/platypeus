@@ -8,6 +8,7 @@ namespace Server.Helpers;
 public static class Helper
 {
     // TODO: Extend validation before deployment
+    // TODO: prune resolver arguments (chilli cream video) maybe idk
     /// <summary>
     /// Validates the provided input and returns a list of errors.
     /// </summary>

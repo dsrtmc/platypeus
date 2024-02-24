@@ -6,6 +6,8 @@ using Server.Services;
 namespace Server.Schema.Queries;
 
 [QueryType]
+// TODO: Enable projection for query types -> as of right now, I cannot do that because I'm opting for paginating every list type,
+// TODO:↑which projection cannot handle.
 public static class ScoreQueries
 {
     public static async Task<List<Score>> GetAllScores(DatabaseContext db)
@@ -32,7 +34,7 @@ public static class ScoreQueries
     // TODO: fix this stupid fucking distinct by thing
     public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db)
     {
-        return db.Scores.Include(s => s.User).DistinctBy(s => s.UserId);
+        return db.Scores;
     }
     
     public static async Task<Score?> GetScore(Guid id, DatabaseContext db)

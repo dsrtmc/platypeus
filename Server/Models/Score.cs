@@ -1,8 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Server.Services;
+
 namespace Server.Models;
 
 // TODO: add more properties, as of right now I don't know what
 public class Score : BaseEntity
 {
+    public Score()
+    {
+    }
+    
     public int Wpm { get; init; }
 
     public int RawWpm { get; init; }

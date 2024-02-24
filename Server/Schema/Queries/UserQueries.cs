@@ -53,11 +53,12 @@ public static class UserQueries
     public static string Bye(IHttpContextAccessor accessor) => "goodbye";
     
     public static List<User> GetAllUsers(DatabaseContext db) => db.Users.ToList();
-    
+
     [UsePaging]
+    // [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static List<User> GetUsers(DatabaseContext db) => db.Users.ToList();
+    public static IQueryable<User> GetUsers(DatabaseContext db) => db.Users;
 
     [UseFirstOrDefault]
     [UseFiltering]

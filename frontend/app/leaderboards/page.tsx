@@ -12,6 +12,7 @@ import { Leaderboard } from "@/components/leaderboards/Leaderboard";
 
 const LeaderboardWithLabel = withLabel(Leaderboard);
 
+// TODO: maybe move it somewhere else
 function withLabel(Component) {
   return ({ children, ...rest }) => {
     return (
@@ -32,18 +33,18 @@ export default function LeaderboardsPage() {
     },
     fetchPolicy: "network-only",
   } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);
-  const queryResult15 = useSuspenseQuery(GetScoresForLeaderboardDocument, {
-    variables: {
-      first: 25,
-      where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 15 } }] },
-      order: [{ wpm: "DESC" }],
-    },
-    fetchPolicy: "network-only",
-  } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);
+  // const queryResult15 = useSuspenseQuery(GetScoresForLeaderboardDocument, {
+  //   variables: {
+  //     first: 25,
+  //     where: { and: [{ mode: { eq: "time" } }, { modeSetting: { eq: 15 } }] },
+  //     order: [{ wpm: "DESC" }],
+  //   },
+  //   fetchPolicy: "network-only",
+  // } as SuspenseQueryHookOptions<GetScoresQuery, GetScoresQueryVariables>);
   return (
     <div className={styles.tables}>
       <LeaderboardWithLabel queryResult={queryResult5}>Time 5</LeaderboardWithLabel>
-      <LeaderboardWithLabel queryResult={queryResult15}>Time 15</LeaderboardWithLabel>
+      {/*<LeaderboardWithLabel queryResult={queryResult15}>Time 15</LeaderboardWithLabel>*/}
     </div>
   );
 }

@@ -32,4 +32,14 @@ export const THEMES: ThemeType = {
     "--error-color": "#cc517a",
     "--error-extra-color": "#cc3768",
   },
+  pastel: {
+    "--bg-color": "#e0b2bd",
+    "--main-color": "#fbf4b6",
+    "--caret-color": "#fbf4b6",
+    "--sub-color": "#b4e9ff",
+    "--sub-alt-color": "#d29fab",
+    "--text-color": "#6d5c6f",
+    "--error-color": "#ff6961",
+    "--error-extra-color": "#c23b22",
+  },
 };
