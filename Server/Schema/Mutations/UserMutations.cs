@@ -20,6 +20,7 @@ public static class UserMutations
     /// Deletes the user from the database.
     /// </summary>
     /// <param name="userId">The ID of the user to be deleted.</param>
+    /// <param name="db">Our database context</param>
     /// <returns><c>true</c> if the user is successfully removed from the database, <c>false</c> otherwise.</returns>
     public static async Task<bool> DeleteUser(Guid userId, DatabaseContext db)
     {
@@ -67,17 +68,16 @@ public static class UserMutations
     {
         var errors = input.Validate();
         
+        if (errors.Count > 0)
+            return new(errors);
+        
         var user = await db.Users.FirstOrDefaultAsync(u => u.Username == input.Username);
 
         if (user is null)
-            errors.Add(new IncorrectCredentialsError());
-        
-        // TODO: I guess we can end the validation here? Then only check the password? hmm...
-        if (errors.Count > 0)
-            return new(errors);
+            return new IncorrectCredentialsError();
 
         if (!await PasswordHasher.Verify(user!.Password, input.Password!))
-            return new(new IncorrectCredentialsError());
+            return new IncorrectCredentialsError();
 
         await accessor.HttpContext!.SignInAsync("default", new ClaimsPrincipal(
             new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, "default")
@@ -88,6 +88,10 @@ public static class UserMutations
 
     public static async Task<bool> Logout(DatabaseContext db, IHttpContextAccessor accessor)
     {
+        // I don't know if it can ever happen, but it's funny to just always return true so I added a filler `if` statement.
+        if (accessor.HttpContext is null)
+            return false;
+        
         await accessor.HttpContext!.SignOutAsync();
         return true;
     }

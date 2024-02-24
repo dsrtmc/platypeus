@@ -86,7 +86,7 @@ builder.Services
         o.Complexity.Enable = true;
         o.Complexity.DefaultComplexity = 1;
         o.Complexity.DefaultResolverComplexity = 5;
-        o.Complexity.MaximumAllowed = 1500;
+        o.Complexity.MaximumAllowed = 10000;
         // TODO: consider persistent queries
         // TODO: maybe make it dev only? ↓
         o.IncludeExceptionDetails = true;

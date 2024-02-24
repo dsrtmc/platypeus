@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
 using Server.Models;
 using Server.Schema.Types.Errors;
@@ -11,41 +12,15 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class RaceMutations
 {
-    // TODO: i don't even know if we have to return anything here. i mean, why not I guess, but then again, why should we?
-    public static async Task<MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacerStatisticsError>> UpdateStatsForUser(
-        Guid userId, Guid raceId, DatabaseContext db, int wpm, int wordsTyped,
-        [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
-    {
-        var user = await db.Users.FindAsync(userId);
-        if (user is null)
-            return new InvalidUserError(userId);
-        
-        var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
-        if (race is null)
-            return new InvalidRaceError(raceId);
-
-        var racer = await db.Racers.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.User.Id == userId, cancellationToken);
-        if (racer is null)
-            return new InvalidRacerStatisticsError(userId, raceId);
-
-        racer.Wpm = wpm;
-        racer.WordsTyped = wordsTyped;
-
-        await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
-        
-        return race;
-    }
-    
     public static async Task<MutationResult<Race, InvalidRaceError>> FinishRace(
         Guid raceId, DatabaseContext db,
-        [Service] ITopicEventSender eventSender,
-        CancellationToken cancellationToken)
+        [Service] ITopicEventSender eventSender)
     {
         var race = await db.Races
             .Include(r => r.Host)
-            .Include(r => r.Racers).ThenInclude(r => r.User)
-            .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+            .Include(r => r.Racers)
+                .ThenInclude(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == raceId);
         
         if (race is null)
             return new InvalidRaceError(raceId);
@@ -55,44 +30,22 @@ public static class RaceMutations
 
         race.Finished = true;
 
-        await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
-
-        return race;
-    }
-    
-    public static async Task<MutationResult<Race, InvalidRaceError, InvalidUserError, InvalidRacerStatisticsError>> FinishRaceForUser(
-        Guid userId, Guid raceId, DatabaseContext db,
-        [Service] ITopicEventSender eventSender,
-        CancellationToken cancellationToken)
-    {
-        var user = await db.Users.FindAsync(userId);
-        if (user is null)
-            return new InvalidUserError(userId);
-        
-        var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).Include(r => r.Host).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
-        if (race is null)
-            return new InvalidRaceError(raceId);
-        
-        var racerStatistics = await db.Racers.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.User.Id == userId, cancellationToken);
-        if (racerStatistics is null)
-            return new InvalidRacerStatisticsError(userId, raceId);
-
-        racerStatistics.Finished = true;
-
-        await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+        await db.SaveChangesAsync();
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race);
 
         return race;
     }
     
     public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> RunRace(
-        Guid raceId, DatabaseContext db,
-        [Service] ITopicEventSender eventSender,
-        CancellationToken cancellationToken)
+        Guid raceId, DatabaseContext db, [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
         // TODO: fix funny includes
-        var race = await db.Races.Include(r => r.Host).Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        var race = await db.Races
+            .Include(r => r.Host)
+            .Include(r => r.Racers)
+                .ThenInclude(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        
         if (race is null)
             return new InvalidRaceError(raceId);
         
@@ -122,8 +75,13 @@ public static class RaceMutations
         if (user is null)
             return new NotAuthenticatedError();
         
-        // TODO: fix funny includes
-        var race = await db.Races.Include(r => r.Host).Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        // I'm pretty sure I am forced to include all of these
+        var race = await db.Races
+            .Include(r => r.Host)
+            .Include(r => r.Racers)
+                .ThenInclude(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        
         if (race is null)
             return new InvalidRaceError(raceId);
 
@@ -149,10 +107,8 @@ public static class RaceMutations
     public static async Task<
         MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacePasswordError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
     > JoinRace(
-        Guid? userId, Guid? raceId, string? password,
-        DatabaseContext db,
-        [Service] ITopicEventSender eventSender,
-        CancellationToken cancellationToken)
+        Guid? userId, Guid? raceId, string? password, DatabaseContext db,
+        [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
         if (userId is null)
             return new InvalidUserError(userId);
@@ -227,15 +183,16 @@ public static class RaceMutations
         bool isPrivate, string mode, int modeSetting, string content, 
         string? password, DatabaseContext db, IHttpContextAccessor accessor)
     {
-        var userIdClaim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-        if (userIdClaim is null)
+        var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+        if (claim is null || claim.Value.IsNullOrEmpty())
             return new NotAuthenticatedError();
 
-        var user = await db.Users.FindAsync(new Guid(userIdClaim.Value));
+        var userId = new Guid(claim.Value);
+        
+        var user = await db.Users.FindAsync(userId);
         if (user is null)
             return new NotAuthenticatedError();
             
-        // if (!isPrivate) password = null; // TODO: could be funny to add that, seems like it'd make sense.
         var race = new Race
         {
             Host = user,
@@ -245,7 +202,7 @@ public static class RaceMutations
             ModeSetting = modeSetting,
             Content = content,
             Chatbox = new Chatbox(),
-            Password = password
+            Password = isPrivate ? password : null
         };
         
         db.Races.Add(race);

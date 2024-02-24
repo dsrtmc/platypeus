@@ -1,14 +1,6 @@
 import { getClient } from "@/lib/client";
 import styles from "./User.module.css";
-import {
-  GetScoresDocument,
-  GetScoresQueryVariables,
-  GetUserByUsernameDocument,
-  GetUsersBestScoresDocument,
-  UserPage_GetUserDocument,
-} from "@/graphql/generated/graphql";
-import { PerformanceChart } from "@/app/user/[username]/PerformanceChart";
-import { gql } from "@apollo/client";
+import { UserPage_GetUserDocument } from "@/graphql/generated/graphql";
 
 export default async function UserPage({ params }: { params: { username: string } }) {
   const { data } = await getClient().query({

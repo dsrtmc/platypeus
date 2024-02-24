@@ -510,7 +510,9 @@ export const Test = forwardRef<TestMethods, Props>(
             exitActive: styles.wordsExitActive,
           }}
         >
-          <div className={styles.words}>{wordPool.map((word) => word)}</div>
+          <div className={styles.words} ref={nodeRef}>
+            {wordPool.map((word) => word)}
+          </div>
         </CSSTransition>
         <Caret x={caretPosition.x} y={caretPosition.y} running={running} focused={focused} ref={caretRef} />
       </>

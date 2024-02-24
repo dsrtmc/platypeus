@@ -29,6 +29,7 @@ public class DatabaseContext : DbContext
         // not sure if that's any bit real so I keep it here to verify it later
         var entries = ChangeTracker.Entries();
         var now = DateTime.UtcNow;
+        
         foreach (var entry in entries)
         {
             if (entry.Entity is not BaseEntity entity) continue;

@@ -11,7 +11,7 @@ export async function RaceList({}) {
     query: GetRacesDocument,
     variables: {
       where: { and: [{ running: { eq: false } }, { finished: { eq: false } }] },
-      order: { createdAt: "DESC" },
+      order: [{ createdAt: "DESC" }],
       racesFirst: 5,
       racersFirst: 5,
     } as GetRacesQueryVariables,

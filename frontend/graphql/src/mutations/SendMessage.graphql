@@ -1,5 +1,13 @@
 mutation SendMessage($input: SendMessageInput!) {
     sendMessage(input: $input) {
-        boolean
+        message {
+            id
+        }
+        errors {
+            code: __typename
+            ... on Error {
+                message
+            }
+        }
     }
 }

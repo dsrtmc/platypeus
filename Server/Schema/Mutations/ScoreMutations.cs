@@ -25,10 +25,10 @@ public static class ScoreMutations
     /// <param name="accessor">Provides access to the current <see cref="HttpContext"/>, if one is available</param>
     /// <returns>The created score</returns>
     public static async Task<Score> CreateScore(
-        int wpm, int rawWpm, string mode, int modeSetting, string content, float accuracy, List<int> wpmStats, List<int> rawStats,
-        string language, DatabaseContext db,
-        [Service] IHttpContextAccessor accessor
-    ) {
+        int wpm, int rawWpm, string mode, int modeSetting, string content,
+        float accuracy, List<int> wpmStats, List<int> rawStats, string language,
+        DatabaseContext db, [Service] IHttpContextAccessor accessor)
+    {
         var score = new Score
         {
             Wpm = wpm,
@@ -42,9 +42,8 @@ public static class ScoreMutations
             Language = language,
         };
         
-        var context = accessor.HttpContext!;
+        var userId = accessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
         
-        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
             return score;
 

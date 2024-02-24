@@ -7,6 +7,12 @@ namespace Server.Schema.Queries;
 [QueryType]
 public static class ChatboxQueries
 {
-    public static List<Chatbox> GetAllChatboxes(DatabaseContext db)
-        => db.Chatboxes.Include(c => c.Messages).ToList();
+    [UsePaging]
+    // [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<Chatbox> GetChatboxes(DatabaseContext db)
+        => db.Chatboxes
+            .Include(c => c.Messages)
+                .ThenInclude(m => m.Author);
 }

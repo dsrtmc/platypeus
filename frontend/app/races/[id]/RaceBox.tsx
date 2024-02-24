@@ -1,13 +1,11 @@
 "use client";
 
-import React, { Fragment, Ref, useCallback, useEffect, useRef, useState } from "react";
-import { gql, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
+import React, { useEffect, useRef, useState } from "react";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
   CreateScoreDocument,
   FinishRaceDocument,
   FinishRaceForUserDocument,
-  FlipRunningStatusDocument,
-  GetRacesDocument,
   JoinRaceDocument,
   LeaveRaceDocument,
   MeDocument,
@@ -24,12 +22,8 @@ import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
 import { StartRaceButton } from "@/app/races/[id]/StartRaceButton";
 import { JoinRaceButton } from "@/app/races/[id]/JoinRaceButton";
 import { LeaveRaceButton } from "@/app/races/[id]/LeaveRaceButton";
-import { setFlagsFromString } from "v8";
 import { Timer } from "@/components/test/Timer";
 import { WordProgress } from "@/components/test/WordProgress";
-import { count } from "rxjs";
-import { RacerProgressCard } from "@/app/races/[id]/RacerProgressCard";
-import { RacerScoreCard } from "@/app/races/[id]/RacerScoreCard";
 import { RaceScoreboard } from "@/app/races/[id]/RaceScoreboard";
 
 interface Props {
@@ -39,6 +33,7 @@ interface Props {
 // The length of race start countdown in seconds
 const COUNTDOWN_TIME = 5;
 
+// TODO: ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ lowkey i like that idea.
 // TODO: Maybe we just load the race server-side first in `../page.tsx` and then we don't have to struggle w/ initial states here
 // TODO: add error handling whenever we execute a mutation (not just in this file)
 export const RaceBox: React.FC<Props> = ({ raceId }) => {
@@ -78,11 +73,9 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     if (userHasFinished) return;
     await updateStatsForUser({ variables: { input: { raceId, userId: meData.me.id, wpm, wordsTyped: wordCount } } });
   }
-  // TODO: maybe rename to `handleFinishTest`? makes sense since the behavior changes based on where we're at
   async function handleSaveScore(score: ScoreType) {
+    // Prevents multiple saving of the same score (as well as attempting to save on re-entering, which would crash out)
     if (userHasFinished) return;
-    // TODO: think whether i definitely want to save scores in races
-    console.log("The score we should be trying to save:", score);
     await handleChangeWpm(score.wpm);
     await createScore({
       variables: {
@@ -131,7 +124,6 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
     return words;
   }
 
-  // Handles what happens after the `StartRaceButton` is pressed
   async function handleStart() {
     if (!data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
       await startRace({ variables: { input: { raceId } } });
@@ -149,8 +141,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
   async function handleFinishForUser() {
     if (!meData || !meData.me) return;
     const response = await finishRaceForUser({ variables: { input: { raceId, userId: meData?.me!.id } } });
-    console.log("Response from finishRaceForUser:", response);
-    setUserHasFinished(true);
+    setUserHasFinished(!!response.data?.finishRaceForUser.racer?.finished);
   }
 
   async function handleJoinRace() {
@@ -274,6 +265,7 @@ export const RaceBox: React.FC<Props> = ({ raceId }) => {
           handleStart={handleStart}
         />
       )}
+      {/* TODO: ↓ */}
       {!data.onRaceEvent.running && !data.onRaceEvent.finished && (
         <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
       )}

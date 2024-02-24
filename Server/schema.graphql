@@ -19,6 +19,24 @@ type Chatbox {
   updatedAt: DateTime!
 }
 
+"A connection to a list of items."
+type ChatboxesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [ChatboxesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Chatbox!]
+}
+
+"An edge in a connection."
+type ChatboxesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Chatbox!
+}
+
 type CreateChatboxPayload {
   chatbox: Chatbox
 }
@@ -37,7 +55,7 @@ type DeleteUserPayload {
 }
 
 type FinishRaceForUserPayload {
-  race: Race
+  racer: Racer
   errors: [FinishRaceForUserError!] @cost(complexity: 5)
 }
 
@@ -129,14 +147,14 @@ type Mutation {
   joinChatbox(input: JoinChatboxInput!): JoinChatboxPayload! @cost(complexity: 5)
   createChatbox: CreateChatboxPayload! @cost(complexity: 5)
   sendMessage(input: SendMessageInput!): SendMessagePayload! @cost(complexity: 5)
-  updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload! @cost(complexity: 5)
   finishRace(input: FinishRaceInput!): FinishRacePayload! @cost(complexity: 5)
-  finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload! @cost(complexity: 5)
   runRace(input: RunRaceInput!): RunRacePayload! @cost(complexity: 5)
   startRace(input: StartRaceInput!): StartRacePayload! @cost(complexity: 5)
   joinRace(input: JoinRaceInput!): JoinRacePayload! @cost(complexity: 5)
   leaveRace(input: LeaveRaceInput!): LeaveRacePayload! @cost(complexity: 5)
   createRace(input: CreateRaceInput!): CreateRacePayload! @cost(complexity: 5)
+  updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload! @cost(complexity: 5)
+  finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload! @cost(complexity: 5)
   createScore(input: CreateScoreInput!): CreateScorePayload! @cost(complexity: 5)
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(complexity: 5)
   register(input: RegisterInput!): RegisterPayload! @cost(complexity: 5)
@@ -165,21 +183,17 @@ type PageInfo {
 }
 
 type Query {
-  allChatboxes: [Chatbox!]!
+  chatboxes("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ChatboxFilterInput order: [ChatboxSortInput!]): ChatboxesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  messages("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: MessageFilterInput order: [MessageSortInput!]): MessagesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   hello: String!
-  racers(raceId: UUID!): [Racer!]! @cost(complexity: 5)
   races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
-  allRaces: [Race!]!
   allScores: [Score!]! @cost(complexity: 5)
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  score(id: UUID! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): Score @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   scoresForLeaderboard("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
-  score(id: UUID!): Score @cost(complexity: 5)
+  bye: String! @authorize
   me: User
   usersBestScores(userId: UUID!): [Score]!
-  userByUsername(username: String!): User
-  userById(id: UUID!): User
-  bye: String! @authorize
-  allUsers: [User!]!
   users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: UserFilterInput order: [UserSortInput!]): UsersConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   user(where: UserFilterInput): User @cost(complexity: 5)
 }
@@ -322,7 +336,8 @@ type ScoresForLeaderboardEdge {
 }
 
 type SendMessagePayload {
-  boolean: Boolean
+  message: Message
+  errors: [SendMessageError!] @cost(complexity: 5)
 }
 
 type StartRacePayload {
@@ -331,8 +346,8 @@ type StartRacePayload {
 }
 
 type Subscription {
-  onRaceEvent(raceId: UUID!): Race!
   onChatboxEvent(chatboxId: UUID!): Chatbox!
+  onRaceEvent(raceId: UUID!): Race!
 }
 
 type TooFewRacersError implements Error {
@@ -340,7 +355,7 @@ type TooFewRacersError implements Error {
 }
 
 type UpdateStatsForUserPayload {
-  race: Race
+  racer: Racer
   errors: [UpdateStatsForUserError!] @cost(complexity: 5)
 }
 
@@ -393,6 +408,8 @@ union LoginError = InvalidFieldError | IncorrectCredentialsError
 union RegisterError = InvalidFieldError | UsernameTakenError
 
 union RunRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
+
+union SendMessageError = NotAuthenticatedError | InvalidChatboxError
 
 union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError | RaceAlreadyRunningError | TooFewRacersError
 
@@ -556,6 +573,15 @@ input MessageFilterInput {
   updatedAt: DateTimeOperationFilterInput
 }
 
+input MessageSortInput {
+  author: UserSortInput
+  chatbox: ChatboxSortInput
+  content: SortEnumType
+  id: SortEnumType
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
+}
+
 input RaceFilterInput {
   and: [RaceFilterInput!]
   or: [RaceFilterInput!]
@@ -653,7 +679,6 @@ input ScoreSortInput {
 }
 
 input SendMessageInput {
-  userId: UUID!
   chatboxId: UUID!
   content: String!
 }

@@ -8,7 +8,7 @@ namespace Server.Helpers;
 public static class Helper
 {
     // TODO: Extend validation before deployment
-    // TODO: prune resolver arguments (chilli cream video) maybe idk
+    // TODO: prune resolver arguments (ChilliCream video) maybe idk
     /// <summary>
     /// Validates the provided input and returns a list of errors.
     /// </summary>
@@ -17,6 +17,7 @@ public static class Helper
     public static List<object> Validate(this LoginInput input)
     {
         var errors = new List<object>();
+        
         if (input.Username is null)
             errors.Add(new InvalidFieldError("username", input.Username));
         
@@ -34,6 +35,7 @@ public static class Helper
     public static List<object> Validate(this RegisterInput input)
     {
         var errors = new List<object>();
+        
         if (input.Username is null)
             errors.Add(new InvalidFieldError("username", input.Username));
         
@@ -46,7 +48,6 @@ public static class Helper
         return errors;
     }
 
-    // TODO: rename to on race event
-    public static string EncodeOnRaceEventToken(Guid? raceId) => $"{nameof(Subscription.OnRaceEvent)}_{raceId}";
-    public static string EncodeOnChatboxEventToken(Guid? chatboxId) => $"{nameof(Subscription.OnChatboxEvent)}_{chatboxId}";
+    public static string EncodeOnRaceEventToken(Guid? raceId) => $"{nameof(RaceSubscriptions.OnRaceEvent)}_{raceId}";
+    public static string EncodeOnChatboxEventToken(Guid? chatboxId) => $"{nameof(ChatboxSubscriptions.OnChatboxEvent)}_{chatboxId}";
 }
