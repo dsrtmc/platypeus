@@ -10,16 +10,11 @@ namespace Server.Schema.Queries;
 [QueryType]
 public static class ScoreQueries
 {
-    public static async Task<List<Score>> GetAllScores(DatabaseContext db)
-    {
-        return await db.Scores.Include(s => s.User).ToListAsync();
-    }
-    
     [UsePaging]
     // [UseProjection]
     [UseFiltering]
     [UseSorting]
-    // DUPLICATION????????????? STUPID BUG
+    // investigate the duplicated entries bug
     public static IQueryable<Score> GetScores(DatabaseContext db)
     {
         // TODO: Distinct on User, not necessarily here or make it opt-in
@@ -36,14 +31,17 @@ public static class ScoreQueries
         return db.Scores;
     }
     
+    // TODO: The generated SQL is the worst thing I've ever seen. Doubt I can tackle that without HotChocolate supporting `distinct_on` or writing the SQL myself
+    // ↑ see https://github.com/ChilliCream/graphql-platform/discussions/4848
+    // While the EF Core's translation of this raw SQL isn't amazing either, it's definitely much clearer
     [UsePaging]
-    // [UseProjection]
-    [UseFiltering]
-    [UseSorting]
-    // DUPLICATION????????????? STUPID BUG
-    // TODO: fix this stupid fucking distinct by thing
-    public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db)
+    // investigate the duplicated entries bug
+    public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db, string mode, int modeSetting)
     {
-        return db.Scores;
+        // return db.Scores.Include(s => s.User).GroupBy(s => s.UserId).Select(r => r.First());
+        // TODO: Why the fuck does it only work if `mode` is "time" AND `modeSetting` is 5?
+        return db.Scores.FromSql(
+                $"SELECT DISTINCT ON (s.\"UserId\") s.* FROM \"Scores\" s WHERE s.\"Mode\" = {mode} AND s.\"ModeSetting\" = {modeSetting} ORDER BY s.\"UserId\", s.\"Wpm\" DESC"
+            ).Include(s => s.User);
     }
 }

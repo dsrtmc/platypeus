@@ -1,6 +1,6 @@
 # It's just a copy of GetScores, but is distinct on the user field.
-query GetScoresForLeaderboard($after: String, $before: String, $first: Int, $last: Int, $order: [ScoreSortInput!], $where: ScoreFilterInput) {
-    scoresForLeaderboard(after: $after, before: $before, first: $first, last: $last, order: $order, where: $where) {
+query GetScoresForLeaderboard($after: String, $before: String, $first: Int, $last: Int, $mode: String!, $modeSetting: Int!) {
+    scoresForLeaderboard(after: $after, before: $before, first: $first, last: $last, mode: $mode, modeSetting: $modeSetting) {
         edges {
             node {
                 id

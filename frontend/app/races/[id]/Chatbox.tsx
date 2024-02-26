@@ -56,7 +56,6 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
       variables: {
         input: {
           content: data.content,
-          userId: meData.me!.id,
           chatboxId,
         },
       },

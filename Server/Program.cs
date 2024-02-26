@@ -29,6 +29,7 @@ builder.Services.AddCors((o) =>
     });
 });
 
+// TODO: read up on advanced operation complexity HotChocolate
 // TODO: rename
 // TODO: see if there's an easy way to return an errors "sorry you're rate limited" rather than just making the user wait
 // TODO: change values in prod and idk before deployment and stuff

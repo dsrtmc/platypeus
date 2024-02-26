@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using HotChocolate.Subscriptions;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
@@ -12,6 +13,7 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class MessageMutations
 {
+    // TODO: Figure out rate-limiting on specific mutations; if not possible, then just resort to writing a limiter only on the client-side.
     public static async Task<MutationResult<Message, NotAuthenticatedError, InvalidChatboxError>> SendMessage(
         Guid chatboxId, string content, DatabaseContext db,
         IHttpContextAccessor accessor, [Service] ITopicEventSender eventSender)
