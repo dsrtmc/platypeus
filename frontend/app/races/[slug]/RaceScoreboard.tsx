@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Race.module.css";
 import { OnRaceEventSubscription } from "@/graphql/generated/graphql";
-import { RacerScoreCard } from "@/app/races/[id]/RacerScoreCard";
+import { RacerScoreCard } from "@/app/races/[slug]/RacerScoreCard";
 
 interface Props {
   edges: OnRaceEventSubscription["onRaceEvent"]["racers"]["edges"];

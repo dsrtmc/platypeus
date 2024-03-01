@@ -281,7 +281,7 @@
     width: 100%;
     padding: .25rem 1rem;
     background-color: var(--sub-alt-color);
-    color: var(--sub-color);
+    color: var(--text-color);
     font-size: 1rem; /* kind of funny but it's because of `TestConfig` overriding the size */
 }
 

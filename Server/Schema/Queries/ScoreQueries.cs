@@ -21,11 +21,10 @@ public static class ScoreQueries
         return db.Scores.Include(s => s.User);
     }
     
-    [UsePaging]
-    [UseFiltering]
-    [UseSorting]
     [UseSingleOrDefault]
-    public static IQueryable<Score?> GetScore(Guid id, DatabaseContext db)
+    [UseProjection]
+    [UseFiltering]
+    public static IQueryable<Score?> GetScore(DatabaseContext db)
     {
         // not sure whether the return type should be nullable if I'm using UseSingleOrDefault
         return db.Scores;

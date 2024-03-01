@@ -11,7 +11,7 @@ import {
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { IoSend } from "react-icons/io5";
-import { Message } from "@/app/races/[id]/Message";
+import { Message } from "@/app/races/[slug]/Message";
 import TextareaAutosize from "react-textarea-autosize";
 
 interface Props {
@@ -29,13 +29,13 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
   const { data, loading, error } = useSubscription(OnChatboxEventDocument, {
     variables: {
       chatboxId,
-      messagesFirst: 50,
+      messagesLast: 50,
     },
   });
 
-  // TODO: Not sure whether there's a better way to do that with react-hook-form,
-  // but as of right now, using `role="textbox"` is an issue.
   const [sendMessage, _] = useMutation(SendMessageDocument);
+
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const {
     register,
@@ -60,6 +60,9 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
         },
       },
     });
+    if (wrapperRef.current) {
+      wrapperRef.current!.scrollTop = wrapperRef.current!.scrollHeight;
+    }
     resetField("content" as FieldPath<FormValues>);
   };
 
@@ -70,9 +73,11 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
     }
   }
 
+  // TODO: look up all `if (!data)` or `if (loading)` and make them look nicer
+  if (!data) return <div>no data yet</div>;
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.chatbox}>
-      <div className={styles.messageListWrapper}>
+      <div className={styles.messageListWrapper} ref={wrapperRef}>
         <ul className={styles.messageList}>
           {data?.onChatboxEvent.messages?.edges!.map((edge) => (
             // TODO: colors xd

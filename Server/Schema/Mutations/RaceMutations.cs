@@ -6,6 +6,7 @@ using Server.Helpers;
 using Server.Models;
 using Server.Schema.Types.Errors;
 using Server.Services;
+using Server.Utilities;
 
 namespace Server.Schema.Mutations;
 
@@ -192,7 +193,20 @@ public static class RaceMutations
         var user = await db.Users.FindAsync(userId);
         if (user is null)
             return new NotAuthenticatedError();
-            
+
+        var attemptCount = 0;
+        var slug = RandomGenerator.GenerateRandomString(8);
+        
+        while (db.Races.FirstOrDefault(r => r.Slug == slug) is not null)
+        {
+            Console.WriteLine($"The slug: {slug}");
+            if (++attemptCount >= 50)
+            {
+                // TODO: return an error "too many attempts to generate a slug" idk
+            }
+            slug = RandomGenerator.GenerateRandomString(8);
+        }
+        
         var race = new Race
         {
             Host = user,
@@ -202,6 +216,7 @@ public static class RaceMutations
             ModeSetting = modeSetting,
             Content = content,
             Chatbox = new Chatbox(),
+            Slug = slug,
             Password = isPrivate ? password : null
         };
         

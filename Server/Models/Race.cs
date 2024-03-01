@@ -24,7 +24,9 @@ public class Race : BaseEntity
     
     public string? Password { get; set; }
     
-    public DateTime StartTime { get; set; }
+    public string Slug { get; set; }
+    
+    public DateTime? StartTime { get; set; }
     
     public Guid ChatboxId { get; set; }
     

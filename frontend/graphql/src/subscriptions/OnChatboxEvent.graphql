@@ -1,6 +1,6 @@
-subscription OnChatboxEvent($chatboxId: UUID!, $messagesFirst: Int) {
+subscription OnChatboxEvent($chatboxId: UUID!, $messagesLast: Int) {
     onChatboxEvent(chatboxId: $chatboxId) {
-        messages(first: $messagesFirst) {
+        messages(last: $messagesLast) {
             edges {
                 node {
                     id

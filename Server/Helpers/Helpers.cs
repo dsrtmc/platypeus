@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Schema.Types.Mutations;
@@ -47,7 +48,7 @@ public static class Helper
 
         return errors;
     }
-
+    
     public static string EncodeOnRaceEventToken(Guid? raceId) => $"{nameof(RaceSubscriptions.OnRaceEvent)}_{raceId}";
     public static string EncodeOnChatboxEventToken(Guid? chatboxId) => $"{nameof(ChatboxSubscriptions.OnChatboxEvent)}_{chatboxId}";
 }

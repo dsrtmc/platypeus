@@ -1,5 +1,5 @@
-query GetScore($id: UUID!) {
-    score(id: $id) {
+query GetScore($where: ScoreFilterInput) {
+    score(where: $where) {
         id
         wpm
         rawWpm

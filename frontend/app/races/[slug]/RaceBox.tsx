@@ -6,6 +6,7 @@ import {
   CreateScoreDocument,
   FinishRaceDocument,
   FinishRaceForUserDocument,
+  GetRaceQuery,
   JoinRaceDocument,
   LeaveRaceDocument,
   MeDocument,
@@ -15,19 +16,19 @@ import {
   StartRaceDocument,
   UpdateStatsForUserDocument,
 } from "@/graphql/generated/graphql";
-import { Chatbox } from "@/app/races/[id]/Chatbox";
+import { Chatbox } from "@/app/races/[slug]/Chatbox";
 import styles from "./Race.module.css";
 import { Test, TestMethods } from "@/components/test/Test";
 import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
-import { StartRaceButton } from "@/app/races/[id]/StartRaceButton";
-import { JoinRaceButton } from "@/app/races/[id]/JoinRaceButton";
-import { LeaveRaceButton } from "@/app/races/[id]/LeaveRaceButton";
+import { StartRaceButton } from "@/app/races/[slug]/StartRaceButton";
+import { JoinRaceButton } from "@/app/races/[slug]/JoinRaceButton";
+import { LeaveRaceButton } from "@/app/races/[slug]/LeaveRaceButton";
 import { Timer } from "@/components/test/Timer";
 import { WordProgress } from "@/components/test/WordProgress";
-import { RaceScoreboard } from "@/app/races/[id]/RaceScoreboard";
+import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
 
 interface Props {
-  raceId: string;
+  race: GetRaceQuery["race"];
 }
 
 // The length of race start countdown in seconds
@@ -36,8 +37,11 @@ const COUNTDOWN_TIME = 5;
 // TODO: ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ lowkey i like that idea.
 // TODO: Maybe we just load the race server-side first in `../page.tsx` and then we don't have to struggle w/ initial states here
 // TODO: add error handling whenever we execute a mutation (not just in this file)
-export const RaceBox: React.FC<Props> = ({ raceId }) => {
-  const { data, loading, error } = useSubscription(OnRaceEventDocument, { variables: { raceId, racersFirst: 10 } });
+export const RaceBox: React.FC<Props> = ({ race }) => {
+  const { data, loading, error } = useSubscription(OnRaceEventDocument, {
+    variables: { raceId: race!.id, racersFirst: 10 },
+  });
+  console.log("THE DATA:", data);
   const { data: meData } = useQuery(MeDocument);
 
   const [finishRaceForUser, {}] = useMutation(FinishRaceForUserDocument);

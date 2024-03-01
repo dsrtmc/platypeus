@@ -16,4 +16,13 @@ public static class RaceQueries
             .Include(r => r.Host)
             .Include(r => r.Racers)
                 .ThenInclude(r => r.User);
+    
+    [UseSingleOrDefault]
+    [UseProjection]
+    [UseFiltering]
+    public static IQueryable<Race?> GetRace(DatabaseContext db)
+    {
+        // not sure whether the return type should be nullable if I'm using UseSingleOrDefault
+        return db.Races;
+    }
 }

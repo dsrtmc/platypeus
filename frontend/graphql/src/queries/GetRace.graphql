@@ -1,0 +1,20 @@
+query GetRace($where: RaceFilterInput, $racersFirst: Int!) {
+    race(where: $where) {
+        id
+        createdAt
+        racers(first: $racersFirst) {
+            edges {
+                node {
+                    user {
+                        username
+                    }
+                    wpm
+                }
+            }
+        }
+        host {
+            username
+        }
+        finished
+    }
+}

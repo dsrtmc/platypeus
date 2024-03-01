@@ -71,7 +71,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     });
     console.log("mode setting:", data.modeSetting);
     console.log("The response we got:", response);
-    router.push(`/races/${response.data?.createRace.race?.id}`);
+    router.push(`/races/${response.data?.createRace.race?.slug}`);
   };
   // TODO: require authentication
   return (

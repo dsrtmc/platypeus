@@ -187,8 +187,9 @@ type Query {
   messages("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: MessageFilterInput order: [MessageSortInput!]): MessagesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   hello: String!
   races("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: RaceFilterInput order: [RaceSortInput!]): RacesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  race(where: RaceFilterInput): Race @cost(complexity: 5)
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
-  score(id: UUID! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): Score @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  score(where: ScoreFilterInput): Score @cost(complexity: 5)
   scoresForLeaderboard(mode: String! modeSetting: Int! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   bye: String! @authorize
   me: User
@@ -208,7 +209,8 @@ type Race {
   finished: Boolean!
   private: Boolean!
   password: String
-  startTime: DateTime!
+  slug: String!
+  startTime: DateTime
   chatboxId: UUID!
   chatbox: Chatbox!
   id: UUID!
@@ -594,6 +596,7 @@ input RaceFilterInput {
   finished: BooleanOperationFilterInput
   private: BooleanOperationFilterInput
   password: StringOperationFilterInput
+  slug: StringOperationFilterInput
   startTime: DateTimeOperationFilterInput
   chatboxId: UuidOperationFilterInput
   chatbox: ChatboxFilterInput
@@ -612,6 +615,7 @@ input RaceSortInput {
   finished: SortEnumType
   private: SortEnumType
   password: SortEnumType
+  slug: SortEnumType
   startTime: SortEnumType
   chatboxId: SortEnumType
   chatbox: ChatboxSortInput

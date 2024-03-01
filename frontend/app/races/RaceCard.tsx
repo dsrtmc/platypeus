@@ -9,7 +9,7 @@ interface Props {
 
 export const RaceCard: React.FC<Props> = ({ node: race }) => {
   return (
-    <Link href={`/races/${race.id}`} className={styles.card}>
+    <Link href={`/races/${race.slug}`} className={styles.card}>
       <div>click here to join it :D</div>
       <div>author: {race.host.username}</div>
       <div>
