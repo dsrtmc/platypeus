@@ -4,10 +4,8 @@ public class UsernameTakenError
 {
     public UsernameTakenError(string username)
     {
-        Username = username;
+        Message = $"The username \"{username}\" is already taken.";
     }
     
-    private string Username { get; set; }
-    
-    public string Message => $"The username \"{Username}\" is already taken.";
+    public string Message { get; set; }
 }

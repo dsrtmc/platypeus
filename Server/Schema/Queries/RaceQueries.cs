@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Models;
+using Server.Schema.Subscriptions;
 using Server.Services;
 
 namespace Server.Schema.Queries;
@@ -16,7 +17,7 @@ public static class RaceQueries
             .Include(r => r.Host)
             .Include(r => r.Racers)
                 .ThenInclude(r => r.User);
-    
+
     [UseSingleOrDefault]
     [UseProjection]
     [UseFiltering]

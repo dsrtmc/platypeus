@@ -8,6 +8,7 @@ import {
   FunctionComponent,
   ReactElement,
   ReducerState,
+  Ref,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -42,7 +43,7 @@ interface Props {
    * @param {KeyboardEvent} e - the global keyboard event
    * @returns {number} 0 if all OK, non-0 value if we should stop handling inputs
    */
-  onKeyDown: (e: globalThis.KeyboardEvent) => number;
+  onKeyDown: (e: globalThis.KeyboardEvent) => boolean;
   onPoolUpdate: (count: number, index?: number) => string[];
   handleFinish: () => void;
   handleChangeWpm: (wpm: number) => void;
@@ -367,12 +368,13 @@ export const Test = forwardRef<TestMethods, Props>(
       dispatch(initialState);
       setWordPool(createWordElements(initialContent));
       dispatch({ content: initialContent });
+      wordsDivRef.current?.focus();
     }
 
     // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
     const handleKeyDown = useCallback(
       (e: globalThis.KeyboardEvent) => {
-        if (e.key === "Space") e.preventDefault();
+        if (e.key === " ") e.preventDefault();
         // TODO: maybe name it better xd
         const result = onKeyDown(e);
         if (result) return;
@@ -475,10 +477,10 @@ export const Test = forwardRef<TestMethods, Props>(
     }, [windowSize]);
 
     useEffect(() => {
-      document.addEventListener("keydown", handleKeyDown);
+      if (wordsDivRef?.current) wordsDivRef.current!.addEventListener("keydown", handleKeyDown);
       window.addEventListener("resize", handleResize);
       return () => {
-        document.removeEventListener("keydown", handleKeyDown);
+        if (wordsDivRef?.current) wordsDivRef.current!.removeEventListener("keydown", handleKeyDown);
         window.removeEventListener("resize", handleResize);
       };
     }, [handleKeyDown, handleResize]);
@@ -493,14 +495,14 @@ export const Test = forwardRef<TestMethods, Props>(
       return () => setVisible(false);
     }, []);
 
-    // TODO: type
-    const nodeRef = useRef<any>(null);
+    // TODO: name xd
+    const wordsDivRef = useRef<HTMLDivElement | null>(null);
 
     // TODO: not sure if I should keep it here, it kinda looks funky during races, so I guess move it to `TestBox`?
     return (
       <>
         <CSSTransition
-          nodeRef={nodeRef}
+          nodeRef={wordsDivRef as Ref<HTMLDivElement | null>}
           in={visible}
           timeout={500}
           classNames={{
@@ -510,7 +512,7 @@ export const Test = forwardRef<TestMethods, Props>(
             exitActive: styles.wordsExitActive,
           }}
         >
-          <div className={styles.words} ref={nodeRef}>
+          <div className={styles.words} ref={wordsDivRef} tabIndex={1}>
             {wordPool.map((word) => word)}
           </div>
         </CSSTransition>

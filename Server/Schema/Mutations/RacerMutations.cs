@@ -2,6 +2,7 @@ using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
 using Server.Models;
+using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Services;
 
@@ -10,8 +11,8 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class RacerMutations
 {
-    // TODO: i don't even know if we have to return anything here. i mean, why not I guess, but then again, why should we?
-    public static async Task<MutationResult<Racer, InvalidUserError, InvalidRaceError, InvalidRacerStatisticsError>> UpdateStatsForUser(
+    // TODO: make it cookie based again
+    public static async Task<MutationResult<Racer, InvalidUserError, InvalidRaceError, InvalidRacerError>> UpdateStatsForUser(
         Guid userId, Guid raceId, DatabaseContext db, int wpm, int wordsTyped,
         [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
@@ -25,18 +26,23 @@ public static class RacerMutations
 
         var racer = await db.Racers.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.User.Id == userId, cancellationToken);
         if (racer is null)
-            return new InvalidRacerStatisticsError(userId, raceId);
+            return new InvalidRacerError(raceId, user.Username);
 
         racer.Wpm = wpm;
         racer.WordsTyped = wordsTyped;
 
         await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+
+        var message = new RacePropertyUpdate
+        {
+            Racers = race.Racers
+        };
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
         
         return racer;
     }
     
-    public static async Task<MutationResult<Racer, InvalidRaceError, InvalidUserError, InvalidRacerStatisticsError>> FinishRaceForUser(
+    public static async Task<MutationResult<Racer, InvalidRaceError, InvalidUserError, InvalidRacerError>> FinishRaceForUser(
         Guid userId, Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
         CancellationToken cancellationToken)
@@ -51,12 +57,16 @@ public static class RacerMutations
         
         var racer = await db.Racers.FirstOrDefaultAsync(r => r.Race.Id == raceId && r.User.Id == userId, cancellationToken);
         if (racer is null)
-            return new InvalidRacerStatisticsError(userId, raceId);
+            return new InvalidRacerError(raceId, user.Username);
 
         racer.Finished = true;
 
         await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+        var message = new RacePropertyUpdate
+        {
+            Racers = race.Racers
+        };
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return racer;
     }

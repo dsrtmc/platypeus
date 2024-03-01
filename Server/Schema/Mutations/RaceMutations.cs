@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
 using Server.Models;
+using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Services;
 using Server.Utilities;
@@ -32,7 +33,11 @@ public static class RaceMutations
         race.Finished = true;
 
         await db.SaveChangesAsync();
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race);
+        var message = new RacePropertyUpdate
+        {
+            Finished = true
+        };
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message);
 
         return race;
     }
@@ -53,12 +58,15 @@ public static class RaceMutations
         race.Running = true;
 
         await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+        var message = new RacePropertyUpdate
+        {
+            Finished = true
+        };
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;
     }
 
-    // TODO: finally read up on what cancellation token does holy fuck this is ridiculous
     public static async Task<
         MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError, RaceAlreadyRunningError, TooFewRacersError>
     > StartRace(
@@ -100,23 +108,33 @@ public static class RaceMutations
         race.StartTime = DateTime.UtcNow;
         
         await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+        var message = new RacePropertyUpdate
+        {
+            Started = race.Started,
+            StartTime = race.StartTime
+        };
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;
     }
     
     public static async Task<
-        MutationResult<Race, InvalidUserError, InvalidRaceError, InvalidRacePasswordError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
+        MutationResult<Race, NotAuthenticatedError, InvalidRaceError, InvalidRacePasswordError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
     > JoinRace(
-        Guid? userId, Guid? raceId, string? password, DatabaseContext db,
+        Guid? raceId, string? password, DatabaseContext db, IHttpContextAccessor accessor,
         [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
-        if (userId is null)
-            return new InvalidUserError(userId);
+        var context = accessor.HttpContext!;
+        
+        var claim = context.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+        if (claim is null)
+            return new NotAuthenticatedError();
+        
+        var userId = new Guid(claim.Value);
         
         var user = await db.Users.FindAsync(userId);
         if (user is null)
-            return new InvalidUserError(userId);
+            return new NotAuthenticatedError();
 
         var race = await db.Races
             .Include(r => r.Racers)
@@ -144,24 +162,36 @@ public static class RaceMutations
         };
 
         if (race.Racers.FirstOrDefault(r => r.User.Id == user.Id) is not null)
-            return new AlreadyJoinedRaceError(raceId, userId);
+            return new AlreadyJoinedRaceError(raceId, user.Username);
             
         race.Racers.Add(racer);
         
         await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+        var message = new RacePropertyUpdate
+        {
+            Racers = race.Racers
+        };
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
         
         return race;
     }
     
-    public static async Task<MutationResult<Race?, InvalidUserError, InvalidRaceError, RaceIsRunningError>> LeaveRace(
-        Guid userId, Guid raceId, DatabaseContext db,
+    public static async Task<MutationResult<Race?, NotAuthenticatedError, InvalidRaceError, RaceIsRunningError, NotInRaceError>> LeaveRace(
+        Guid raceId, DatabaseContext db, IHttpContextAccessor accessor,
         [Service] ITopicEventSender eventSender,
         CancellationToken cancellationToken)
     {
+        var context = accessor.HttpContext!;
+        
+        var claim = context.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+        if (claim is null)
+            return new NotAuthenticatedError();
+        
+        var userId = new Guid(claim.Value);
+        
         var user = await db.Users.FindAsync(userId);
         if (user is null)
-            return new InvalidUserError(userId);
+            return new NotAuthenticatedError();
     
         var race = await db.Races.Include(r => r.Racers).ThenInclude(r => r.User).FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         if (race is null)
@@ -171,11 +201,17 @@ public static class RaceMutations
             return new RaceIsRunningError();
 
         var racer = race.Racers.FirstOrDefault(r => r.User.Id == userId);
-        if (racer is not null)
-            db.Racers.Remove(racer);
+        if (racer is null)
+            return new NotInRaceError(raceId, user.Username);
+            
+        db.Racers.Remove(racer);
     
         await db.SaveChangesAsync(cancellationToken);
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), race, cancellationToken);
+        var message = new RacePropertyUpdate
+        {
+            Racers = race.Racers
+        };
+        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
     
         return race;
     }

@@ -65,6 +65,14 @@
     overflow: hidden;
 }
 
+.words:active {
+    outline: none;
+}
+
+.words:focus {
+    outline: none;
+}
+
 .wordsEnter {
     opacity: 0;
 }

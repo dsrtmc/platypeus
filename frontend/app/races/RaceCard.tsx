@@ -4,10 +4,10 @@ import Link from "next/link";
 import styles from "./Races.module.css";
 
 interface Props {
-  node: NonNullable<NonNullable<GetRacesQuery["races"]["edges"][number]>["node"]>; // the funniest type known to man
+  race: NonNullable<NonNullable<GetRacesQuery["races"]["edges"][number]>["node"]>; // the funniest type known to man
 }
 
-export const RaceCard: React.FC<Props> = ({ node: race }) => {
+export const RaceCard: React.FC<Props> = ({ race }) => {
   return (
     <Link href={`/races/${race.slug}`} className={styles.card}>
       <div>click here to join it :D</div>

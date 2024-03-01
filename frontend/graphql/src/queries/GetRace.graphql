@@ -1,6 +1,7 @@
 query GetRace($where: RaceFilterInput, $racersFirst: Int!) {
     race(where: $where) {
         id
+        startTime
         createdAt
         racers(first: $racersFirst) {
             edges {
@@ -15,6 +16,7 @@ query GetRace($where: RaceFilterInput, $racersFirst: Int!) {
         host {
             username
         }
+        running
         finished
     }
 }

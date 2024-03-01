@@ -28,7 +28,7 @@ import { WordProgress } from "@/components/test/WordProgress";
 import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
 
 interface Props {
-  race: GetRaceQuery["race"];
+  race: NonNullable<GetRaceQuery["race"]>;
 }
 
 // The length of race start countdown in seconds
@@ -63,19 +63,20 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const [timePassed, setTimePassed] = useState(0);
   const [userHasFinished, setUserHasFinished] = useState(false);
   const [content, setContent] = useState<Array<string> | null>(null);
-  const [countdown, setCountdown] = useState(COUNTDOWN_TIME);
+  const [countdown, setCountdown] = useState(race.running ? 0 : COUNTDOWN_TIME);
   const [wordCount, setWordCount] = useState(0);
 
-  // TODO: maybe just make it a bool xd idk why i did funny numbers
-  function handleKeyDown(e: globalThis.MouseEvent): number {
-    if (!data?.onRaceEvent.running || userHasFinished || !focused) return 1;
-    return 0;
+  // TODO: make it nicer, right now it returns true when we should prevent user input
+  function handleKeyDown(e: globalThis.MouseEvent): boolean {
+    return !data?.onRaceEvent.running || userHasFinished || !focused;
   }
   // TODO: investigate those
   async function handleChangeWpm(wpm: number) {
     if (!meData?.me) return;
     if (userHasFinished) return;
-    await updateStatsForUser({ variables: { input: { raceId, userId: meData.me.id, wpm, wordsTyped: wordCount } } });
+    await updateStatsForUser({
+      variables: { input: { raceId: race!.id, userId: meData.me.id, wpm, wordsTyped: wordCount } },
+    });
   }
   async function handleSaveScore(score: ScoreType) {
     // Prevents multiple saving of the same score (as well as attempting to save on re-entering, which would crash out)
@@ -130,7 +131,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   async function handleStart() {
     if (!data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
-      await startRace({ variables: { input: { raceId } } });
+      await startRace({ variables: { input: { raceId: race!.id } } });
     }
   }
 
@@ -138,23 +139,23 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     if (countdownIntervalRef.current) {
       clearInterval(countdownIntervalRef.current);
     }
-    await finishRace({ variables: { input: { raceId } } });
+    await finishRace({ variables: { input: { raceId: race!.id } } });
   }
 
   // TODO: very likely this shit is causing race conditions; need to investigate how to avoid sending the entire race as the event
   async function handleFinishForUser() {
     if (!meData || !meData.me) return;
-    const response = await finishRaceForUser({ variables: { input: { raceId, userId: meData?.me!.id } } });
+    const response = await finishRaceForUser({ variables: { input: { raceId: race!.id, userId: meData?.me!.id } } });
     setUserHasFinished(!!response.data?.finishRaceForUser.racer?.finished);
   }
 
   async function handleJoinRace() {
-    await joinRace({ variables: { input: { raceId, userId: meData!.me!.id } } });
+    await joinRace({ variables: { input: { raceId: race.id } } });
   }
 
   async function handleLeaveRace() {
     if (!meData || !meData.me) return;
-    await leaveRace({ variables: { input: { raceId, userId: meData.me.id } } });
+    await leaveRace({ variables: { input: { raceId: race.id } } });
   }
 
   useEffect(() => {
@@ -173,7 +174,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     if (!data) return;
     if (countdown <= 0) {
       clearInterval(countdownIntervalRef.current);
-      (async () => await runRace({ variables: { input: { raceId } } }))();
+      (async () => await runRace({ variables: { input: { raceId: race.id } } }))();
     }
   }, [countdown]);
 
@@ -235,7 +236,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
       )}
       {/* TODO: maybe an unnecessary ref idk */}
-      <h1>FOCUSED: {focused ? " True" : " False"}</h1>
       <div ref={ref}>
         <Test
           focused={focused}
@@ -258,7 +258,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
       </div>
       {data?.onRaceEvent.host.id === meData?.me?.id && (
         // TODO: looks like the length doesn't get updated the way it should? useState??????? LOL!!!!!!!!!!! love react
-        // <StartRaceButton handleStart={onRaceStart} hasError={finished || data.onRaceEvent.racers.length <= 0} />
         <StartRaceButton
           disabled={
             data.onRaceEvent.finished ||
@@ -279,11 +278,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         modeSetting={data.onRaceEvent.modeSetting}
       />
       <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>current time: {JSON.stringify(new Date())}</h1>
-      {/* TODO: Consider adding a `startTime` field to a race? then it's easier to calculate the time left lol */}
-      <h1 style={{ fontSize: "3rem" }}>FINISHED? {data.onRaceEvent.finished ? "☑️" : "❎"} finished</h1>
-      <h1 style={{ fontSize: "3rem" }}>running backend: {data?.onRaceEvent.running ? "true" : "false"}</h1>
-      <h1 style={{ fontSize: "3rem" }}>THE HOST IS: {data?.onRaceEvent.host.username}</h1>
       <div className={styles.hr} />
       <Chatbox chatboxId={data.onRaceEvent.chatboxId} meData={meData} />
     </div>

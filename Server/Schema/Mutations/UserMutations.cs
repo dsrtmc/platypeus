@@ -12,7 +12,6 @@ using Server.Utilities;
 
 namespace Server.Schema.Mutations;
 
-// TODO: not specific to this location but SQL INJECTION????????????????????? ANALYSE!
 [MutationType]
 public static class UserMutations
 {

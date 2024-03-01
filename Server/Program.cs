@@ -34,7 +34,7 @@ builder.Services.AddCors((o) =>
 // TODO: see if there's an easy way to return an errors "sorry you're rate limited" rather than just making the user wait
 // TODO: change values in prod and idk before deployment and stuff
 // Rate limiting
-var myOptions = new TokenBucketRateLimiterOptions
+var rateLimiterOptions = new TokenBucketRateLimiterOptions
 {
     AutoReplenishment = true,
     QueueLimit = 1,
@@ -46,17 +46,17 @@ var myOptions = new TokenBucketRateLimiterOptions
 
 const string tokenPolicy = "token";
 
-builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(myOptions);
+builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(rateLimiterOptions);
 
 builder.Services.AddRateLimiter(_ => _
     .AddTokenBucketLimiter(policyName: tokenPolicy, options =>
     {
-        options.TokenLimit = myOptions.TokenLimit;
+        options.TokenLimit = rateLimiterOptions.TokenLimit;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = myOptions.QueueLimit;
-        options.ReplenishmentPeriod = myOptions.ReplenishmentPeriod;
-        options.TokensPerPeriod = myOptions.TokensPerPeriod;
-        options.AutoReplenishment = myOptions.AutoReplenishment;
+        options.QueueLimit = rateLimiterOptions.QueueLimit;
+        options.ReplenishmentPeriod = rateLimiterOptions.ReplenishmentPeriod;
+        options.TokensPerPeriod = rateLimiterOptions.TokensPerPeriod;
+        options.AutoReplenishment = rateLimiterOptions.AutoReplenishment;
     }));
 
 // Cookies setup
@@ -135,7 +135,7 @@ app.MapGraphQL().RequireRateLimiting(tokenPolicy);
 
 app.Run();
 
-// JWT setup
+// JWT setup // LEGACY
 // builder.Services.AddAuthentication(o =>
 // {
 //     o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -147,7 +147,7 @@ app.Run();
 // {
 //     o.TokenValidationParameters = new TokenValidationParameters
 //     {
-//         // TODO: add issuer/audience
+//         // should add issuer/audience
 //         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!)),
 //         ValidateIssuerSigningKey = true,
 //         ValidateIssuer = false, // probably true

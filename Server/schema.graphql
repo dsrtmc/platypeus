@@ -84,7 +84,7 @@ type InvalidRacePasswordError implements Error {
   message: String!
 }
 
-type InvalidRacerStatisticsError implements Error {
+type InvalidRacerError implements Error {
   message: String!
 }
 
@@ -167,6 +167,10 @@ type NotAuthenticatedError implements Error {
 }
 
 type NotAuthorizedError implements Error {
+  message: String!
+}
+
+type NotInRaceError implements Error {
   message: String!
 }
 
@@ -396,13 +400,13 @@ union CreateRaceError = NotAuthenticatedError
 
 union FinishRaceError = InvalidRaceError
 
-union FinishRaceForUserError = InvalidRaceError | InvalidUserError | InvalidRacerStatisticsError
+union FinishRaceForUserError = InvalidRaceError | InvalidUserError | InvalidRacerError
 
 union JoinChatboxError = InvalidUserError | InvalidChatboxError
 
-union JoinRaceError = InvalidUserError | InvalidRaceError | InvalidRacePasswordError | RaceAlreadyRunningError | AlreadyJoinedRaceError
+union JoinRaceError = NotAuthenticatedError | InvalidRaceError | InvalidRacePasswordError | RaceAlreadyRunningError | AlreadyJoinedRaceError
 
-union LeaveRaceError = InvalidUserError | InvalidRaceError | RaceIsRunningError
+union LeaveRaceError = NotAuthenticatedError | InvalidRaceError | RaceIsRunningError | NotInRaceError
 
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
@@ -414,7 +418,7 @@ union SendMessageError = NotAuthenticatedError | InvalidChatboxError
 
 union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError | RaceAlreadyRunningError | TooFewRacersError
 
-union UpdateStatsForUserError = InvalidUserError | InvalidRaceError | InvalidRacerStatisticsError
+union UpdateStatsForUserError = InvalidUserError | InvalidRaceError | InvalidRacerError
 
 input BooleanOperationFilterInput {
   eq: Boolean
@@ -520,13 +524,11 @@ input JoinChatboxInput {
 }
 
 input JoinRaceInput {
-  userId: UUID
   raceId: UUID
   password: String
 }
 
 input LeaveRaceInput {
-  userId: UUID!
   raceId: UUID!
 }
 
@@ -758,15 +760,10 @@ enum SortEnumType {
   DESC
 }
 
-directive @allowAnonymous repeatable on FIELD_DEFINITION
-
 directive @authorize("The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!] "Defines when when the authorize directive shall be applied.By default the authorize directives are applied during the validation phase." apply: ApplyPolicy! = BEFORE_RESOLVER) repeatable on OBJECT | FIELD_DEFINITION
 
 "The cost directives is used to express the complexity of a field."
 directive @cost("Defines the complexity of the field." complexity: Int! = 1 "Defines field arguments that act as complexity multipliers." multipliers: [MultiplierPath!] defaultMultiplier: Int) on FIELD_DEFINITION
-
-"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
-directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")

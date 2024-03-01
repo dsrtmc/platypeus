@@ -26,19 +26,15 @@ public static class ScoreQueries
     [UseFiltering]
     public static IQueryable<Score?> GetScore(DatabaseContext db)
     {
-        // not sure whether the return type should be nullable if I'm using UseSingleOrDefault
         return db.Scores;
     }
     
     // TODO: The generated SQL is the worst thing I've ever seen. Doubt I can tackle that without HotChocolate supporting `distinct_on` or writing the SQL myself
     // ↑ see https://github.com/ChilliCream/graphql-platform/discussions/4848
-    // While the EF Core's translation of this raw SQL isn't amazing either, it's definitely much clearer
+    // While the EF Core's use of this raw SQL isn't amazing either, it's definitely much clearer
     [UsePaging]
-    // investigate the duplicated entries bug
     public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db, string mode, int modeSetting)
     {
-        // return db.Scores.Include(s => s.User).GroupBy(s => s.UserId).Select(r => r.First());
-        // TODO: Why the fuck does it only work if `mode` is "time" AND `modeSetting` is 5?
         return db.Scores.FromSql(
                 $"SELECT DISTINCT ON (s.\"UserId\") s.* FROM \"Scores\" s WHERE s.\"Mode\" = {mode} AND s.\"ModeSetting\" = {modeSetting} ORDER BY s.\"UserId\", s.\"Wpm\" DESC"
             ).Include(s => s.User);

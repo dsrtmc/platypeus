@@ -1,11 +1,16 @@
 namespace Server.Schema.Types.Errors;
 
-// TODO: Maybe don't use IDs in every error, they're supposed to be potentially helpful for normal people too, so I guess use usernames in some places?
+// TODO: maybe add slugs to error messages? hmm think about it
 public class AlreadyJoinedRaceError
 {
     public AlreadyJoinedRaceError(Guid? raceId, Guid? userId)
     {
         Message = $"The user \"{userId}\" is already a part of race \"{raceId}\"";
+    }
+    
+    public AlreadyJoinedRaceError(Guid? raceId, string? username)
+    {
+        Message = $"The user \"{username}\" is already a part of race \"{raceId}\"";
     }
     
     public string Message { get; set; }

@@ -15,10 +15,14 @@
     flex-direction: column;
     margin: auto;
     gap: 1rem;
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    padding: 10px 14px;
 }
 
 .field {
     all: unset;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,8 +31,8 @@
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
     padding: 6px 8px;
+    box-sizing: border-box; /* TODO: why the fuck do I need to do it? `globals.css` already has it? */
     transition: filter 200ms ease;
-    width: 100%;
 }
 
 .chatInputField {
@@ -69,6 +73,7 @@
     border-radius: var(--roundness);
     padding: 6px 8px;
     transition: color, background-color 200ms ease;
+    box-sizing: border-box; /* TODO: why the fuck do I need to do it? `globals.css` already has it? */
     width: 100%;
 }
 
