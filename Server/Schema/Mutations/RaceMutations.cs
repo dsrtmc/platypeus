@@ -33,10 +33,8 @@ public static class RaceMutations
         race.Finished = true;
 
         await db.SaveChangesAsync();
-        var message = new RacePropertyUpdate
-        {
-            Finished = true
-        };
+        
+        var message = new RacePropertyUpdate { Finished = true };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message);
 
         return race;
@@ -60,7 +58,7 @@ public static class RaceMutations
         await db.SaveChangesAsync(cancellationToken);
         var message = new RacePropertyUpdate
         {
-            Finished = true
+            Running = true
         };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
@@ -108,16 +106,14 @@ public static class RaceMutations
         race.StartTime = DateTime.UtcNow;
         
         await db.SaveChangesAsync(cancellationToken);
-        var message = new RacePropertyUpdate
-        {
-            Started = race.Started,
-            StartTime = race.StartTime
-        };
+        
+        var message = new RacePropertyUpdate { Started = race.Started, StartTime = race.StartTime };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;
     }
     
+    // TODO: investigate the generated SQL because holy chungus is it horrifying
     public static async Task<
         MutationResult<Race, NotAuthenticatedError, InvalidRaceError, InvalidRacePasswordError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
     > JoinRace(
@@ -167,10 +163,8 @@ public static class RaceMutations
         race.Racers.Add(racer);
         
         await db.SaveChangesAsync(cancellationToken);
-        var message = new RacePropertyUpdate
-        {
-            Racers = race.Racers
-        };
+        
+        var message = new RacePropertyUpdate { Racers = race.Racers };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
         
         return race;
@@ -207,10 +201,8 @@ public static class RaceMutations
         db.Racers.Remove(racer);
     
         await db.SaveChangesAsync(cancellationToken);
-        var message = new RacePropertyUpdate
-        {
-            Racers = race.Racers
-        };
+        
+        var message = new RacePropertyUpdate { Racers = race.Racers };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
     
         return race;

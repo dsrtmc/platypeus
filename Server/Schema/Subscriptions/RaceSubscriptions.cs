@@ -57,18 +57,24 @@ public class RaceSubscriptions
         
         await foreach (var propertyUpdate in sourceStream.ReadEventsAsync())
         {
+            var raceProperties = typeof(Race).GetProperties();
             var properties = typeof(RacePropertyUpdate).GetProperties();
-            foreach (var property in properties)
+            foreach (var raceProperty in raceProperties)
             {
-                var value = property.GetValue(propertyUpdate);
-                if (value is null) continue;
-                
-                if (value is List<Racer> racers)
+                foreach (var property in properties)
                 {
-                    race!.Racers = racers;
+                    /*
+                     * We're only checking the name of the property, which could potentially be dangerous, since
+                     * it only relies on a correct implementation of the update class. I didn't know how to
+                     * account for type mismatch caused by nullability, so I opted for this solution for now.
+                     */
+                    if (raceProperty.Name != property.Name) continue;
+                    
+                    var value = property.GetValue(propertyUpdate);
+                    if (value is null) continue;
+                        
+                    raceProperty.SetValue(race, value);
                 }
-                else
-                    property.SetValue(race, value);
             }
             yield return race;
         }
@@ -87,15 +93,9 @@ public class RaceSubscriptions
     //     => await db.Races.Where(r => ids.Contains(r.Id)).ToDictionaryAsync(r => r.Id, cancellationToken);
 }
 
-public enum RacePropertyUpdateAction
-{
-    Join,
-    Leave,
-}
-
 // TODO: rename i guess
 /// <summary>
-/// Holds the property that are to be updated in the `Race` object.
+/// Holds the properties that are to be updated in the `Race` object.
 /// </summary>
 public class RacePropertyUpdate
 {

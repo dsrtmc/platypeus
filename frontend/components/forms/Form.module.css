@@ -20,7 +20,7 @@
 }
 
 .field:focus {
-    border: 2px solid var(--main-color);
+    /*border: 2px solid var(--main-color);*/
 }
 
 .field::placeholder {
@@ -39,10 +39,6 @@
     border-radius: var(--roundness);
     padding: 4px 6px;
     transition: color, background-color 200ms ease;
-}
-
-.button:focus {
-    border: 2px solid var(--main-color);
 }
 
 .button:hover {

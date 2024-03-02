@@ -46,7 +46,6 @@
 }
 
 .sendButton {
-    all: unset;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,17 +54,10 @@
     color: var(--sub-color);
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
+    /*border-bottom-left-radius: 0;*/
+    /*border-top-left-radius: 0;*/
     padding: 6px 8px;
     transition: color 100ms ease;
-}
-
-.sendButton:focus-visible {
-    border: 2px solid var(--text-color);
-    /*border-bottom-left-radius: var(--roundness);*/
-    /*border-top-left-radius: var(--roundness);*/
-    border-radius: var(--roundness);
 }
 
 .sendButton:hover {

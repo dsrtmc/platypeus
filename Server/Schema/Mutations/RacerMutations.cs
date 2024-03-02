@@ -33,10 +33,7 @@ public static class RacerMutations
 
         await db.SaveChangesAsync(cancellationToken);
 
-        var message = new RacePropertyUpdate
-        {
-            Racers = race.Racers
-        };
+        var message = new RacePropertyUpdate { Racers = race.Racers };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
         
         return racer;
@@ -62,10 +59,8 @@ public static class RacerMutations
         racer.Finished = true;
 
         await db.SaveChangesAsync(cancellationToken);
-        var message = new RacePropertyUpdate
-        {
-            Racers = race.Racers
-        };
+        
+        var message = new RacePropertyUpdate { Racers = race.Racers };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return racer;

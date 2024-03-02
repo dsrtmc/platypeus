@@ -16,12 +16,13 @@
 }
 
 .item {
-    all: unset;
     display: flex;
     gap: .5rem;
     align-items: center;
-    transition: all 150ms ease;
+    transition: color, opacity 150ms ease;
     color: var(--sub-color);
+    border: 0;
+    background: transparent;
     padding: .5rem;
 }
 
@@ -31,6 +32,10 @@
 }
 
 .item:active {
+    filter: opacity(0.8);
+}
+
+.item:focus {
     filter: opacity(0.8);
 }
 

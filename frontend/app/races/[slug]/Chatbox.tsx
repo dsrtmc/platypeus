@@ -87,6 +87,7 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
       </div>
       <div className={styles.bottom}>
         {/* TODO: `.blur()` on Escape click, however if I pass a ref here some funny stuff happens and it crashes */}
+        {/* TODO: for some reason we have spell check LOL? */}
         <TextareaAutosize
           maxRows={3}
           placeholder={meData.me ? "Message the group" : "Log in to use the chatroom"}

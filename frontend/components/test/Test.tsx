@@ -512,7 +512,7 @@ export const Test = forwardRef<TestMethods, Props>(
             exitActive: styles.wordsExitActive,
           }}
         >
-          <div className={styles.words} ref={wordsDivRef} tabIndex={1}>
+          <div className={styles.words} ref={wordsDivRef} tabIndex={-1}>
             {wordPool.map((word) => word)}
           </div>
         </CSSTransition>

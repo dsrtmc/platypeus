@@ -278,6 +278,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         modeSetting={data.onRaceEvent.modeSetting}
       />
       <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
+      <h1 style={{ fontSize: "1.5rem" }}>status:</h1>
+      <h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>
+      <h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.started ? "true" : "false"}</h1>
+      <h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>
       <div className={styles.hr} />
       <Chatbox chatboxId={data.onRaceEvent.chatboxId} meData={meData} />
     </div>

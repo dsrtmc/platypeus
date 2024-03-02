@@ -39,6 +39,11 @@
     scrollbar-color: var(--sub-color) transparent !important;
 }
 
+*:focus-visible {
+    outline: 2px solid var(--text-color);
+    border-radius: var(--roundness);
+}
+
 svg {
     display: block;
     max-width: 100%;
