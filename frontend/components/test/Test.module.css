@@ -73,13 +73,21 @@
     outline: none;
 }
 
+.wordsWrapper {
+    
+}
+
 .wordsEnter {
     opacity: 0;
 }
 
 .wordsEnterActive {
     opacity: 1;
-    transition: opacity 500ms;
+    transition: opacity 150ms;
+}
+
+.wordsEnterDone {
+    opacity: 1;
 }
 
 .wordsExit {
@@ -88,7 +96,11 @@
 
 .wordsExitActive {
     opacity: 0;
-    transition: opacity 500ms;
+    transition: opacity 150ms;
+}
+
+.wordsExitDone {
+    opacity: 0;
 }
 
 .words:nth-col(2) {
@@ -105,7 +117,7 @@
 
 .caret {
     position: absolute;
-    background-color: var(--sub-color);
+    background-color: var(--main-color);
     border-radius: 10%;
     width: 3px;
     height: calc(2rem + 0.5rem); /* TODO: var(--font-size) */

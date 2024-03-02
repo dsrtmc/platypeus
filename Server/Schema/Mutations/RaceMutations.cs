@@ -56,10 +56,8 @@ public static class RaceMutations
         race.Running = true;
 
         await db.SaveChangesAsync(cancellationToken);
-        var message = new RacePropertyUpdate
-        {
-            Running = true
-        };
+        
+        var message = new RacePropertyUpdate { Running = true };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;
@@ -73,7 +71,6 @@ public static class RaceMutations
         IHttpContextAccessor accessor,
         CancellationToken cancellationToken)
     {
-        // TODO: maybe just take userId as a parameter? no reason to check for cookies i think maybe idk
         var userIdClaim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
         if (userIdClaim is null)
             return new NotAuthenticatedError();
@@ -82,11 +79,8 @@ public static class RaceMutations
         if (user is null)
             return new NotAuthenticatedError();
         
-        // I'm pretty sure I am forced to include all of these
         var race = await db.Races
             .Include(r => r.Host)
-            .Include(r => r.Racers)
-                .ThenInclude(r => r.User)
             .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
         
         if (race is null)

@@ -43,8 +43,8 @@ export const Score: FC<Props> = ({ score }) => {
           <div className={styles.bottom}>{score.wpm * 5}</div>
         </div>
         <div className={`${styles.group} ${styles.last}`}>
-          {/* TODO: xd fix  IH :) I HATE CSS I HATE CSS */}
           <div className={styles.top}>content</div>
+          {/* TODO: xd fix ^  IH :) I HATE CSS I HATE CSS */}
           <div className={`${styles.bottom} ${styles.content}`}>{score.content}</div>
         </div>
       </div>

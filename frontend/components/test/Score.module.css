@@ -34,10 +34,10 @@
     flex-direction: column;
 }
 
-/* TODO: HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA */
 .last {
-    width: fit-content;
-    margin-top: 0.5rem;
+    /* TODO: xD */
+    min-width: 50%;
+    max-width: 75%;
 }
 
 .top {
@@ -49,7 +49,6 @@
 }
 
 .content {
-    width: min-content;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

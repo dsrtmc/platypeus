@@ -30,11 +30,9 @@ export const MainBox: FC<Props> = ({}) => {
 
   const [createScore] = useMutation(CreateScoreDocument);
 
-  async function handleSaveScore(score: ScoreType) {
+  function handleSaveScore(score: ScoreType) {
     // TODO: some validation of course, anti-cheat (LONG SHOT)
-    // TODO: Probably use a GraphQL fragment so I can do { input: { ...score } } or something alike
-    // TODO: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    const response = await createScore({
+    createScore({
       variables: {
         input: {
           wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
@@ -48,7 +46,7 @@ export const MainBox: FC<Props> = ({}) => {
           language: score.language,
         },
       },
-    });
+    }).then((data) => console.log("Saved score:", data));
     setShowScore(true);
     setScoreData(score);
   }

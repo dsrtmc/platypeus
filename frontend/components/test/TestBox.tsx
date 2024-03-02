@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./Test.module.css";
-import { useEffect, useRef, useState } from "react";
+import { Ref, useEffect, useRef, useState } from "react";
 import { Test, TestMethods } from "@/components/test/Test";
 import { Timer } from "@/components/test/Timer";
 import { ModeSettingSelection } from "@/components/test/ModeSettingSelection";
@@ -26,6 +26,8 @@ interface Props {
 }
 
 export function TestBox({ handleSaveScore }: Props) {
+  // Used for triggering the animation on test reset
+  const [mounted, setMounted] = useState(true);
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
@@ -40,8 +42,8 @@ export function TestBox({ handleSaveScore }: Props) {
   const [timePassed, setTimePassed] = useState(modeSetting);
   const [wpm, setWpm] = useState(0);
 
-  const testRef = useRef<TestMethods | null>(null);
   const ref = useRef<HTMLDivElement | null>(null);
+  const testRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const restartButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -53,13 +55,13 @@ export function TestBox({ handleSaveScore }: Props) {
         restartButtonRef.current!.focus();
       }
     } else if (e.key.length === 1) {
-      if (finished || !focused) return 1;
+      if (finished || !focused) return true;
       if (!running) handleStart();
       if (restartButtonRef && restartButtonRef.current) {
         restartButtonRef.current!.blur();
       }
     }
-    return 0;
+    return false;
   }
 
   function handleClick(e: globalThis.MouseEvent) {
@@ -114,10 +116,11 @@ export function TestBox({ handleSaveScore }: Props) {
   }
 
   function handleReset() {
+    setMounted(true);
     setFocused(true);
     setFinished(false);
     setRunning(false);
-    setTimePassed(0); // TODO: 0/25 words instead of timer
+    setTimePassed(0);
     setWpm(0);
     setWordCount(0);
     // TODO: maybe make that better somehow heh xd
@@ -165,9 +168,20 @@ export function TestBox({ handleSaveScore }: Props) {
     initializePool(_mode, _modeSetting);
   }, []);
 
+  function handleTabPress(e: KeyboardEvent) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      if (restartButtonRef.current) restartButtonRef.current!.focus();
+    }
+  }
+
   useEffect(() => {
+    document.addEventListener("keydown", handleTabPress);
     document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener("keydown", handleTabPress);
+      document.removeEventListener("click", handleClick);
+    };
   }, []);
 
   useEffect(() => {
@@ -200,11 +214,6 @@ export function TestBox({ handleSaveScore }: Props) {
             handleSelectModeSetting={handleSelectModeSetting}
           />
         </section>
-        {/*<section>*/}
-        {/*  Current mode: {mode}*/}
-        {/*  <ModeSelection handleSelectMode={handleSelectMode} />*/}
-        {/*</section>*/}
-        {/*selected language: {language}*/}
         <section className={styles.top}>
           <section className={styles.left}>
             {/* TODO: Is there a better way to handle checking the mode? */}
@@ -215,38 +224,47 @@ export function TestBox({ handleSaveScore }: Props) {
             )}
             <Counter count={wpm} />
           </section>
-          {/* HOW CAN I CENTER A DIV LOL */}
-          {/*<section className={styles.center}>*/}
-          {/*  <LanguageSelection selectedLanguage={language} handleSelectLanguage={handleSelectLanguage} />*/}
-          {/*</section>*/}
-          {/*<section className={styles.right}>*/}
-          {/*  <ModeSettingSelection mode={mode} selectedSetting={modeSetting} handleSelect={handleSelectModeSetting} />*/}
-          {/*</section>*/}
         </section>
         <section className={styles.middle}>
-          <Test
-            focused={focused}
-            running={running}
-            finished={finished}
-            timePassed={timePassed}
-            modeSetting={modeSetting}
-            startTime={testStartTime}
-            mode={mode}
-            language={language}
-            onKeyDown={handleKeyDown}
-            onPoolUpdate={onPoolUpdate}
-            handleFinish={handleFinish}
-            handleChangeWpm={handleChangeWpm}
-            handleSaveScore={handleSaveScore}
-            setWordCount={setWordCount}
-            initialContent={initialContent}
-            ref={testRef}
-            key={testKey}
-          />
+          <CSSTransition
+            nodeRef={testRef as Ref<HTMLDivElement | null>}
+            in={mounted}
+            timeout={150}
+            classNames={{
+              enter: styles.wordsEnter,
+              enterActive: styles.wordsEnterActive,
+              enterDone: styles.wordsEnterDone,
+              exit: styles.wordsExit,
+              exitActive: styles.wordsExitActive,
+              exitDone: styles.wordsExitDone,
+            }}
+            onExited={() => handleReset()}
+            mountOnEnter
+            unmountOnExit
+          >
+            <Test
+              focused={focused}
+              running={running}
+              finished={finished}
+              timePassed={timePassed}
+              modeSetting={modeSetting}
+              startTime={testStartTime}
+              mode={mode}
+              language={language}
+              onKeyDown={handleKeyDown}
+              onPoolUpdate={onPoolUpdate}
+              handleFinish={handleFinish}
+              handleChangeWpm={handleChangeWpm}
+              handleSaveScore={handleSaveScore}
+              setWordCount={setWordCount}
+              initialContent={initialContent}
+              innerRef={testRef}
+              key={testKey}
+            />
+          </CSSTransition>
         </section>
         <section className={styles.bottom}>
-          <RestartButton onReset={handleReset} ref={restartButtonRef} />
-          <p>{focused ? "FOCUSED" : "UNFOCUSED"}</p>
+          <RestartButton onReset={() => setMounted(false)} ref={restartButtonRef} />
         </section>
       </div>
     );

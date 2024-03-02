@@ -27,14 +27,13 @@ export function withLabel(Component) {
   };
 }
 
-export function Leaderboard({ queryResult, mode, modeSetting }: Props) {
+export function Leaderboard({ mode, modeSetting }: Props) {
   const { data, fetchMore } = useQuery(GetScoresForLeaderboardDocument, {
     variables: {
       first: 25,
       mode,
       modeSetting,
     },
-    fetchPolicy: "network-only",
   } as SuspenseQueryHookOptions<GetScoresForLeaderboardQuery, GetScoresForLeaderboardQueryVariables>);
   async function handleFetchMore() {
     console.log("The next cursor:", data?.scoresForLeaderboard?.pageInfo?.endCursor);
