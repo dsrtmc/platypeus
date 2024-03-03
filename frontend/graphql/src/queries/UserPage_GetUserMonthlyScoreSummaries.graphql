@@ -1,0 +1,7 @@
+query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {
+    userMonthlyScoreSummaries(userId: $userId) {
+        wpm
+        rawWpm
+        createdAt
+    }
+}

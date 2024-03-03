@@ -1,7 +1,19 @@
 import { getClient } from "@/lib/client";
 import styles from "./User.module.css";
-import { UserPage_GetUserDocument } from "@/graphql/generated/graphql";
+import {
+  GetScoresDocument,
+  GetScoresQueryVariables,
+  GetUsersBestScoresDocument,
+  UserPage_GetUserDailyScoreSummariesDocument,
+  UserPage_GetUserDailyScoreSummariesQueryVariables,
+  UserPage_GetUserDocument,
+  UserPage_GetUserMonthlyScoreSummariesDocument,
+  UserPage_GetUserMonthlyScoreSummariesQueryVariables,
+} from "@/graphql/generated/graphql";
+import { PerformanceChart } from "@/app/user/[username]/PerformanceChart";
+import UserInfo from "@/app/user/[username]/UserInfo";
 
+// TODO: CONSIDER GOING FOR ROUTE-SPECIFIC QUERIES SO THAT WE AVOID OVER-FETCHING
 export default async function UserPage({ params }: { params: { username: string } }) {
   const { data } = await getClient().query({
     query: UserPage_GetUserDocument,
@@ -11,46 +23,20 @@ export default async function UserPage({ params }: { params: { username: string 
           eq: params.username,
         },
       },
-      first: 1,
     },
   });
-  if (!data.user) return <div>no such user</div>;
-  // const { data: bestScoresData } = await getClient().query({
-  //   query: GetUsersBestScoresDocument,
-  //   variables: {
-  //     userId: userData.userByUsername?.id,
-  //   },
-  // });
-  // TODO: this shit doesn't work, no clue why - it works on the backend
-  // const { data: scoresData } = await getClient().query({
-  //   query: GetScoresDocument,
-  //   variables: {
-  //     where: {
-  //       user: {
-  //         username: {
-  //           eq: params.username,
-  //         },
-  //       },
-  //     },
-  //   } as GetScoresQueryVariables,
-  // });
+  if (!data?.user) return <div>no such user</div>;
+  const { data: scoresData } = await getClient().query({
+    query: UserPage_GetUserMonthlyScoreSummariesDocument,
+    variables: {
+      userId: data.user.id,
+    } as UserPage_GetUserMonthlyScoreSummariesQueryVariables,
+  });
   return (
     <div>
-      <div>
-        this account has been created on
-        <code>{JSON.stringify(new Date(data.user.createdAt))}</code>
-      </div>
-      <div className={styles.box}>
-        {/* TODO: Fix nullable stuff here, we shouldn't have gaps */}
-        {/*{bestScoresData.usersBestScores.map((score) => (*/}
-        {/*  <div key={score?.modeSetting} className={styles.group}>*/}
-        {/*    <div className={styles.test}>{score?.modeSetting} seconds</div>*/}
-        {/*    <div className={styles.wpm}>{score?.wpm}</div>*/}
-        {/*    <div className={styles.accuracy}>{score?.accuracy.toFixed(2) * 100}%</div>*/}
-        {/*  </div>*/}
-        {/*))}*/}
-      </div>
-      {/*<PerformanceChart scoresData={scoresData} />*/}
+      <UserInfo user={data.user} />
+      <div className={styles.box}></div>
+      <PerformanceChart scores={scoresData.userMonthlyScoreSummaries} />
     </div>
   );
 }

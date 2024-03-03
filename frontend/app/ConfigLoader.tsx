@@ -14,6 +14,7 @@ const defaultConfig: ConfigType = {
   time: 5,
   words: 50,
   mode: "time",
+  language: "english",
 };
 
 /*

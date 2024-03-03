@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Server.Services;
 
 namespace Server.Models;
 
@@ -38,6 +39,21 @@ public class User : BaseEntity
         return this.Email;
     }
     
+    /*
+     * Works if we don't try and project it (which we can't do anyways because we're using paginated fields).
+     * Assuming projections support nested pagination, then we'd have to use `db.Scores.Count` instead and
+     * rely on data loaders, otherwise we're left with the N+1 problem.
+     */
+    public int GetScoreCount(DatabaseContext db)
+    {
+        return this.Scores.Count(s => s.UserId == this.Id);
+    }
+    
+    public double GetAverageWpm(DatabaseContext db)
+    {
+        return this.Scores.Average(s => s.Wpm);
+    }
+
     [GraphQLIgnore]
     public string Password { get; set; }
 

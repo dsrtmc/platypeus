@@ -4,8 +4,6 @@ import { HiMiniLanguage } from "react-icons/hi2";
 import { WORD_LISTS } from "@/utils/wordLists";
 import { LanguageList } from "@/components/test/LanguageList";
 import { Modal } from "@/components/Modal";
-import modalStyles from "../Modal.module.css";
-import { CSSTransition } from "react-transition-group";
 
 interface Props {
   selectedLanguage: string;
@@ -13,16 +11,17 @@ interface Props {
 }
 
 export const LanguageSelection: React.FC<Props> = ({ selectedLanguage, handleSelectLanguage }) => {
+  const [visibleModal, setVisibleModal] = useState(false);
+
   function onSelectLanguage(language: string) {
     return () => {
       handleHideModal();
       handleSelectLanguage(language);
     };
   }
-  // TODO: rename
-  const [visibleModal, setVisibleModal] = useState(false);
-  function toggleModal() {
-    setVisibleModal((vm) => !vm);
+
+  function showModal() {
+    setVisibleModal(true);
   }
 
   function handleHideModal() {
@@ -31,16 +30,11 @@ export const LanguageSelection: React.FC<Props> = ({ selectedLanguage, handleSel
 
   return (
     <div className={styles.mode}>
-      {/*{Object.entries(WORD_LISTS).map(([language, _]) => (*/}
-      {/*  <button onClick={onSelectLanguage(language)}>*/}
-      {/*    <HiMiniLanguage /> {language}*/}
-      {/*  </button>*/}
-      {/*))}*/}
-      <button onClick={toggleModal} className={styles.languageButton}>
+      <button onClick={showModal} className={styles.languageButton}>
         <HiMiniLanguage /> {selectedLanguage}
       </button>
       <Modal visible={visibleModal} handleHide={handleHideModal}>
-        <LanguageList list={WORD_LISTS} handleSelectLanguage={onSelectLanguage} />
+        <LanguageList list={WORD_LISTS} selectedLanguage={selectedLanguage} handleSelectLanguage={onSelectLanguage} />
       </Modal>
     </div>
   );

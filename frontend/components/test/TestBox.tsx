@@ -64,7 +64,7 @@ export function TestBox({ handleSaveScore }: Props) {
     return false;
   }
 
-  function handleClick(e: globalThis.MouseEvent) {
+  function handleMouseUp(e: globalThis.MouseEvent) {
     if (ref && ref.current) setFocused(ref.current!.contains(e.target));
   }
 
@@ -73,7 +73,7 @@ export function TestBox({ handleSaveScore }: Props) {
     setRunning(true);
   }
 
-  // TODO: save selected modeSettings to localStorage config
+  // TODO: useLocalStorage hook?
   function handleSelectMode(mode: string) {
     const config = getConfig();
     if (config && config[mode]) {
@@ -97,6 +97,11 @@ export function TestBox({ handleSaveScore }: Props) {
   }
 
   function handleSelectLanguage(language: string) {
+    const config = getConfig();
+    if (config) {
+      config.language = language;
+      setConfig(config);
+    }
     setLanguage(language);
   }
 
@@ -126,6 +131,11 @@ export function TestBox({ handleSaveScore }: Props) {
     // TODO: maybe make that better somehow heh xd
     initializePool(mode, modeSetting);
     setTestKey((k) => k + 1); // Does a re-mount of `Test`, therefore causing a reset
+  }
+
+  // Upon setting `mounted` to false, <CSSTransitionGroup> will automatically mount it back after the animation ends.
+  function remountTest() {
+    setMounted(false);
   }
 
   /**
@@ -158,13 +168,15 @@ export function TestBox({ handleSaveScore }: Props) {
     // TODO: fix this funny code lol
     let _mode = mode;
     let _modeSetting = modeSetting;
+    let _language = language;
     if (config) {
       _mode = config.mode;
       setMode(_mode);
       _modeSetting = config[_mode];
       setModeSetting(_modeSetting);
+      _language = config.language;
+      setLanguage(_language);
     }
-    // TODO: Code duplication, could probably have a function `initializePool` or something alike
     initializePool(_mode, _modeSetting);
   }, []);
 
@@ -177,10 +189,10 @@ export function TestBox({ handleSaveScore }: Props) {
 
   useEffect(() => {
     document.addEventListener("keydown", handleTabPress);
-    document.addEventListener("click", handleClick);
+    document.addEventListener("mouseup", handleMouseUp);
     return () => {
       document.removeEventListener("keydown", handleTabPress);
-      document.removeEventListener("click", handleClick);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
 
@@ -195,9 +207,13 @@ export function TestBox({ handleSaveScore }: Props) {
   }, [running]);
 
   useEffect(() => {
-    // TODO: THINK -> not sure if that condition is necessary
     if (!finished) {
-      handleReset();
+      // TODO: a hack, which will probably stay here forever :)
+      if (mounted) {
+        setMounted(false);
+      } else {
+        handleReset();
+      }
     }
   }, [mode, modeSetting, language]);
 
@@ -226,6 +242,7 @@ export function TestBox({ handleSaveScore }: Props) {
           </section>
         </section>
         <section className={styles.middle}>
+          {/* TODO: eventually make it fade-in on the first render, not only on re-mount */}
           <CSSTransition
             nodeRef={testRef as Ref<HTMLDivElement | null>}
             in={mounted}
@@ -265,6 +282,7 @@ export function TestBox({ handleSaveScore }: Props) {
         </section>
         <section className={styles.bottom}>
           <RestartButton onReset={() => setMounted(false)} ref={restartButtonRef} />
+          {focused ? "FOCUSED" : "NOT FOCUSED"}
         </section>
       </div>
     );

@@ -31,7 +31,7 @@ public class Race : BaseEntity
 
     public string Slug { get; set; } = null!;
     
-    public DateTime? StartTime { get; set; }
+    public DateTimeOffset? StartTime { get; set; }
     
     public Guid ChatboxId { get; set; }
     

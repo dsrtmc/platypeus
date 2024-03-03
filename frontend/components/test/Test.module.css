@@ -118,7 +118,7 @@
 .caret {
     position: absolute;
     background-color: var(--main-color);
-    border-radius: 10%;
+    border-radius: 2px;
     width: 3px;
     height: calc(2rem + 0.5rem); /* TODO: var(--font-size) */
     transition: all ease var(--caret-speed);
@@ -159,13 +159,14 @@
 
 .modeSettingSelection {
     display: flex;
-    gap: 1rem;
+    gap: .25rem;
 }
 
 .modeSettingButton {
     all: unset;
     color: var(--sub-color);
     transition: color, filter 200ms ease;
+    padding: .25rem .4rem;
 }
 
 .modeSettingButton:hover {
@@ -191,6 +192,7 @@
 }
 
 .mode {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -226,7 +228,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: .25rem;
 }
 
 .languageButton {
@@ -237,6 +239,7 @@
     gap: 1ch;
     color: var(--sub-color);
     transition: color 200ms ease;
+    padding: 6px 8px;
 }
 
 .languageButton:hover {
@@ -244,9 +247,11 @@
 }
 
 .modeButton {
-    all: unset;
     color: var(--sub-color);
+    background-color: transparent;
+    border: none;
     transition: color 200ms ease;
+    padding: .25rem .4rem;
 }
 
 .modeButton:hover {
@@ -257,7 +262,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--sub-alt-color);
     gap: 1rem;
     height: 100%;
     border-radius: 0.5rem;
@@ -265,12 +269,18 @@
     font-size: 0.8rem;
 }
 
+.testConfig *:focus-visible {
+    outline: 2px solid var(--text-color);
+    border-radius: var(--roundness);
+}
+
 .spacer {
-    height: 100%;
+    height: 66%;
     width: 3px;
     background-color: var(--sub-color);
     filter: opacity(25%);
     border-radius: var(--roundness);
+    z-index: -1;
 }
 
 .languageList {
@@ -298,6 +308,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    gap: 1rem;
     width: 100%;
     padding: .25rem 1rem;
     background-color: var(--sub-alt-color);

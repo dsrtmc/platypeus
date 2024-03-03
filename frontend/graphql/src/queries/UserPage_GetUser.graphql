@@ -4,7 +4,8 @@ query UserPage_GetUser(
     user(where: $where) {
         id
         username
+        averageWpm
+        scoreCount
         createdAt
-        updatedAt
     }
 }

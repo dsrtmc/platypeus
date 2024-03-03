@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
-import { GetScoresQuery } from "@/graphql/generated/graphql";
+import { GetScoresQuery, UserPage_GetUserMonthlyScoreSummariesQuery } from "@/graphql/generated/graphql";
 import { LineProps } from "chart.js";
 import styles from "./User.module.css";
 import {
@@ -17,12 +17,12 @@ import {
 } from "chart.js";
 
 interface Props {
-  scoresData: GetScoresQuery;
+  scores: UserPage_GetUserMonthlyScoreSummariesQuery["userMonthlyScoreSummaries"];
 }
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-export const PerformanceChart: React.FC<Props> = ({ scoresData }) => {
+export const PerformanceChart: React.FC<Props> = ({ scores }) => {
   const [subColor, setSubColor] = useState("white");
   const [subAltColor, setSubAltColor] = useState("white");
 
@@ -53,11 +53,11 @@ export const PerformanceChart: React.FC<Props> = ({ scoresData }) => {
   };
 
   const data = {
-    // labels: scoresData.scores?.edges?.map((edge) => new Date(edge.node.createdAt)),
+    labels: scores.map((score) => new Date(score!.createdAt).getUTCMonth() + 1),
     datasets: [
       {
         label: "wpm",
-        data: scoresData.scores?.edges?.map((edge) => edge.node.wpm),
+        data: scores.map((score) => score!.wpm),
         borderColor: subColor,
         backgroundColor: subAltColor,
       },
@@ -65,6 +65,7 @@ export const PerformanceChart: React.FC<Props> = ({ scoresData }) => {
   };
 
   // really don't know whether I should be doing it like that, it seems very very very error-prone but oh well
+  // TODO: use global variables as an enum?
   useEffect(() => {
     let style = getComputedStyle(document.body);
     setSubColor(style.getPropertyValue("--sub-color"));

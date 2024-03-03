@@ -107,5 +107,5 @@ public class RacePropertyUpdate
     
     public bool? Finished { get; set; }
     
-    public DateTime? StartTime { get; set; }
+    public DateTimeOffset? StartTime { get; set; }
 }

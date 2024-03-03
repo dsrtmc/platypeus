@@ -11,7 +11,7 @@ interface Props {
 export const Modal: React.FC<PropsWithChildren<Props>> = ({ visible, handleHide, children }) => {
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  function handleClick(e: globalThis.MouseEvent) {
+  function handleMouseUp(e: globalThis.MouseEvent) {
     if (!contentRef || !contentRef.current || !visible) return;
     if (!contentRef.current!.contains(e.target)) {
       console.log("We clicked outside");
@@ -24,15 +24,13 @@ export const Modal: React.FC<PropsWithChildren<Props>> = ({ visible, handleHide,
   }
 
   useEffect(() => {
-    document.addEventListener("click", handleClick);
+    document.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("click", handleClick);
+      document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [visible]);
-
-  useEffect(() => console.log("we just mounted"), []);
 
   return (
     <CSSTransition

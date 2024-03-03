@@ -7,6 +7,7 @@ export type ConfigType = {
   time: number;
   words: number;
   mode: string;
+  language: string;
 };
 
 export type ThemeCssVariablesType = {

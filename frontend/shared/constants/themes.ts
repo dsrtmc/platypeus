@@ -42,4 +42,14 @@ export const THEMES: ThemeType = {
     "--error-color": "#ff6961",
     "--error-extra-color": "#c23b22",
   },
+  dark: {
+    "--bg-color": "#010203",
+    "--main-color": "#383e42",
+    "--caret-color": "#282e32",
+    "--sub-color": "#5e676e",
+    "--sub-alt-color": "#121212",
+    "--text-color": "#383e42",
+    "--error-color": "#5c1c2f",
+    "--error-extra-color": "#38101c",
+  },
 };

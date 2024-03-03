@@ -491,6 +491,7 @@ export function Test({
   }, []);
 
   // TODO: name xd
+  // TODO: probably look at these refs here, innerRef and others.
   const wordsDivRef = useRef<HTMLDivElement | null>(null);
 
   // TODO: not sure if I should keep it here, it kinda looks funky during races, so I guess move it to `TestBox`?

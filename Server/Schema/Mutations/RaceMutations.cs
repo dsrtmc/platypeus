@@ -97,7 +97,7 @@ public static class RaceMutations
             return new NotAuthorizedError();
 
         race.Started = true;
-        race.StartTime = DateTime.UtcNow;
+        race.StartTime = DateTimeOffset.UtcNow;
         
         await db.SaveChangesAsync(cancellationToken);
         

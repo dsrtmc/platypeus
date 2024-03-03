@@ -27,6 +27,7 @@ export default function SettingsPage() {
   const [state, dispatch] = useReducer(reducer, themeCssVariables as ReducerState<State>);
   return (
     <div className={styles.main}>
+      {/* TODO: if we choose a theme button, it doesn't update those fields, and in the future it should. */}
       <div className={styles.properties}>
         {Object.entries(state).map(([name, cssName]) => (
           <PropertyEditor name={name} cssName={cssName} key={cssName} />
