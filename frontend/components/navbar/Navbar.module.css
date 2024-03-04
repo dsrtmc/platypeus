@@ -19,16 +19,16 @@
     display: flex;
     gap: .5rem;
     align-items: center;
-    transition: color, opacity 150ms ease;
     color: var(--sub-color);
     border: 0;
     background: transparent;
     padding: .5rem;
+    transition: all 150ms ease;
 }
 
 .item:hover {
-    cursor: pointer;
     color: var(--text-color);
+    cursor: pointer;
 }
 
 .item:active {

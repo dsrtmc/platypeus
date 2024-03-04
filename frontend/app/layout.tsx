@@ -1,5 +1,5 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Inter, Itim } from "next/font/google";
 import { ReactNode } from "react";
 import { ApolloWrapper } from "@/lib/apollo-provider";
 import { ContentWrapper } from "@/components/ContentWrapper";
@@ -7,6 +7,7 @@ import { Header } from "@/components/header/Header";
 import { ConfigLoader } from "@/app/ConfigLoader";
 
 const inter = Inter({ subsets: ["latin"] });
+const itim = Itim({ weight: "400", subsets: ["latin"] });
 
 // ???
 export const metadata = {
@@ -17,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={itim.className}>
         <ApolloWrapper>
           <ContentWrapper>
             <Header />

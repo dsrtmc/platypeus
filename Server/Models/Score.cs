@@ -43,6 +43,9 @@ public class UserMonthlySummary
     /// <summary>The average <see cref="Score.RawWpm" /> of aggregated user's scores from a particular month.</summary>
     public int RawWpm { get; set; }
     
+    /// <summary>The average <see cref="Score.RawWpm" /> of aggregated user's scores from a particular month.</summary>
+    public float Accuracy { get; set; }
+    
     /// <summary>
     /// This date is likely to be assigned from the first score of that period, therefore only the month && the year matter.
     /// </summary>

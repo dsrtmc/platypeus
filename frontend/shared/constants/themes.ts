@@ -52,4 +52,14 @@ export const THEMES: ThemeType = {
     "--error-color": "#5c1c2f",
     "--error-extra-color": "#38101c",
   },
+  catppuccin: {
+    "--bg-color": "#1e1e2e",
+    "--main-color": "#abe9b3",
+    "--caret-color": "#fae3b0",
+    "--sub-color": "#575268",
+    "--sub-alt-color": "#292739",
+    "--text-color": "#d9e0ee",
+    "--error-color": "#f28fad",
+    "--error-extra-color": "#e8a2af",
+  },
 };

@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Models;
+using Server.Utilities;
 
 namespace Server.Services;
 
@@ -7,6 +9,17 @@ public class DatabaseContext : DbContext
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) {}
+    
+    /// <summary>
+    /// <para>Applies <see cref="DateTimeOffsetConverter"/>'s conversion to every <see cref="DateTimeOffset"/> value to ensure data consistency.</para>
+    /// <para>see: https://github.com/npgsql/npgsql/issues/4176</para>
+    /// </summary>
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+            .Properties<DateTimeOffset>()
+            .HaveConversion<DateTimeOffsetConverter>();
+    }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
@@ -25,10 +38,8 @@ public class DatabaseContext : DbContext
     /// </summary>
     private void OnUpdate()
     {
-        // I have a note saying that it changes UpdatedAt everytime we USE the entity
-        // not sure if that's any bit real so I keep it here to verify it later
         var entries = ChangeTracker.Entries();
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
         
         foreach (var entry in entries)
         {

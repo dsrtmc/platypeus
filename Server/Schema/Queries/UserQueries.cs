@@ -52,6 +52,7 @@ public static class UserQueries
             {
                 Wpm = Convert.ToInt32(group.Average(g => g.Wpm)),
                 RawWpm = Convert.ToInt32(group.Average(g => g.RawWpm)),
+                Accuracy = Convert.ToSingle(group.Average(g => g.Accuracy)),
                 Date = group.First().CreatedAt
             });
     }

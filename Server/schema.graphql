@@ -380,6 +380,7 @@ type User {
 type UserMonthlySummary {
   wpm: Int!
   rawWpm: Int!
+  accuracy: Float!
   date: DateTime!
 }
 

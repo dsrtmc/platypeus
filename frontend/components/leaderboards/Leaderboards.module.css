@@ -62,7 +62,7 @@ tr td:last-child {
     width: 100%;
 }
 
-.wrapper {
+.innerWrapper {
     height: calc(100vh - 14rem);
     overflow-x: auto;
     overflow-y: scroll;

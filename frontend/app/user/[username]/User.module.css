@@ -82,8 +82,8 @@
 
 .chart {
     grid-area: chart;
-    height: 300px;
-    width: 66% !important;
+    height: 400px;
+    width: 75%;
     min-width: 50%;
 }
 
@@ -201,12 +201,12 @@
 
 .center {
     font-size: 2rem;
-    filter: opacity(0.75);
+    filter: opacity(0.9);
 }
 
 .bottom {
     font-size: 0.9rem;
-    filter: opacity(0.5);
+    filter: opacity(0.6);
 }
 
 .detail {
