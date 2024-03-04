@@ -1,3 +1,12 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    height: 100%;
+}
+
 .box {
     display: flex;
     align-items: center;
@@ -42,4 +51,74 @@
     grid-area: chart;
     height: 200px;
     width: 100%!important;
+}
+
+.bestUserScoresBoxWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.selectModeButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.selectModeButton {
+    border: 0;
+    background-color: var(--sub-alt-color);
+    color: var(--sub-color);
+    padding: .4rem .75rem;
+    border-radius: var(--roundness);
+    transition: color, background-color 150ms ease;
+}
+
+.selectModeButton:hover, .selected {
+    background-color: var(--sub-color);
+    color: var(--sub-alt-color);
+}
+
+.bestUserScoresBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--sub-alt-color);
+    padding: 0.6rem 0.9rem;
+    height: 7rem;
+    border-radius: var(--roundness);
+}
+
+.bestUserScoreCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    color: var(--sub-color);
+    gap: .25rem;
+    height: 6rem;
+    width: 6rem;
+    cursor: default;
+}
+
+.top {
+    font-size: 0.8rem;
+}
+
+.center {
+    font-size: 2rem;
+    filter: opacity(0.6);
+}
+
+.bottom {
+    font-size: 0.9rem;
+    filter: opacity(0.5);
+}
+
+.detail {
+    font-size: 0.8rem !important;
 }

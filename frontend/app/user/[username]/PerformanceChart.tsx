@@ -53,7 +53,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
   };
 
   const data = {
-    labels: scores.map((score) => new Date(score!.createdAt).getUTCMonth() + 1),
+    labels: scores.map((score) => new Date(score!.date).getUTCMonth() + 1),
     datasets: [
       {
         label: "wpm",

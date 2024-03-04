@@ -10,7 +10,7 @@
     "gen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
-    "@apollo/client": "^3.8.0-alpha.15",
+    "@apollo/client": "^3.9.5",
     "@apollo/experimental-nextjs-app-support": "^0.2.1",
     "@types/node": "20.3.1",
     "@types/react": "^18.2.22",
@@ -33,7 +33,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "4.0.1",
     "@graphql-codegen/client-preset": "4.0.0",
-    "@graphql-codegen/typescript-react-apollo": "^3.3.7",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
     "@types/chart.js": "^2.9.38",
     "@types/graphql": "^14.5.0",
     "@types/jwt-decode": "^3.1.0",

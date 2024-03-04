@@ -34,10 +34,10 @@ const documents = {
     "query GetScore($where: ScoreFilterInput) {\n  score(where: $where) {\n    id\n    wpm\n    rawWpm\n  }\n}": types.GetScoreDocument,
     "query GetScores($after: String, $before: String, $first: Int, $last: Int, $order: [ScoreSortInput!], $where: ScoreFilterInput) {\n  scores(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    order: $order\n    where: $where\n  ) {\n    edges {\n      node {\n        id\n        wpm\n        rawWpm\n        accuracy\n        userId\n        user {\n          username\n        }\n        mode\n        modeSetting\n        content\n        createdAt\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.GetScoresDocument,
     "query GetScoresForLeaderboard($after: String, $before: String, $first: Int, $last: Int, $mode: String!, $modeSetting: Int!) {\n  scoresForLeaderboard(\n    after: $after\n    before: $before\n    first: $first\n    last: $last\n    mode: $mode\n    modeSetting: $modeSetting\n  ) {\n    edges {\n      node {\n        id\n        wpm\n        rawWpm\n        accuracy\n        user {\n          username\n        }\n        mode\n        modeSetting\n        content\n        createdAt\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.GetScoresForLeaderboardDocument,
-    "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}": types.GetUsersBestScoresDocument,
     "query Me {\n  me {\n    id\n    username\n    email\n    ...UserInfoFragment\n  }\n}": types.MeDocument,
     "query UserPage_GetUser($where: UserFilterInput) {\n  user(where: $where) {\n    id\n    username\n    averageWpm\n    scoreCount\n    createdAt\n  }\n}": types.UserPage_GetUserDocument,
-    "query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n  userMonthlyScoreSummaries(userId: $userId) {\n    wpm\n    rawWpm\n    createdAt\n  }\n}": types.UserPage_GetUserMonthlyScoreSummariesDocument,
+    "query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n  userMonthlyScoreSummaries(userId: $userId) {\n    wpm\n    rawWpm\n    date\n  }\n}": types.UserPage_GetUserMonthlyScoreSummariesDocument,
+    "query UserPage_GetUsersBestScores($userId: UUID!, $mode: String!, $modeSettings: [Int!]!) {\n  usersBestScores(userId: $userId, mode: $mode, modeSettings: $modeSettings) {\n    wpm\n    rawWpm\n    mode\n    modeSetting\n    accuracy\n    createdAt\n  }\n}": types.UserPage_GetUsersBestScoresDocument,
     "subscription OnChatboxEvent($chatboxId: UUID!, $messagesLast: Int) {\n  onChatboxEvent(chatboxId: $chatboxId) {\n    messages(last: $messagesLast) {\n      edges {\n        node {\n          id\n          author {\n            username\n          }\n          content\n          createdAt\n        }\n      }\n    }\n  }\n}": types.OnChatboxEventDocument,
     "subscription OnRaceEvent($raceId: UUID!, $racersFirst: Int) {\n  onRaceEvent(raceId: $raceId) {\n    id\n    mode\n    modeSetting\n    racers(first: $racersFirst) {\n      edges {\n        node {\n          id\n          user {\n            id\n            username\n          }\n          finished\n          wpm\n          wordsTyped\n        }\n      }\n    }\n    host {\n      id\n      username\n    }\n    started\n    running\n    finished\n    content\n    chatboxId\n    startTime\n  }\n}": types.OnRaceEventDocument,
 };
@@ -143,10 +143,6 @@ export function graphql(source: "query GetScoresForLeaderboard($after: String, $
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}"): (typeof documents)["query GetUsersBestScores($userId: UUID!) {\n  usersBestScores(userId: $userId) {\n    wpm\n    mode\n    modeSetting\n    accuracy\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "query Me {\n  me {\n    id\n    username\n    email\n    ...UserInfoFragment\n  }\n}"): (typeof documents)["query Me {\n  me {\n    id\n    username\n    email\n    ...UserInfoFragment\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -155,7 +151,11 @@ export function graphql(source: "query UserPage_GetUser($where: UserFilterInput)
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n  userMonthlyScoreSummaries(userId: $userId) {\n    wpm\n    rawWpm\n    createdAt\n  }\n}"): (typeof documents)["query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n  userMonthlyScoreSummaries(userId: $userId) {\n    wpm\n    rawWpm\n    createdAt\n  }\n}"];
+export function graphql(source: "query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n  userMonthlyScoreSummaries(userId: $userId) {\n    wpm\n    rawWpm\n    date\n  }\n}"): (typeof documents)["query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n  userMonthlyScoreSummaries(userId: $userId) {\n    wpm\n    rawWpm\n    date\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query UserPage_GetUsersBestScores($userId: UUID!, $mode: String!, $modeSettings: [Int!]!) {\n  usersBestScores(userId: $userId, mode: $mode, modeSettings: $modeSettings) {\n    wpm\n    rawWpm\n    mode\n    modeSetting\n    accuracy\n    createdAt\n  }\n}"): (typeof documents)["query UserPage_GetUsersBestScores($userId: UUID!, $mode: String!, $modeSettings: [Int!]!) {\n  usersBestScores(userId: $userId, mode: $mode, modeSettings: $modeSettings) {\n    wpm\n    rawWpm\n    mode\n    modeSetting\n    accuracy\n    createdAt\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -9,6 +9,9 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class ScoreMutations
 {
+    // TODO: somehow make sure people just can't postman the shit out of this mutation and get insane scores
+    // i'm thinking something funny like hash something and attach it to browser requests? not knowing the algorithm,
+    // it seems pretty hard to fake the hash on a custom request.
     /// <summary>
     /// Creates a score and returns it. If the user was not authenticated, the score is not saved to the database.
     /// </summary>

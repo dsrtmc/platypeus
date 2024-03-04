@@ -5,6 +5,7 @@ using Server.Services;
 
 namespace Server.Models;
 
+// TODO: private profile
 [Index(nameof(Username), IsUnique = true)]
 public class User : BaseEntity
 {

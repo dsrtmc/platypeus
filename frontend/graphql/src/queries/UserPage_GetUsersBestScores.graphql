@@ -1,0 +1,10 @@
+query UserPage_GetUsersBestScores($userId: UUID!, $mode: String!, $modeSettings: [Int!]!) {
+    usersBestScores(userId: $userId, mode: $mode, modeSettings: $modeSettings) {
+        wpm
+        rawWpm
+        mode
+        modeSetting
+        accuracy
+        createdAt
+    }
+}

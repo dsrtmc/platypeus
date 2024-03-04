@@ -4,14 +4,13 @@ import {
   GetScoresDocument,
   GetScoresQueryVariables,
   GetUsersBestScoresDocument,
-  UserPage_GetUserDailyScoreSummariesDocument,
-  UserPage_GetUserDailyScoreSummariesQueryVariables,
   UserPage_GetUserDocument,
   UserPage_GetUserMonthlyScoreSummariesDocument,
   UserPage_GetUserMonthlyScoreSummariesQueryVariables,
 } from "@/graphql/generated/graphql";
 import { PerformanceChart } from "@/app/user/[username]/PerformanceChart";
 import UserInfo from "@/app/user/[username]/UserInfo";
+import { BestUserScoresBox } from "@/app/user/[username]/BestUserScoresBox";
 
 // TODO: CONSIDER GOING FOR ROUTE-SPECIFIC QUERIES SO THAT WE AVOID OVER-FETCHING
 export default async function UserPage({ params }: { params: { username: string } }) {
@@ -26,6 +25,7 @@ export default async function UserPage({ params }: { params: { username: string 
     },
   });
   if (!data?.user) return <div>no such user</div>;
+  // TODO: cache is fkd i think idk, even if i do ctrl + f5 it still gets me stale data despite the server getting it correctly
   const { data: scoresData } = await getClient().query({
     query: UserPage_GetUserMonthlyScoreSummariesDocument,
     variables: {
@@ -33,10 +33,17 @@ export default async function UserPage({ params }: { params: { username: string 
     } as UserPage_GetUserMonthlyScoreSummariesQueryVariables,
   });
   return (
-    <div>
+    <div className={styles.main}>
       <UserInfo user={data.user} />
-      <div className={styles.box}></div>
       <PerformanceChart scores={scoresData.userMonthlyScoreSummaries} />
+      <BestUserScoresBox user={data.user} />
+      <BestUserScoresBox user={data.user} />
+      <BestUserScoresBox user={data.user} />
+      <BestUserScoresBox user={data.user} />
+      <BestUserScoresBox user={data.user} />
+      <BestUserScoresBox user={data.user} />
+      <BestUserScoresBox user={data.user} />
+      <BestUserScoresBox user={data.user} />
     </div>
   );
 }
