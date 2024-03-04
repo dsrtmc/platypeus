@@ -33,6 +33,8 @@
 
 * {
     font: inherit;
+    font-family: var(--font-itim);
+    
     font-weight: 500;
     
     /* Firefox */

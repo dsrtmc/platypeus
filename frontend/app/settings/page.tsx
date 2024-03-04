@@ -5,6 +5,7 @@ import { PropertyEditor } from "@/app/settings/PropertyEditor";
 import { THEMES, ThemeType } from "@/shared/constants/themes";
 import styles from "./Settings.module.css";
 import { ThemeButton } from "@/app/settings/ThemeButton";
+import { FontChanger } from "@/app/settings/FontChanger";
 
 interface Props {}
 
@@ -37,6 +38,9 @@ export default function SettingsPage() {
         {Object.entries(THEMES).map(([name, config]) => (
           <ThemeButton themeName={name} themeConfig={config} />
         ))}
+      </div>
+      <div>
+        <FontChanger />
       </div>
     </div>
   );

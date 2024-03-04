@@ -19,6 +19,9 @@ import {
   ChartDataset,
   Chart,
   Filler,
+  FontSpec,
+  LinearScaleOptions,
+  GridLineOptions,
 } from "chart.js";
 
 interface Props {
@@ -38,50 +41,48 @@ export const ScoreChart: React.FC<Props> = ({ score }) => {
   const [subColor, setSubColor] = useState("#00000000");
   const [subAltColor, setSubAltColor] = useState("#00000000");
 
+  const font: Partial<FontSpec> = {
+    family: fontFamily,
+  };
+
+  const ticks: Partial<LinearScaleOptions["ticks"]> = {
+    padding: 15,
+    font,
+  };
+
+  const grid: Partial<GridLineOptions> = {
+    color: subAltColor,
+    drawTicks: false,
+  };
+
   const options: ChartOptions<"line"> = {
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
+          ...ticks,
           color: subColor,
-          padding: 15,
-          font: {
-            family: fontFamily,
-          },
         },
         title: {
           display: true,
           text: "wpm",
           color: subColor,
-          font: {
-            family: fontFamily,
-          },
+          font,
         },
-        grid: {
-          color: subAltColor,
-          drawTicks: false,
-        },
+        grid,
       },
       x: {
         ticks: {
+          ...ticks,
           color: subColor,
-          padding: 15,
-          font: {
-            family: fontFamily,
-          },
         },
         title: {
           display: true,
           text: "minute",
           color: subColor,
-          font: {
-            family: fontFamily,
-          },
+          font,
         },
-        grid: {
-          color: subAltColor,
-          drawTicks: false,
-        },
+        grid,
       },
     },
     maintainAspectRatio: false,

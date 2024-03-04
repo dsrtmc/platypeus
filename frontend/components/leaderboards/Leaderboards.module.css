@@ -42,8 +42,10 @@ tr td:last-child {
 
 .tables {
     display: flex;
-    align-items: center;
+    justify-content: center;
+    align-items: flex-start;
     gap: 1rem;
+    height: 100%;
 }
 
 .box {

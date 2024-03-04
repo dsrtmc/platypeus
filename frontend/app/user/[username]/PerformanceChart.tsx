@@ -11,8 +11,11 @@ import {
   ChartDataset,
   ChartOptions,
   Filler,
+  FontSpec,
+  GridLineOptions,
   Legend,
   LinearScale,
+  LinearScaleOptions,
   LineElement,
   LogarithmicScale,
   PointElement,
@@ -33,6 +36,20 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
   const [subColor, setSubColor] = useState("#00000000");
   const [subAltColor, setSubAltColor] = useState("#00000000");
 
+  const font: Partial<FontSpec> = {
+    family: fontFamily,
+  };
+
+  const ticks: Partial<LinearScaleOptions["ticks"]> = {
+    padding: 15,
+    font,
+  };
+
+  const grid: Partial<GridLineOptions> = {
+    color: subAltColor,
+    drawTicks: false,
+  };
+
   const options: ChartOptions<"line"> = {
     interaction: {
       mode: "index",
@@ -43,24 +60,18 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         type: "linear",
         beginAtZero: true,
         ticks: {
+          ...ticks,
           color: subColor,
-          padding: 15,
-          font: {
-            family: fontFamily,
-          },
         },
         title: {
           display: true,
           text: "accuracy",
           color: subColor,
-          font: {
-            family: fontFamily,
-          },
+          font,
         },
         grid: {
+          ...grid,
           drawOnChartArea: false,
-          color: subAltColor,
-          drawTicks: false,
         },
         position: "left",
       },
@@ -68,42 +79,30 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         type: "linear",
         beginAtZero: true,
         ticks: {
+          ...ticks,
           color: subColor,
-          padding: 15,
-          font: {
-            family: fontFamily,
-          },
         },
         title: {
           display: true,
           text: "wpm",
           color: subColor,
-          font: {
-            family: fontFamily,
-          },
+          font,
         },
-        grid: {
-          color: subAltColor,
-          drawTicks: false,
-        },
+        grid,
         position: "right",
       },
       x: {
         ticks: {
+          ...ticks,
           color: subColor,
-          padding: 15,
-          font: {
-            family: fontFamily,
-          },
         },
         title: {
           display: true,
           color: subColor,
         },
         grid: {
+          ...grid,
           drawOnChartArea: false,
-          color: subAltColor,
-          drawTicks: false,
         },
         position: "left",
       },
@@ -119,9 +118,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
       title: {
         display: true,
         text: "monthly progress",
-        font: {
-          family: fontFamily,
-        },
+        font,
         color: subColor,
         padding: 8,
       },
@@ -135,7 +132,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         data: scores.map((score) => score!.accuracy * 100),
         borderColor: subAltColor,
         pointBackgroundColor: subAltColor,
-        pointRadius: 6,
+        pointRadius: 2,
         fill: true,
         yAxisID: "y",
         order: 2,
@@ -144,6 +141,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         data: scores.map((score) => score!.rawWpm),
         borderColor: subColor,
         pointBackgroundColor: subColor,
+        pointRadius: 2,
         yAxisID: "y1",
         order: 1,
       },
@@ -151,6 +149,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         data: scores.map((score) => score!.wpm),
         borderColor: mainColor,
         pointBackgroundColor: mainColor,
+        pointRadius: 2,
         yAxisID: "y1",
         order: 0,
       },

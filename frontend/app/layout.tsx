@@ -1,13 +1,21 @@
 import "./globals.css";
-import { Inter, Itim } from "next/font/google";
+import { Inter, Itim, IBM_Plex_Mono, JetBrains_Mono } from "next/font/google";
 import { ReactNode } from "react";
 import { ApolloWrapper } from "@/lib/apollo-provider";
 import { ContentWrapper } from "@/components/ContentWrapper";
 import { Header } from "@/components/header/Header";
 import { ConfigLoader } from "@/app/ConfigLoader";
 
-const inter = Inter({ subsets: ["latin"] });
-const itim = Itim({ weight: "400", subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const itim = Itim({ weight: "400", subsets: ["latin"], variable: "--font-itim", display: "swap" });
+const jetBrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-ibm-plex-mono",
+  display: "swap",
+});
+export const availableFonts = [inter, itim, jetBrainsMono, ibmPlexMono];
 
 // ???
 export const metadata = {
@@ -17,8 +25,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body className={itim.className}>
+    <html lang="en" className={`${availableFonts.map((font) => font.variable).join(" ")}`}>
+      <body>
         <ApolloWrapper>
           <ContentWrapper>
             <Header />
