@@ -1,4 +1,5 @@
 import { UserPage_GetUserQuery } from "@/graphql/generated/graphql";
+import styles from "./User.module.css";
 
 interface Props {
   user: NonNullable<UserPage_GetUserQuery["user"]>;
@@ -6,15 +7,23 @@ interface Props {
 
 export default async function UserInfo({ user }: Props) {
   return (
-    <div>
-      {user.username}
-      <div>
-        you have been a member since&nbsp;
-        {new Date(user.createdAt).toLocaleDateString("en-UK", { day: "2-digit", month: "short", year: "numeric" })}
+    <div className={styles.userInfo}>
+      <div className={styles.userStats}>
+        <div className={styles.group}>
+          <div className={styles.username}>{user.username}</div>
+        </div>
+        <div className={styles.group}>
+          <div className={styles.groupTop}>{Math.round(user.averageWpm)}</div>
+          <div className={styles.groupBottom}>average wpm</div>
+        </div>
+        <div className={styles.group}>
+          <div className={styles.groupTop}>{user.scoreCount}</div>
+          <div className={styles.groupBottom}>tests taken</div>
+        </div>
       </div>
-      <div>
-        <p>average wpm: {Math.round(user.averageWpm)}</p>
-        <p>total tests: {user.scoreCount}</p>
+      <div className={styles.joinedInfo}>
+        {user.username} has been a member since&nbsp;
+        {new Date(user.createdAt).toLocaleDateString("en-UK", { day: "2-digit", month: "short", year: "numeric" })}
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
-import React, { FC } from "react";
+import React, { FC, Ref, useRef } from "react";
 import { Score } from "@/graphql/generated/graphql";
 import styles from "./Score.module.css";
 import { ScoreChart } from "@/components/test/ScoreChart";
+import { CSSTransition } from "react-transition-group";
 
 interface Props {
   score: Score;

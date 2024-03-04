@@ -37,13 +37,6 @@ export default async function UserPage({ params }: { params: { username: string 
       <UserInfo user={data.user} />
       <PerformanceChart scores={scoresData.userMonthlyScoreSummaries} />
       <BestUserScoresBox user={data.user} />
-      <BestUserScoresBox user={data.user} />
-      <BestUserScoresBox user={data.user} />
-      <BestUserScoresBox user={data.user} />
-      <BestUserScoresBox user={data.user} />
-      <BestUserScoresBox user={data.user} />
-      <BestUserScoresBox user={data.user} />
-      <BestUserScoresBox user={data.user} />
     </div>
   );
 }

@@ -35,9 +35,15 @@ export const ScoreChart: React.FC<Props> = ({ score }) => {
       y: {
         beginAtZero: true,
         ticks: { color: subColor },
+        grid: {
+          color: subAltColor,
+        },
       },
       x: {
         ticks: { color: subColor },
+        grid: {
+          color: subAltColor,
+        },
       },
     },
     maintainAspectRatio: false,
@@ -46,6 +52,7 @@ export const ScoreChart: React.FC<Props> = ({ score }) => {
         position: "top" as const,
       },
     },
+    animation: false,
   };
 
   // funny squiggly lines despite it being correct 😐

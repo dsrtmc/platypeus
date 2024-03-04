@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Ref, useEffect, useRef, useState } from "react";
 import {
   UserPage_GetUsersBestScoresQuery,
   UserPage_GetUsersBestScoresQueryVariables,
 } from "@/graphql/generated/graphql";
 import styles from "./User.module.css";
+import { CSSTransition } from "react-transition-group";
 
 interface Props {
   score: NonNullable<UserPage_GetUsersBestScoresQuery["usersBestScores"]>[number];
@@ -15,10 +16,10 @@ export const BestUserScoreCard: React.FC<Props> = ({ score, mode, modeSetting })
   const [showDetails, setShowDetails] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   function handleMouseEnter() {
-    setShowDetails(true);
+    if (score) setShowDetails(true);
   }
   function handleMouseLeave() {
-    setShowDetails(false);
+    if (score) setShowDetails(false);
   }
   useEffect(() => {
     if (ref?.current) {
@@ -32,10 +33,24 @@ export const BestUserScoreCard: React.FC<Props> = ({ score, mode, modeSetting })
       }
     };
   }, []);
+  const regularCardRef = useRef<HTMLDivElement | null>(null);
+  const detailedCardRef = useRef<HTMLDivElement | null>(null);
   return (
-    <div className={styles.bestUserScoreCard} ref={ref}>
-      {showDetails ? (
-        <>
+    <div className={styles.cardWrapper} ref={ref}>
+      <CSSTransition
+        nodeRef={detailedCardRef as Ref<HTMLDivElement | null>}
+        in={showDetails}
+        timeout={150}
+        classNames={{
+          enter: styles.cardEnter,
+          enterActive: styles.cardEnterActive,
+          exit: styles.cardExit,
+          exitActive: styles.cardExitActive,
+        }}
+        unmountOnExit
+        mountOnEnter
+      >
+        <div className={styles.card} ref={detailedCardRef}>
           <div className={`${styles.top} ${styles.detail}`}>
             {mode} {modeSetting}
           </div>
@@ -53,16 +68,29 @@ export const BestUserScoreCard: React.FC<Props> = ({ score, mode, modeSetting })
                 })
               : "-"}
           </div>
-        </>
-      ) : (
-        <>
+        </div>
+      </CSSTransition>
+      <CSSTransition
+        nodeRef={regularCardRef as Ref<HTMLDivElement | null>}
+        in={!showDetails}
+        timeout={150}
+        classNames={{
+          enter: styles.cardEnter,
+          enterActive: styles.cardEnterActive,
+          exit: styles.cardExit,
+          exitActive: styles.cardExitActive,
+        }}
+        unmountOnExit
+        mountOnEnter
+      >
+        <div className={styles.card} ref={regularCardRef}>
           <div className={styles.top}>
             {mode} {modeSetting}
           </div>
           <div className={styles.center}>{score ? score.wpm : "-"}</div>
           <div className={styles.bottom}>{score ? Math.round(score.accuracy * 100) + "%" : "-"}</div>
-        </>
-      )}
+        </div>
+      </CSSTransition>
     </div>
   );
 };

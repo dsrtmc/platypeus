@@ -1,6 +1,7 @@
 "use client";
 
 import { ApolloClient, ApolloLink, HttpLink, HttpOptions, split } from "@apollo/client";
+import { NextSSRApolloClient } from "@apollo/experimental-nextjs-app-support/ssr";
 import {
   ApolloNextAppProvider,
   NextSSRInMemoryCache,
@@ -41,7 +42,7 @@ const createSplitLink = (cookie = "") => {
 };
 
 function makeClient() {
-  return new ApolloClient({
+  return new NextSSRApolloClient({
     cache: new NextSSRInMemoryCache(),
     link:
       typeof window !== "undefined" && wsLink

@@ -12,13 +12,13 @@ export function ModeSettingSelection({ mode, selectedSetting, handleSelect }: Pr
   let modeSettings: number[] = [];
   switch (mode) {
     case "words":
-      modeSettings = [5, 25, 50];
+      modeSettings = [10, 25, 50, 100];
       break;
     case "time":
-      modeSettings = [5, 15, 30];
+      modeSettings = [5, 15, 30, 60];
       break;
     default:
-      modeSettings = [5, 15, 30];
+      modeSettings = [5, 15, 30, 60];
   }
   return (
     <div className={styles.modeSettingSelection}>

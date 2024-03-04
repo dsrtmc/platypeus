@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import { NextSSRApolloClient } from "@apollo/experimental-nextjs-app-support/ssr";
 
 const createHttpLink = (cookie: string | undefined) => {
   const options: HttpOptions = {

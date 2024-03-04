@@ -24,17 +24,6 @@ const initialSettings = {
 export function BestUserScoresBox({ user }: Props) {
   const [mode, setMode] = useState(initialSettings.mode);
   const [modeSettings, setModeSettings] = useState(initialSettings.modeSettings);
-  // todo: we lowkey just probably don't need it idk
-  useEffect(() => {
-    switch (mode) {
-      case "time":
-        setModeSettings([5, 15, 30, 60]);
-        break;
-      case "words":
-        setModeSettings([10, 25, 50, 100]);
-        break;
-    }
-  }, [mode]);
   const { data } = useSuspenseQuery(UserPage_GetUsersBestScoresDocument, {
     variables: {
       userId: user.id,
@@ -44,18 +33,21 @@ export function BestUserScoresBox({ user }: Props) {
   });
   if (!data?.usersBestScores) return <div>no data sorry :p</div>;
   function handleSelectMode(mode: string) {
-    return () => setMode(mode);
+    return () => {
+      switch (mode) {
+        case "time":
+          setModeSettings([5, 15, 30, 60]);
+          break;
+        case "words":
+          setModeSettings([10, 25, 50, 100]);
+          break;
+      }
+      setMode(mode);
+    };
   }
   return (
     <div className={styles.bestUserScoresBoxWrapper}>
-      <div className={styles.selectModeButtons}>
-        <SelectModeButton selected={mode === "time"} handleSelectMode={handleSelectMode("time")}>
-          time
-        </SelectModeButton>
-        <SelectModeButton selected={mode === "words"} handleSelectMode={handleSelectMode("words")}>
-          words
-        </SelectModeButton>
-      </div>
+      <label className={styles.label}>{user.username}'s best scores</label>
       <div className={styles.bestUserScoresBox}>
         <Suspense>
           {modeSettings.map((modeSetting) => (
@@ -63,9 +55,18 @@ export function BestUserScoresBox({ user }: Props) {
               score={data!.usersBestScores!.find((score) => score?.modeSetting === modeSetting && score.mode === mode)}
               mode={mode}
               modeSetting={modeSetting}
+              key={modeSetting}
             />
           ))}
         </Suspense>
+      </div>
+      <div className={styles.selectModeButtons}>
+        <SelectModeButton selected={mode === "time"} handleSelectMode={handleSelectMode("time")}>
+          time
+        </SelectModeButton>
+        <SelectModeButton selected={mode === "words"} handleSelectMode={handleSelectMode("words")}>
+          words
+        </SelectModeButton>
       </div>
     </div>
   );

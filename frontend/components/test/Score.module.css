@@ -1,3 +1,24 @@
+.scoreWrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+}
+
+.scoreWrapperAppear {
+    opacity: 0;
+}
+
+.scoreWrapperAppearActive {
+    opacity: 1;
+    transition: opacity 300ms;
+}
+
+.scoreWrapperAppearDone {
+    opacity: 1;
+}
+
 .score {
     display: grid;
     grid-template-columns: auto 1fr;

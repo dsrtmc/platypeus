@@ -219,72 +219,81 @@ export function TestBox({ handleSaveScore }: Props) {
 
   if (visible) {
     return (
-      <div className={styles.box} ref={ref}>
-        <section>
-          <TestConfig
-            language={language}
-            mode={mode}
-            modeSetting={modeSetting}
-            handleSelectMode={handleSelectMode}
-            handleSelectLanguage={handleSelectLanguage}
-            handleSelectModeSetting={handleSelectModeSetting}
-          />
-        </section>
-        <section className={styles.top}>
-          <section className={styles.left}>
-            {/* TODO: Is there a better way to handle checking the mode? */}
-            {mode === "time" ? (
-              <Timer time={modeSetting - timePassed} />
-            ) : (
-              <WordProgress count={wordCount} setting={modeSetting} />
-            )}
-            <Counter count={wpm} />
-          </section>
-        </section>
-        <section className={styles.middle}>
-          {/* TODO: eventually make it fade-in on the first render, not only on re-mount */}
-          <CSSTransition
-            nodeRef={testRef as Ref<HTMLDivElement | null>}
-            in={mounted}
-            timeout={150}
-            classNames={{
-              enter: styles.wordsEnter,
-              enterActive: styles.wordsEnterActive,
-              enterDone: styles.wordsEnterDone,
-              exit: styles.wordsExit,
-              exitActive: styles.wordsExitActive,
-              exitDone: styles.wordsExitDone,
-            }}
-            onExited={() => handleReset()}
-            mountOnEnter
-            unmountOnExit
-          >
-            <Test
-              focused={focused}
-              running={running}
-              finished={finished}
-              timePassed={timePassed}
-              modeSetting={modeSetting}
-              startTime={testStartTime}
-              mode={mode}
+      <CSSTransition
+        nodeRef={ref as Ref<HTMLDivElement | null>}
+        in={true}
+        appear={true}
+        timeout={300}
+        classNames={{
+          appear: styles.boxAppear,
+          appearActive: styles.boxAppearActive,
+          appearDone: styles.boxAppearDone,
+        }}
+      >
+        <div className={styles.box} ref={ref}>
+          <section>
+            <TestConfig
               language={language}
-              onKeyDown={handleKeyDown}
-              onPoolUpdate={onPoolUpdate}
-              handleFinish={handleFinish}
-              handleChangeWpm={handleChangeWpm}
-              handleSaveScore={handleSaveScore}
-              setWordCount={setWordCount}
-              initialContent={initialContent}
-              innerRef={testRef}
-              key={testKey}
+              mode={mode}
+              modeSetting={modeSetting}
+              handleSelectMode={handleSelectMode}
+              handleSelectLanguage={handleSelectLanguage}
+              handleSelectModeSetting={handleSelectModeSetting}
             />
-          </CSSTransition>
-        </section>
-        <section className={styles.bottom}>
-          <RestartButton onReset={() => setMounted(false)} ref={restartButtonRef} />
-          {focused ? "FOCUSED" : "NOT FOCUSED"}
-        </section>
-      </div>
+          </section>
+          <section className={styles.top}>
+            <section className={styles.left}>
+              {/* TODO: Is there a better way to handle checking the mode? */}
+              {mode === "time" ? (
+                <Timer time={modeSetting - timePassed} />
+              ) : (
+                <WordProgress count={wordCount} setting={modeSetting} />
+              )}
+              <Counter count={wpm} />
+            </section>
+          </section>
+          <section className={styles.middle}>
+            {/* TODO: eventually make it fade-in on the first render, not only on re-mount */}
+            <CSSTransition
+              nodeRef={testRef as Ref<HTMLDivElement | null>}
+              in={mounted}
+              timeout={150}
+              classNames={{
+                enter: styles.wordsEnter,
+                enterActive: styles.wordsEnterActive,
+                enterDone: styles.wordsEnterDone,
+                exit: styles.wordsExit,
+                exitActive: styles.wordsExitActive,
+                exitDone: styles.wordsExitDone,
+              }}
+              onExited={() => handleReset()}
+            >
+              <Test
+                focused={focused}
+                running={running}
+                finished={finished}
+                timePassed={timePassed}
+                modeSetting={modeSetting}
+                startTime={testStartTime}
+                mode={mode}
+                language={language}
+                onKeyDown={handleKeyDown}
+                onPoolUpdate={onPoolUpdate}
+                handleFinish={handleFinish}
+                handleChangeWpm={handleChangeWpm}
+                handleSaveScore={handleSaveScore}
+                setWordCount={setWordCount}
+                initialContent={initialContent}
+                innerRef={testRef}
+                key={testKey}
+              />
+            </CSSTransition>
+          </section>
+          <section className={styles.bottom}>
+            <RestartButton onReset={() => setMounted(false)} ref={restartButtonRef} />
+          </section>
+        </div>
+      </CSSTransition>
     );
   }
 }

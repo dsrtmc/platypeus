@@ -1,9 +1,11 @@
 "use client";
 
-import { FC, useEffect, useRef } from "react";
+import { FC, Ref, useEffect, useRef } from "react";
 import { RestartButton } from "@/components/test/RestartButton";
 import { Score as ScoreType } from "@/graphql/generated/graphql";
 import { Score } from "@/components/test/Score";
+import styles from "./Score.module.css";
+import { CSSTransition } from "react-transition-group";
 
 interface Props {
   score: ScoreType;
@@ -31,10 +33,24 @@ export const ScoreBox: FC<Props> = ({ score, handleStartNextTest }) => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const ref = useRef<HTMLDivElement | null>(null);
+
   return (
-    <>
-      <Score score={score} />
-      <RestartButton onReset={handleStartNextTest} ref={restartButtonRef} />
-    </>
+    <CSSTransition
+      nodeRef={ref as Ref<HTMLDivElement | null>}
+      in={true}
+      appear={true}
+      timeout={300}
+      classNames={{
+        appear: styles.scoreWrapperAppear,
+        appearActive: styles.scoreWrapperAppearActive,
+        appearDone: styles.scoreWrapperAppearDone,
+      }}
+    >
+      <div className={styles.scoreWrapper} ref={ref}>
+        <Score score={score} />
+        <RestartButton onReset={handleStartNextTest} ref={restartButtonRef} />
+      </div>
+    </CSSTransition>
   );
 };

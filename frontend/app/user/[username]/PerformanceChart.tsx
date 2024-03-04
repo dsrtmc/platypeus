@@ -22,6 +22,7 @@ interface Props {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+// TODO: fix charts
 export const PerformanceChart: React.FC<Props> = ({ scores }) => {
   const [subColor, setSubColor] = useState("white");
   const [subAltColor, setSubAltColor] = useState("white");
@@ -33,10 +34,16 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         ticks: {
           color: subColor,
         },
+        grid: {
+          color: subAltColor,
+        },
       },
       x: {
         ticks: {
           color: subColor,
+        },
+        grid: {
+          color: subAltColor,
         },
       },
     },
