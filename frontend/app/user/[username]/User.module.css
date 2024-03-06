@@ -39,6 +39,7 @@
 
 .joinedInfo {
     font-size: 0.8rem;
+    color: var(--sub-color);
 }
 
 .group {
@@ -54,6 +55,7 @@
 
 .groupBottom {
     font-size: 0.8rem;
+    color: var(--sub-color);
 }
 
 .test {
@@ -112,12 +114,11 @@
     color: var(--sub-color);
     padding: .4rem .75rem;
     font-size: .8rem;
-    /*border-radius: var(--roundness);*/
-    transition: color, background-color, filter 100ms ease;
 }
 
 .selectModeButton:active {
-    filter: opacity(75%);
+    transition: filter 100ms ease;
+    filter: opacity(0.8);
 }
 
 /* the funniest thing I've done */
@@ -126,9 +127,9 @@
     position: absolute;
     bottom: 0;
     width: 0;
-    height: 1px;
+    height: 2px;
     background-color: var(--sub-color);
-    transition: width 150ms;
+    transition: width 150ms ease;
 }
 
 .selectModeButton::before, .selected::before {

@@ -9,7 +9,7 @@ export const ThemeList: React.FC<Props> = ({}) => {
   return (
     <div className={styles.themeList}>
       {Object.entries(THEMES).map(([name, config]) => (
-        <ThemeButton themeName={name} themeConfig={config} />
+        <ThemeButton themeName={name} themeConfig={config} key={name} />
       ))}
     </div>
   );

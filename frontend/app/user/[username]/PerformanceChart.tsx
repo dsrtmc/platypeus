@@ -125,6 +125,12 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
     },
   };
 
+  // this code makes sure we have a steady line on the chart if someone's only played for a month.
+  // TODO: apparently you should be able to achieve the same using `spanGaps = true`, but it doesn't work for me :)
+  if (scores.length === 1) {
+    scores = [...scores, scores[0]];
+  }
+
   const data: ChartData<"line"> = {
     labels: scores.map((score) => new Date(score!.date).getUTCMonth() + 1),
     datasets: [

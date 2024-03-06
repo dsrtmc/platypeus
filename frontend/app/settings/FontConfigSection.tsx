@@ -1,17 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { availableFonts } from "@/shared/constants/fonts";
-import { FontSelectionItem } from "@/app/settings/FontSelectionItem";
+import React from "react";
 import { FontSelection } from "@/app/settings/FontSelection";
 import { FontSizeChangeSection } from "@/app/settings/FontSizeChangeSection";
 import styles from "./Settings.module.css";
 
 interface Props {}
 
-export const FontChangeSection: React.FC<Props> = ({}) => {
+export const FontConfigSection: React.FC<Props> = ({}) => {
   return (
     <div className={styles.fontChangeSection}>
+      <h1 className={styles.headerSmall}>font</h1>
       <FontSelection />
       <FontSizeChangeSection />
     </div>

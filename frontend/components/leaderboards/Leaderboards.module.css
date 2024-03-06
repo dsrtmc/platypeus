@@ -64,6 +64,10 @@ tr td:last-child {
     width: 100%;
 }
 
+.wrapper {
+    width: 100%;
+}
+
 .innerWrapper {
     height: calc(100vh - 14rem);
     overflow-x: auto;
@@ -116,4 +120,19 @@ tr td:last-child {
     padding: 1rem 0.5rem;
     border-radius: 0 !important;
     background-color: var(--bg-color) !important;
+}
+
+.user {
+    color: var(--text-color);
+    transition: color 150ms ease;
+    cursor: pointer;
+}
+
+.user:hover {
+    color: var(--main-color);
+}
+
+.user:active {
+    transition: filter 150ms ease;
+    filter: opacity(0.8);
 }

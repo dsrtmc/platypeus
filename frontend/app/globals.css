@@ -2,6 +2,7 @@
     --nav-size: 75px;
 
     --bg-color: #242933;
+    --caret-color: #ec4c56;
     --main-color: #ec4c56;
     --sub-color: #596172;
     --sub-alt-color: #1c222d;
@@ -15,7 +16,7 @@
     
     --test-font-size-multiplier: 2;
 
-    --wrapper-width: 900px;
+    --wrapper-width: 1000px;
 
     --caret-speed: 100ms;
     

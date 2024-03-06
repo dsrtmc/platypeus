@@ -37,19 +37,16 @@ export const FontSelection: React.FC<Props> = ({}) => {
 
   return (
     <div className={styles.fontSelection}>
-      {Object.entries(availableFonts).map(([name, font]) => {
-        console.log("Font:", font.style.fontFamily);
-        console.log("Font family:", fontFamily);
-        return (
-          <FontSelectionItem
-            // The variables inside CSS remove single quotation marks from the font names, whereas our object keeps them.
-            selected={removeWhitespace(font.style.fontFamily) === removeWhitespace(fontFamily)}
-            handleFontChange={handleFontChange(font.style.fontFamily)}
-          >
-            {name}
-          </FontSelectionItem>
-        );
-      })}
+      {Object.entries(availableFonts).map(([name, font]) => (
+        <FontSelectionItem
+          // The variables inside CSS remove single quotation marks from the font names, whereas our object keeps them.
+          selected={removeWhitespace(font.style.fontFamily) === removeWhitespace(fontFamily)}
+          handleFontChange={handleFontChange(font.style.fontFamily)}
+          key={name}
+        >
+          {name}
+        </FontSelectionItem>
+      ))}
     </div>
   );
 };

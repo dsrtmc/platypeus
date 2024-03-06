@@ -8,6 +8,7 @@ import {
 } from "@/graphql/generated/graphql";
 import { SuspenseQueryHookOptions, useQuery } from "@apollo/client";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
+import Link from "next/link";
 
 interface Props {
   mode: string;
@@ -136,7 +137,9 @@ export function Leaderboard({ mode, modeSetting }: Props) {
                   <p>{index + 1}</p>
                 </td>
                 <td className={styles.left}>
-                  <p>{edge.node.user?.username}</p>
+                  <Link href={`/user/${edge.node.user?.username}`} className={styles.user}>
+                    {edge.node.user?.username}
+                  </Link>
                 </td>
                 <td className={styles.right}>
                   <p>{edge.node.wpm}</p>

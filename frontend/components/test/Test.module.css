@@ -179,7 +179,7 @@
 .modeSettingButton {
     all: unset;
     color: var(--sub-color);
-    transition: color, filter 200ms ease;
+    transition: color 200ms ease;
     padding: .25rem .4rem;
 }
 
@@ -189,7 +189,8 @@
 }
 
 .modeSettingButton:active {
-    filter: opacity(75%);
+    transition: filter 200ms ease;
+    filter: opacity(0.8);
 }
 
 .timer {

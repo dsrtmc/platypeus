@@ -76,9 +76,11 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
   // TODO: require authentication
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      <h1>Create a race</h1>
-      <label>private?</label>
-      <input {...register("private" as FieldPath<FormValues>)} type={"checkbox"} />
+      <h1 className={styles.header}>create a race</h1>
+      <section className={styles.horizontalGroup}>
+        <label className={styles.label}>private?</label>
+        <input {...register("private" as FieldPath<FormValues>)} type={"checkbox"} className={styles.checkbox} />
+      </section>
       <input
         {...register("password" as FieldPath<FormValues>, {
           disabled: !watch("private"),
@@ -90,9 +92,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
         className={styles.field}
       />
       <div style={{ display: "flex", gap: "1rem" }}>
-        <input {...register("mode" as FieldPath<FormValues>)} type={"radio"} value={"time"} />
+        <input {...register("mode" as FieldPath<FormValues>)} type={"radio"} value={"time"} className={styles.radio} />
         <label htmlFor={"time"}>time</label>
-        <input {...register("mode" as FieldPath<FormValues>)} type={"radio"} value={"words"} />
+        <input {...register("mode" as FieldPath<FormValues>)} type={"radio"} value={"words"} className={styles.radio} />
         <label htmlFor={"words"}>words</label>
         <div>selected mode: {watch("mode")}</div>
       </div>

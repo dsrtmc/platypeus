@@ -1,3 +1,14 @@
+export enum CssThemeVariables {
+  Background = "--bg-color",
+  Caret = "--caret-color",
+  Main = "--main-color",
+  Sub = "--sub-color",
+  SubAlt = "--sub-alt-color",
+  Text = "--text-color",
+  Error = "--error-color",
+  ExtraError = "--error-extra-color",
+}
+
 export type ThemeType = {
   [name: string]: {
     "--bg-color": string;
