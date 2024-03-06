@@ -8,10 +8,14 @@ export type ConfigType = {
   words: number;
   mode: string;
   language: string;
+  fontFamily: string;
+  fontSize: number;
+  testFontSizeMultiplier: number;
 };
 
 export type ThemeCssVariablesType = {
   background: "--bg-color";
+  "caret color": "--caret-color";
   main: "--main-color";
   sub: "--sub-color";
   "sub alt": "--sub-alt-color";

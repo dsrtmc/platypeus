@@ -2,42 +2,36 @@
 
 import styles from "./Test.module.css";
 import { Ref, useEffect, useRef, useState } from "react";
-import { Test, TestMethods } from "@/components/test/Test";
+import { Test } from "@/components/test/Test";
 import { Timer } from "@/components/test/Timer";
-import { ModeSettingSelection } from "@/components/test/ModeSettingSelection";
 import { Counter } from "@/components/test/Counter";
 import { RestartButton } from "@/components/test/RestartButton";
 import { Score as ScoreType } from "@/graphql/generated/graphql";
-import { HiMiniLanguage } from "react-icons/hi2";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomWords } from "@/utils/generateRandomWords";
-import { ModeSelection } from "@/components/test/ModeSelection";
-import { LanguageSelection } from "@/components/test/LanguageSelection";
 import { WordProgress } from "@/components/test/WordProgress";
 import { WORD_LISTS } from "@/utils/wordLists";
-import { TestComponent } from "@/app/about/TestComponent";
 import { TestConfig } from "@/components/test/TestConfig";
 import { CSSTransition } from "react-transition-group";
-import { ConfigType } from "@/shared/types/configTypes";
-import { setConfig, getConfig } from "@/utils/getConfig";
+import { getConfig, setConfig } from "@/utils/configUtils";
 
 interface Props {
   handleSaveScore: (score: ScoreType) => void;
 }
 
 export function TestBox({ handleSaveScore }: Props) {
-  // Used for triggering the animation on test reset
-  const [mounted, setMounted] = useState(true);
+  const [mounted, setMounted] = useState(true); // Used for triggering the animation on test reset
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
   const [language, setLanguage] = useState("english");
   const [mode, setMode] = useState("words");
-  const [modeSetting, setModeSetting] = useState(50);
+  const [modeSetting, setModeSetting] = useState(0);
   const [testKey, setTestKey] = useState(0); // Useful for easy re-mounting
   const [testStartTime, setTestStartTime] = useState(0);
   const [wordCount, setWordCount] = useState(0);
+  const [content, setContent] = useState([""]);
   const [initialContent, setInitialContent] = useState([""]);
   const [timePassed, setTimePassed] = useState(modeSetting);
   const [wpm, setWpm] = useState(0);
@@ -110,17 +104,11 @@ export function TestBox({ handleSaveScore }: Props) {
   }
 
   function initializePool(mode: string, modeSetting: number) {
-    switch (mode) {
-      case "words":
-        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting));
-        break;
-      case "time":
-        setInitialContent(generateRandomWords(WORD_LISTS[language], modeSetting * 7));
-        break;
-    }
+    setInitialContent(generateRandomWords(WORD_LISTS[language], 50));
   }
 
   function handleReset() {
+    console.log("1");
     setMounted(true);
     setFocused(true);
     setFinished(false);
@@ -131,11 +119,6 @@ export function TestBox({ handleSaveScore }: Props) {
     // TODO: maybe make that better somehow heh xd
     initializePool(mode, modeSetting);
     setTestKey((k) => k + 1); // Does a re-mount of `Test`, therefore causing a reset
-  }
-
-  // Upon setting `mounted` to false, <CSSTransitionGroup> will automatically mount it back after the animation ends.
-  function remountTest() {
-    setMounted(false);
   }
 
   /**
@@ -163,7 +146,6 @@ export function TestBox({ handleSaveScore }: Props) {
 
   // TODO: sit down one day and think about those useEffect()s, some of them here and in `Test.tsx` are likely to be unnecessary.
   useEffect(() => {
-    setVisible(true);
     const config = getConfig();
     // TODO: fix this funny code lol
     let _mode = mode;
@@ -178,6 +160,7 @@ export function TestBox({ handleSaveScore }: Props) {
       setLanguage(_language);
     }
     initializePool(_mode, _modeSetting);
+    setVisible(true);
   }, []);
 
   function handleTabPress(e: KeyboardEvent) {
@@ -209,6 +192,12 @@ export function TestBox({ handleSaveScore }: Props) {
   useEffect(() => {
     if (!finished) {
       // TODO: a hack, which will probably stay here forever :)
+      /*
+       * NOTE: this only runs if the initial loading of settings actually changes one of those dependencies.
+       * it means that if those values in the config are equal to the initial values in this component, we will not call it.
+       * to counteract that, we just make sure the initial values are bogus and incredibly unlikely to be a part of someone's config. :)
+       * TODO: ↑ fix ↑
+       */
       if (mounted) {
         setMounted(false);
       } else {
@@ -216,6 +205,8 @@ export function TestBox({ handleSaveScore }: Props) {
       }
     }
   }, [mode, modeSetting, language]);
+
+  // TODO: make sure a user cannot just sit in test for a million years and stack up an array with infinite length
 
   if (visible) {
     return (
@@ -266,7 +257,10 @@ export function TestBox({ handleSaveScore }: Props) {
                 exitActive: styles.wordsExitActive,
                 exitDone: styles.wordsExitDone,
               }}
-              onExited={() => handleReset()}
+              onExited={() => {
+                console.log("But we call reset :)");
+                handleReset();
+              }}
             >
               <Test
                 focused={focused}
@@ -290,7 +284,12 @@ export function TestBox({ handleSaveScore }: Props) {
             </CSSTransition>
           </section>
           <section className={styles.bottom}>
-            <RestartButton onReset={() => setMounted(false)} ref={restartButtonRef} />
+            <RestartButton
+              onReset={() => {
+                setMounted(false);
+              }}
+              ref={restartButtonRef}
+            />
           </section>
         </div>
       </CSSTransition>

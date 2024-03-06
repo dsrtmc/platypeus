@@ -37,12 +37,14 @@ interface LineProps {
 
 export const ScoreChart: React.FC<Props> = ({ score }) => {
   const [fontFamily, setFontFamily] = useState("monospace");
+  const [fontSize, setFontSize] = useState(16);
   const [mainColor, setMainColor] = useState("#00000000");
   const [subColor, setSubColor] = useState("#00000000");
   const [subAltColor, setSubAltColor] = useState("#00000000");
 
   const font: Partial<FontSpec> = {
     family: fontFamily,
+    size: fontSize,
   };
 
   const ticks: Partial<LinearScaleOptions["ticks"]> = {
@@ -78,7 +80,7 @@ export const ScoreChart: React.FC<Props> = ({ score }) => {
         },
         title: {
           display: true,
-          text: "minute",
+          text: "second",
           color: subColor,
           font,
         },
@@ -115,10 +117,11 @@ export const ScoreChart: React.FC<Props> = ({ score }) => {
       },
     ] as ChartDataset<"line">[],
   };
-
+  // TODO: for some incredibly funny reason, IBM Plex Mono doesn't work here lol and needs an additional re-render to work
   useEffect(() => {
     let style = getComputedStyle(document.body);
-    setFontFamily(style.getPropertyValue("font-family"));
+    setFontFamily(style.getPropertyValue("--font-family"));
+    setFontSize(parseFloat(style.getPropertyValue("--font-size")));
     setMainColor(style.getPropertyValue("--main-color"));
     setSubColor(style.getPropertyValue("--sub-color"));
     setSubAltColor(style.getPropertyValue("--sub-alt-color"));

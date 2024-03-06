@@ -33,6 +33,7 @@ export const ThemeButton: React.FC<Props> = ({ themeName, themeConfig }) => {
       onClick={handleSelect(themeName, themeConfig)}
       className={`${styles.themeButton} ${selected && styles.selected}`}
       style={{ color: themeConfig["--main-color"], backgroundColor: themeConfig["--bg-color"] }}
+      type={"button"}
     >
       {themeName}
     </button>

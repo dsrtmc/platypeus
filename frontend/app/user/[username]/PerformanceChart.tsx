@@ -65,7 +65,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         },
         title: {
           display: true,
-          text: "accuracy",
+          text: "accuracy%",
           color: subColor,
           font,
         },

@@ -457,7 +457,6 @@ export function Test({
     console.log("Running:", running);
     console.log("Finished:", finished);
     if (running && !finished) {
-      console.log("WE CALL IT EVEN THOUGH WE SHOULDN'T?");
       updateStats(timePassed);
 
       // TODO: again, not sure if mode checking here is a good thing to do

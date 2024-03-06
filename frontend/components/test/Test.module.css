@@ -73,7 +73,6 @@
     align-content: flex-start;
     flex-wrap: wrap;
     gap: 0.75rem;
-    font-size: 2rem;
     /* TODO: GET CANCER HOW CAN I MAKE FLEX-WRAP LIMIT TO 3 ROWS MAN HOLY SHIT */
     height: calc(100px * calc(2 * 0.75));
     overflow: hidden;
@@ -127,6 +126,7 @@
 
 .letter {
     color: var(--sub-color);
+    font-size: calc(var(--font-size) * var(--test-font-size-multiplier));
 }
 
 .caret {
@@ -134,7 +134,7 @@
     background-color: var(--main-color);
     border-radius: 2px;
     width: 3px;
-    height: calc(2rem + 0.5rem); /* TODO: var(--font-size) */
+    height: calc(var(--font-size) * var(--test-font-size-multiplier) * 1.25);
     transition: all ease var(--caret-speed);
 }
 
@@ -326,12 +326,11 @@
     width: 100%;
     padding: .25rem 1rem;
     background-color: var(--sub-alt-color);
-    color: var(--text-color);
+    color: var(--sub-color);
     font-size: 1rem; /* kind of funny but it's because of `TestConfig` overriding the size */
 }
 
 .languageListItem:hover {
-    color: var(--sub-alt-color);
     background-color: var(--text-color);
 }
 

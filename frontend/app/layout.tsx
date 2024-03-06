@@ -5,17 +5,19 @@ import { ApolloWrapper } from "@/lib/apollo-provider";
 import { ContentWrapper } from "@/components/ContentWrapper";
 import { Header } from "@/components/header/Header";
 import { ConfigLoader } from "@/app/ConfigLoader";
+import { availableFonts } from "@/shared/constants/fonts";
+import { isNavigatingToNewRootLayout } from "next/dist/client/components/router-reducer/is-navigating-to-new-root-layout";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const itim = Itim({ weight: "400", subsets: ["latin"], variable: "--font-itim", display: "swap" });
-const jetBrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
-const ibmPlexMono = IBM_Plex_Mono({
-  weight: ["100", "200", "300", "400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-ibm-plex-mono",
-  display: "swap",
-});
-export const availableFonts = [inter, itim, jetBrainsMono, ibmPlexMono];
+// const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// const itim = Itim({ weight: "400", subsets: ["latin"], variable: "--font-itim", display: "swap" });
+// const jetBrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
+// const ibmPlexMono = IBM_Plex_Mono({
+//   weight: ["100", "200", "300", "400", "500", "600", "700"],
+//   subsets: ["latin"],
+//   variable: "--font-ibm-plex-mono",
+//   display: "swap",
+// });
+// export const availableFonts = [inter, itim, jetBrainsMono, ibmPlexMono];
 
 // ???
 export const metadata = {
@@ -25,7 +27,12 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${availableFonts.map((font) => font.variable).join(" ")}`}>
+    <html
+      lang="en"
+      className={`${Object.entries(availableFonts)
+        .map(([name, font]) => font.variable)
+        .join(" ")}`}
+    >
       <body>
         <ApolloWrapper>
           <ContentWrapper>

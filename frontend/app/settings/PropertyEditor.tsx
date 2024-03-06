@@ -1,6 +1,7 @@
 import React, { FormEvent, KeyboardEvent, useEffect, useState } from "react";
 import styles from "./Settings.module.css";
-import { setConfig } from "@/utils/getConfig";
+import { getConfig, setConfig } from "@/utils/configUtils";
+import { ConfigType } from "@/shared/types/configTypes";
 
 interface Props {
   name: string;
@@ -36,7 +37,7 @@ export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
   function changePropertyValue(property: string, val: string) {
     document.documentElement.style.setProperty(property, val);
     setValue(val);
-    let config = JSON.parse(localStorage.getItem("config"));
+    let config = getConfig();
     if (!config) {
       console.error("`config` has not been found in the local storage.");
       return;
@@ -54,8 +55,13 @@ export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
         onKeyDown={handleKeyDown}
         className={styles.field}
       />
-      <input type={"color"} value={value} onInput={handleColorInput} id={`${name}-input`} />
-      <label htmlFor={`#${name}-input`} />
+      <input
+        type={"color"}
+        value={value}
+        onInput={handleColorInput}
+        id={`${name}-input`}
+        className={styles.colorInput}
+      />
     </div>
   );
 };

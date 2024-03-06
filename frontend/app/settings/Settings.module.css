@@ -1,59 +1,36 @@
 .main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: flex-start;
+    gap: 4rem;
+    height: 100%;
+}
+
+.header {
+    font-size: 2rem;
 }
 
 .properties {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 1rem;
 }
 
-.propertyBox {
-    display: flex;
-    align-items: center;
+.themeList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
     width: 100%;
 }
 
-.name {
-    margin-right: auto;
-}
-
-.field {
-    all: unset;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid transparent;
-    color: var(--text-color);
-    background-color: var(--sub-alt-color);
-    border-radius: var(--roundness);
-    padding: 4px 6px;
-}
-
-.themeList {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 1rem;
-}
-
 .themeButton {
     all: unset;
-    width: 8rem;
     padding: 6px 8px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: var(--roundness);
     transition: scale 200ms ease;
-}
-
-.selected {
-    border: 3px solid var(--main-color);
 }
 
 .themeButton:hover {
@@ -72,12 +49,145 @@
     border-radius: var(--roundness);
 }
 
-#sub-input::-webkit-color-swatch {
-    border-radius: 15px;
-    border: none;
+.fontChangeSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
 }
 
-#sub-input::-moz-color-swatch {
-    border-radius: 15px;
+.fontSelection {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+.fontSelectionItem {
     border: none;
+    background: none;
+    color: var(--sub-color);
+    border-radius: var(--roundness);
+    padding: .4rem .6rem;
+    transition: background-color 100ms ease;
+}
+
+.fontSelectionItem:hover {
+    background-color: var(--text-color);
+}
+
+.fontSizeChangeSection {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.fontSizeChangeWrapper {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.fontSizeChangeField {
+    border: 0;
+    color: var(--text-color);
+    background-color: var(--sub-alt-color);
+    width: 25%;
+    padding: .4rem .6rem;
+    border-radius: var(--roundness);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.fontSizeChangeButton {
+    border: 0;
+    background: none;
+    color: var(--sub-color);
+    padding: .4rem .6rem;
+    transition: color, filter 150ms ease;
+}
+
+.fontSizeChangeButton:hover {
+    color: var(--text-color);
+}
+
+.fontSizeChangeButton:active {
+    filter: opacity(0.8%);
+}
+
+.fontSizeChangeButton:nth-last-child(1) {
+    margin-left: auto;
+}
+
+
+.selected {
+    background-color: var(--main-color);
+    color: var(--sub-alt-color);
+}
+
+.propertyBox {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.name {
+    display: flex;
+    margin-right: auto;
+    width: fit-content;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
+
+.field {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid transparent;
+    color: var(--text-color);
+    background-color: var(--sub-alt-color);
+    border-radius: var(--roundness);
+    padding: 4px 6px;
+    width: 12ch;
+    text-align: left;
+}
+
+.colorInput {
+    width: 2rem;
+    height: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.colorInput::-webkit-color-swatch {
+    border-radius: var(--roundness);
+    border: 1px solid var(--sub-color);
+    transition: 150ms border ease;
+}
+
+.colorInput::-webkit-color-swatch:hover {
+    border: 1px solid var(--main-color);
+}
+
+.colorInput::-moz-color-swatch {
+    border-radius: var(--roundness);
+    border: 1px solid var(--sub-color);
+    transition: 150ms border ease;
+}
+
+.colorInput::-moz-color-swatch:hover {
+    border: 1px solid var(--main-color);
 }
