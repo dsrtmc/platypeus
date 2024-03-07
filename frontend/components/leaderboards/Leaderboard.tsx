@@ -6,9 +6,10 @@ import {
   GetScoresForLeaderboardQuery,
   GetScoresForLeaderboardQueryVariables,
 } from "@/graphql/generated/graphql";
-import { SuspenseQueryHookOptions, useQuery } from "@apollo/client";
+import { SuspenseQueryHookOptions, useQuery, useSuspenseQuery } from "@apollo/client";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 interface Props {
   mode: string;
@@ -29,13 +30,13 @@ export function withLabel(Component) {
 }
 
 export function Leaderboard({ mode, modeSetting }: Props) {
-  const { data, fetchMore } = useQuery(GetScoresForLeaderboardDocument, {
+  const { data, error, fetchMore } = useSuspenseQuery(GetScoresForLeaderboardDocument, {
     variables: {
       first: 25,
       mode,
       modeSetting,
     },
-  } as SuspenseQueryHookOptions<GetScoresForLeaderboardQuery, GetScoresForLeaderboardQueryVariables>);
+  });
   // TODO: we get an error in console when we run this, cache update funny shit
   function handleFetchMore() {
     console.log("The next cursor:", data?.scoresForLeaderboard?.pageInfo?.endCursor);
@@ -94,7 +95,10 @@ export function Leaderboard({ mode, modeSetting }: Props) {
       };
     }, [handleFetchMore]);
 
-  if (!data?.scoresForLeaderboard) return <div>no data</div>;
+  if (!data?.scoresForLeaderboard) {
+    // TODO: throw an error?
+    throw new Error("we didnt get data");
+  }
   return (
     <div className={styles.box}>
       <label>

@@ -27,6 +27,7 @@
 
 tr {
     display: table-row;
+    height: 2rem;
 }
 
 thead {

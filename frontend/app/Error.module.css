@@ -1,0 +1,35 @@
+.main {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header {
+    font-size: 2rem;
+}
+
+.sub {
+    color: var(--sub-color);
+}
+
+.button {
+    border: 0;
+    background: none;
+    padding: .4rem .6rem;
+    color: var(--sub-color);
+    transition: color 150ms ease;
+    font-size: 1.5rem;
+}
+
+.button:hover {
+    color: var(--text-color);
+}
+
+.button:active {
+    transition: filter 150ms ease;
+    filter: opacity(0.8);
+}

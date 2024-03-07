@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
 }
 
 .top {
@@ -11,7 +11,15 @@
 }
 
 .middle {
+    color: var(--sub-color);
 }
 
-.bottom {
+.bottom * {
+    color: var(--sub-color);
+    font-size: 1.5rem;
+    transition: color 150ms ease;
+}
+
+.bottom *:hover {
+    color: var(--text-color);
 }

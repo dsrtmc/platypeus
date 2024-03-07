@@ -14,7 +14,6 @@ interface Props {}
  * a good way to ensure something happens on every page on the client,
  * after the server-side render.
  */
-// TODO: fix the funny font flicker, it just flicks through 2 fonts BEFORE selecting the correct one, lol
 export const ConfigLoader: React.FC<Props> = ({}) => {
   useEffect(() => {
     let config = getConfig();

@@ -38,17 +38,19 @@
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
     padding: 4px 6px;
+    height: 1.25rem;
     transition: color, background-color 200ms ease;
+    cursor: pointer;
 }
 
 .button:hover {
     color: var(--sub-alt-color);
     background-color: var(--text-color);
-    cursor: pointer;
 }
 
 .button:disabled {
     color: var(--bg-color);
+    filter: opacity(0.5);
 }
 
 .error {
@@ -63,4 +65,22 @@
 
 .instead:hover {
     color: var(--text-color);
+}
+
+.spinner {
+    color: var(--sub-color);
+    animation: spin 500ms linear infinite;
+    font-size: 1rem;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }

@@ -169,7 +169,7 @@
     cursor: default;
 }
 
-.item {
+.card {
     position: absolute;
     display: flex;
     flex-direction: column;

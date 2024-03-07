@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { BiLogIn } from "react-icons/bi";
+import { LoginButton } from "@/components/forms/LoginButton";
 
 type FormValues = {
   username: string;
@@ -19,7 +20,7 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     setFocus,
   } = useForm<FormValues>({
     defaultValues: {
@@ -37,6 +38,7 @@ export default function LoginForm() {
         if (!data) {
           return null;
         }
+        // TODO: fix i guess xd idk graphql fragment or some shit idk
         cache.writeQuery<MeQuery>({
           query: MeDocument,
           data: {
@@ -73,9 +75,7 @@ export default function LoginForm() {
         className={styles.field}
       />
       {errors.password && <span className={styles.error}>{errors.password.message}</span>}
-      <button type={"submit"} disabled={!!errors.password || !!errors.username} className={styles.button}>
-        <BiLogIn /> login
-      </button>
+      <LoginButton disabled={!!errors.password || !!errors.username || isSubmitting} isSubmitting={isSubmitting} />
       <Link href={"/register"} className={styles.instead}>
         Sign up instead
       </Link>

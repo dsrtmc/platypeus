@@ -32,6 +32,7 @@ public static class ScoreQueries
     // TODO: The generated SQL is the worst thing I've ever seen. Doubt I can tackle that without HotChocolate supporting `distinct_on` or writing the SQL myself
     // ↑ see https://github.com/ChilliCream/graphql-platform/discussions/4848
     // While the EF Core's use of this raw SQL isn't amazing either, it's definitely much clearer
+    // TODO: fix this ordering, it doesn't properly sort by WPM.
     [UsePaging]
     public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db, string mode, int modeSetting)
     {

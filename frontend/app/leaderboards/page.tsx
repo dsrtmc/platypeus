@@ -1,6 +1,5 @@
 import styles from "@/components/leaderboards/Leaderboards.module.css";
 import { Leaderboard } from "@/components/leaderboards/Leaderboard";
-import React from "react";
 
 export default function LeaderboardsPage() {
   return (

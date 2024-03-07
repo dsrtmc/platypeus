@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from "react";
 import { GetRacesDocument, GetRacesQueryVariables, RaceSortInput } from "@/graphql/generated/graphql";
 import styles from "./Races.module.css";
-import { useQuery } from "@apollo/client";
+import { useQuery, useSuspenseQuery } from "@apollo/client";
 import { RaceListItem } from "@/app/races/RaceListItem";
 import { RaceListRefreshButton } from "@/app/races/RaceListRefreshButton";
 import { RaceListEmptyMessage } from "@/app/races/RaceListEmptyMessage";
@@ -17,7 +17,7 @@ export function RaceList({}) {
     racesFirst: 10,
     racersFirst: 10,
   };
-  const { data, loading, error, refetch, fetchMore } = useQuery(GetRacesDocument, {
+  const { data, loading, error, refetch, fetchMore } = useSuspenseQuery(GetRacesDocument, {
     variables,
   });
   async function handleRefetch() {
@@ -28,6 +28,7 @@ export function RaceList({}) {
     const response = await fetchMore({
       variables: { ...variables, after: data?.races?.pageInfo.endCursor } as GetRacesQueryVariables,
       updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+        // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
         if (!data?.races?.pageInfo.hasNextPage) return;
 
         if (!fetchMoreResult.races || !previousQueryResult?.races) {

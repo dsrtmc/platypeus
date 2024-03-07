@@ -1,13 +1,8 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
-import { getClient } from "@/lib/client";
-import {
-  UserPage_GetUserQuery,
-  UserPage_GetUsersBestScoresDocument,
-  UserPage_GetUsersBestScoresQueryVariables,
-} from "@/graphql/generated/graphql";
-import { useQuery, useSuspenseQuery } from "@apollo/client";
+import React, { Suspense, useState } from "react";
+import { UserPage_GetUserQuery, UserPage_GetUsersBestScoresDocument } from "@/graphql/generated/graphql";
+import { useSuspenseQuery } from "@apollo/client";
 import { BestUserScoreCard } from "@/app/user/[username]/BestUserScoreCard";
 import styles from "./User.module.css";
 import { SelectModeButton } from "@/app/user/[username]/SelectModeButton";
