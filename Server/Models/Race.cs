@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Server.Models;
 
 public class Race : BaseEntity
@@ -6,6 +8,9 @@ public class Race : BaseEntity
     
     [UsePaging]
     public List<Racer> Racers { get; set; } = new();
+
+    [NotMapped]
+    public static int MaxAllowedRacers { get; set; } = 8;
 
     public string Mode { get; init; } = null!; // "time", "words", "quote"
 

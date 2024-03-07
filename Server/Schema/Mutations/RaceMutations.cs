@@ -142,6 +142,10 @@ public static class RaceMutations
         if (race.Private && race.Password != password)
             return new InvalidRacePasswordError(raceId, password);
 
+        // TODO: that's an incorrect error, but I think HotChocolate only allows me to have 5 errors? lol
+        if (race.Racers.Count >= Race.MaxAllowedRacers)
+            return new InvalidRaceError(raceId);
+
         var racer = new Racer
         {
             Race = race,

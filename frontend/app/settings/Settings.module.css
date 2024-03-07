@@ -23,7 +23,7 @@
 
 .propertyList {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 17rem);
+    grid-template-columns: repeat(auto-fit, 20rem);
     justify-content: space-around;
     gap: 1rem;
 }
@@ -41,6 +41,7 @@
     white-space: nowrap;
     flex-wrap: nowrap;
     flex: 0 0 auto;
+    color: var(--sub-color);
 }
 
 .field {
@@ -94,7 +95,7 @@
 
 .themeButton {
     all: unset;
-    padding: 6px 8px;
+    padding: .5rem .75rem;
     display: flex;
     justify-content: center;
     align-items: center;

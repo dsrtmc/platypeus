@@ -1,6 +1,6 @@
 "use client";
 
-import React, { startTransition, useEffect, useRef } from "react";
+import React, { startTransition, useCallback, useEffect, useRef } from "react";
 import {
   GetScoresForLeaderboardDocument,
   GetScoresForLeaderboardQuery,
@@ -36,7 +36,8 @@ export function Leaderboard({ mode, modeSetting }: Props) {
       modeSetting,
     },
   } as SuspenseQueryHookOptions<GetScoresForLeaderboardQuery, GetScoresForLeaderboardQueryVariables>);
-  async function handleFetchMore() {
+  // TODO: we get an error in console when we run this, cache update funny shit
+  function handleFetchMore() {
     console.log("The next cursor:", data?.scoresForLeaderboard?.pageInfo?.endCursor);
     if (data?.scoresForLeaderboard?.pageInfo?.hasNextPage) {
       const variables: GetScoresForLeaderboardQueryVariables = {
@@ -47,9 +48,10 @@ export function Leaderboard({ mode, modeSetting }: Props) {
       };
       startTransition(() => {
         fetchMore({
-          query: GetScoresForLeaderboardDocument,
           variables,
           updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+            if (!data?.scoresForLeaderboard?.pageInfo.hasNextPage) return;
+
             if (!fetchMoreResult?.scoresForLeaderboard || !previousQueryResult?.scoresForLeaderboard) {
               return {
                 scores: {
@@ -73,27 +75,25 @@ export function Leaderboard({ mode, modeSetting }: Props) {
     }
   }
 
-  const observerRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(async (entry) => {
-        if (entry.isIntersecting) {
-          // TODO: uncomment for infinite scroll
-          // await handleRefetch();
-        }
+  /* prettier-ignore */
+  const observerRef = useCallback((node: HTMLDivElement | null) => {
+      if (!node) return;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(async (entry) => {
+          if (entry.isIntersecting) {
+            // uncomment for infinite scroll
+            await handleFetchMore();
+          }
+        });
       });
-    });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current as HTMLDivElement);
-    }
+      observer.observe(node);
 
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current as HTMLDivElement);
-      }
-    };
-  }, [observerRef]);
+      return () => {
+        observer.unobserve(node);
+      };
+    }, [handleFetchMore]);
+
   if (!data?.scoresForLeaderboard) return <div>no data</div>;
   return (
     <div className={styles.box}>
@@ -103,7 +103,6 @@ export function Leaderboard({ mode, modeSetting }: Props) {
       <div className={styles.wrapper}>
         <table className={styles.table}>
           <thead className={styles.head}>
-            {/* TODO: fix opacity on those lol */}
             <tr>
               <th className={styles.left}>
                 <p>#</p>
@@ -160,15 +159,6 @@ export function Leaderboard({ mode, modeSetting }: Props) {
               </tr>
             ))}
           </tbody>
-          <tfoot className={styles.foot}>
-            <tr className={styles.row}>
-              <td className={styles.cell} colSpan={"100%" as any}>
-                {data?.scoresForLeaderboard?.pageInfo?.hasNextPage && (
-                  <button onClick={handleFetchMore}>fetch more</button>
-                )}
-              </td>
-            </tr>
-          </tfoot>
         </table>
         <div ref={observerRef} />
       </div>

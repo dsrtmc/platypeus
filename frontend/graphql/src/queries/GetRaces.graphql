@@ -21,5 +21,9 @@ query GetRaces($after: String, $before: String, $racesFirst: Int, $racesLast: In
                 finished
             }
         }
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
     }
 }
