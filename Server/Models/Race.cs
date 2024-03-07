@@ -30,9 +30,7 @@ public class Race : BaseEntity
     
     public bool Finished { get; set; }
 
-    public bool Private { get; set; } = false;
-    
-    public string? Password { get; set; }
+    public bool Unlisted { get; set; } = false;
 
     public string Slug { get; set; } = null!;
     

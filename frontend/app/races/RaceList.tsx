@@ -12,7 +12,7 @@ interface Props {}
 
 export function RaceList({}) {
   const variables: GetRacesQueryVariables = {
-    where: { and: [{ running: { eq: false } }, { finished: { eq: false } }] },
+    where: { and: [{ running: { eq: false } }, { finished: { eq: false } }, { unlisted: { eq: false } }] },
     order: [{ createdAt: "DESC" }] as RaceSortInput,
     racesFirst: 10,
     racersFirst: 10,

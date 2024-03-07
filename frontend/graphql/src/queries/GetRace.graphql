@@ -16,6 +16,7 @@ query GetRace($where: RaceFilterInput, $racersFirst: Int!) {
         host {
             username
         }
+        unlisted
         running
         finished
     }

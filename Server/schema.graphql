@@ -80,10 +80,6 @@ type InvalidRaceError implements Error {
   message: String!
 }
 
-type InvalidRacePasswordError implements Error {
-  message: String!
-}
-
 type InvalidRacerError implements Error {
   message: String!
 }
@@ -212,8 +208,7 @@ type Race {
   started: Boolean!
   running: Boolean!
   finished: Boolean!
-  private: Boolean!
-  password: String
+  unlisted: Boolean!
   slug: String!
   startTime: DateTime
   chatboxId: UUID!
@@ -414,7 +409,7 @@ union FinishRaceForUserError = InvalidRaceError | InvalidUserError | InvalidRace
 
 union JoinChatboxError = InvalidUserError | InvalidChatboxError
 
-union JoinRaceError = NotAuthenticatedError | InvalidRaceError | InvalidRacePasswordError | RaceAlreadyRunningError | AlreadyJoinedRaceError
+union JoinRaceError = NotAuthenticatedError | InvalidRaceError | RaceAlreadyRunningError | AlreadyJoinedRaceError
 
 union LeaveRaceError = NotAuthenticatedError | InvalidRaceError | RaceIsRunningError | NotInRaceError
 
@@ -451,11 +446,10 @@ input ChatboxSortInput {
 }
 
 input CreateRaceInput {
-  isPrivate: Boolean!
+  unlisted: Boolean!
   mode: String!
   modeSetting: Int!
   content: String!
-  password: String
 }
 
 input CreateScoreInput {
@@ -535,7 +529,6 @@ input JoinChatboxInput {
 
 input JoinRaceInput {
   raceId: UUID
-  password: String
 }
 
 input LeaveRaceInput {
@@ -606,8 +599,7 @@ input RaceFilterInput {
   started: BooleanOperationFilterInput
   running: BooleanOperationFilterInput
   finished: BooleanOperationFilterInput
-  private: BooleanOperationFilterInput
-  password: StringOperationFilterInput
+  unlisted: BooleanOperationFilterInput
   slug: StringOperationFilterInput
   startTime: DateTimeOperationFilterInput
   chatboxId: UuidOperationFilterInput
@@ -625,8 +617,7 @@ input RaceSortInput {
   started: SortEnumType
   running: SortEnumType
   finished: SortEnumType
-  private: SortEnumType
-  password: SortEnumType
+  unlisted: SortEnumType
   slug: SortEnumType
   startTime: SortEnumType
   chatboxId: SortEnumType

@@ -16,8 +16,7 @@ import { deepEqual } from "assert";
 interface Props {}
 
 type FormValues = {
-  private: boolean;
-  password?: string;
+  unlisted: boolean;
   mode: "time" | "words";
   modeSetting: string;
 };
@@ -38,10 +37,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     setValue,
   } = useForm<FormValues>({
     defaultValues: {
-      private: false,
+      unlisted: false,
       mode: "time",
       modeSetting: "5",
-      password: "",
     },
   });
 
@@ -60,7 +58,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     const response = await createRace({
       variables: {
         input: {
-          isPrivate: false,
+          unlisted: data.unlisted,
           mode: data.mode,
           modeSetting: parseInt(data.modeSetting),
           // TODO: is that a good idea to just use a string? :/
@@ -73,6 +71,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     });
     console.log("mode setting:", data.modeSetting);
     console.log("The response we got:", response);
+    if (!response.data?.createRace.race) return;
     router.push(`/races/${response.data?.createRace.race?.slug}`);
   };
 
@@ -89,19 +88,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <h1 className={styles.header}>create a race</h1>
       <label className={styles.label}>
-        private?
-        <input {...register("private" as FieldPath<FormValues>)} type={"checkbox"} className={styles.checkbox} />
+        unlisted?
+        <input {...register("unlisted" as FieldPath<FormValues>)} type={"checkbox"} className={styles.checkbox} />
       </label>
-      <input
-        {...register("password" as FieldPath<FormValues>, {
-          disabled: !watch("private"),
-          required: { value: watch("private"), message: "When set to private, a password is required." },
-        })}
-        type={"password"}
-        placeholder={"password"}
-        aria-invalid={errors.password ? "true" : "false"}
-        className={styles.field}
-      />
       <section className={styles.horizontalGroup}>
         <div className={styles.label}>mode:</div>
         <div className={styles.spacer} />
@@ -168,8 +157,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           </>
         )}
       </section>
-      {errors.password && <span className={styles.error}>{errors.password.message}</span>}
-      <button type={"submit"} disabled={!!errors.password} className={styles.submitButton}>
+      <button type={"submit"} className={styles.submitButton}>
         <FaPlus /> create
       </button>
     </form>

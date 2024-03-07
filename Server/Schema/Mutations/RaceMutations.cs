@@ -109,9 +109,9 @@ public static class RaceMutations
     
     // TODO: investigate the generated SQL because holy chungus is it horrifying
     public static async Task<
-        MutationResult<Race, NotAuthenticatedError, InvalidRaceError, InvalidRacePasswordError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
+        MutationResult<Race, NotAuthenticatedError, InvalidRaceError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
     > JoinRace(
-        Guid? raceId, string? password, DatabaseContext db, IHttpContextAccessor accessor,
+        Guid? raceId, DatabaseContext db, IHttpContextAccessor accessor,
         [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
         var context = accessor.HttpContext!;
@@ -138,9 +138,6 @@ public static class RaceMutations
 
         if (race.Running)
             return new RaceAlreadyRunningError((Guid) raceId!);
-
-        if (race.Private && race.Password != password)
-            return new InvalidRacePasswordError(raceId, password);
 
         // TODO: that's an incorrect error, but I think HotChocolate only allows me to have 5 errors? lol
         if (race.Racers.Count >= Race.MaxAllowedRacers)
@@ -207,8 +204,8 @@ public static class RaceMutations
     }
     
     public static async Task<MutationResult<Race, NotAuthenticatedError>> CreateRace(
-        bool isPrivate, string mode, int modeSetting, string content, 
-        string? password, DatabaseContext db, IHttpContextAccessor accessor)
+        bool unlisted, string mode, int modeSetting, string content, 
+        DatabaseContext db, IHttpContextAccessor accessor)
     {
         var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
         if (claim is null || claim.Value.IsNullOrEmpty())
@@ -237,13 +234,12 @@ public static class RaceMutations
         {
             Host = user,
             Racers = new List<Racer>(),
-            Private = isPrivate,
+            Unlisted = unlisted,
             Mode = mode,
             ModeSetting = modeSetting,
             Content = content,
             Chatbox = new Chatbox(),
             Slug = slug,
-            Password = isPrivate ? password : null
         };
         
         db.Races.Add(race);

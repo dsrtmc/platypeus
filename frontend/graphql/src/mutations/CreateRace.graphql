@@ -2,8 +2,14 @@ mutation CreateRace($input: CreateRaceInput!) {
     createRace(input: $input) {
         race {
             id
-            private
+            unlisted
             slug
+        }
+        errors {
+            code: __typename
+            ... on Error {
+                message
+            }
         }
     }
 }

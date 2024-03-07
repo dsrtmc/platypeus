@@ -17,6 +17,7 @@ query GetRaces($after: String, $before: String, $racesFirst: Int, $racesLast: In
                 host {
                     username
                 }
+                unlisted
                 slug
                 finished
             }
