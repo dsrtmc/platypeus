@@ -104,7 +104,8 @@ export function TestBox({ handleSaveScore }: Props) {
   }
 
   function initializePool(mode: string, modeSetting: number) {
-    setInitialContent(generateRandomWords(WORD_LISTS[language], 50));
+    let count = mode === "words" ? modeSetting : 50;
+    setInitialContent(generateRandomWords(WORD_LISTS[language], count));
   }
 
   function handleReset() {

@@ -82,11 +82,34 @@
     color: var(--sub-color);
 }
 
+.chartFallback {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    width: 75%;
+    min-width: 50%;
+    margin: 0 auto;
+}
+
 .chart {
     grid-area: chart;
     height: 400px;
     width: 75%;
     min-width: 50%;
+}
+
+.chartAppear {
+    opacity: 0;
+}
+
+.chartAppearActive {
+    opacity: 1;
+    transition: opacity 300ms;
+}
+
+.chartAppearDone {
+    opacity: 1;
 }
 
 .label {
@@ -212,4 +235,22 @@
 
 .detail {
     font-size: 0.8rem !important;
+}
+
+.spinner {
+    color: var(--sub-color);
+    animation: spin 500ms linear infinite;
+    font-size: 2rem;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }

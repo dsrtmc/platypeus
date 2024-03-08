@@ -8,6 +8,7 @@ import Link from "next/link";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { BiLogIn } from "react-icons/bi";
 import { LoginButton } from "@/components/forms/LoginButton";
+import { useRouter } from "next/navigation";
 
 type FormValues = {
   username: string;
@@ -16,6 +17,7 @@ type FormValues = {
 
 export default function LoginForm() {
   const [login] = useMutation(LoginDocument);
+  const router = useRouter();
 
   const {
     register,
@@ -33,7 +35,7 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
     const response = await login({
-      variables: { input: { username: data.username, password: data.password } },
+      variables: { input: { username: data.username, password: null } },
       update: (cache, { data }) => {
         if (!data) {
           return null;
@@ -49,6 +51,9 @@ export default function LoginForm() {
     });
     console.log("Response:", response);
     // TODO: redirect home
+    if (response.data?.login.user) {
+      router.push("/");
+    }
   };
 
   useEffect(() => {

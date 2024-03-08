@@ -1,6 +1,6 @@
 "use client";
 
-import { ApolloClient, ApolloLink, HttpLink, HttpOptions, split } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, HttpOptions, InMemoryCache, split } from "@apollo/client";
 import { NextSSRApolloClient } from "@apollo/experimental-nextjs-app-support/ssr";
 import {
   ApolloNextAppProvider,
@@ -11,6 +11,7 @@ import { PropsWithChildren } from "react";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import possibleTypes from "@/possibleTypes.json";
 
 const wsLink =
   typeof window !== "undefined"
@@ -43,7 +44,9 @@ const createSplitLink = (cookie = "") => {
 
 function makeClient() {
   return new NextSSRApolloClient({
-    cache: new NextSSRInMemoryCache(),
+    cache: new NextSSRInMemoryCache({
+      possibleTypes,
+    }),
     link:
       typeof window !== "undefined" && wsLink
         ? createSplitLink()

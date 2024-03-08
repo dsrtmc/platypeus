@@ -1,6 +1,7 @@
 import { registerApolloClient } from "@apollo/experimental-nextjs-app-support/rsc";
 import { ApolloClient, HttpLink, HttpOptions, InMemoryCache, split } from "@apollo/client";
 import { headers } from "next/headers";
+import possibleTypes from "@/possibleTypes.json";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
@@ -18,7 +19,9 @@ const createHttpLink = (cookie: string | undefined) => {
 export const { getClient }: { getClient: () => ApolloClient<any> } = registerApolloClient(() => {
   const cookie = headers().get("cookie");
   return new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      possibleTypes,
+    }),
     link: createHttpLink(cookie),
     credentials: "include",
     headers: {

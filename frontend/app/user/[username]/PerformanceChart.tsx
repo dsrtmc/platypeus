@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Ref, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { GetScoresQuery, UserPage_GetUserMonthlyScoreSummariesQuery } from "@/graphql/generated/graphql";
 import styles from "./User.module.css";
@@ -22,6 +22,8 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
+import { PerformanceChartFallback } from "@/app/user/[username]/PerformanceChartFallback";
+import { CSSTransition } from "react-transition-group";
 
 interface Props {
   scores: UserPage_GetUserMonthlyScoreSummariesQuery["userMonthlyScoreSummaries"];
@@ -31,6 +33,8 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 // TODO: fix charts
 export const PerformanceChart: React.FC<Props> = ({ scores }) => {
+  const [visible, setVisible] = useState(false);
+
   const [fontFamily, setFontFamily] = useState("monospace");
   const [mainColor, setMainColor] = useState("#00000000");
   const [subColor, setSubColor] = useState("#00000000");
@@ -123,6 +127,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
         padding: 8,
       },
     },
+    animation: false,
   };
 
   // this code makes sure we have a steady line on the chart if someone's only played for a month.
@@ -170,11 +175,26 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
     setMainColor(style.getPropertyValue("--main-color"));
     setSubColor(style.getPropertyValue("--sub-color"));
     setSubAltColor(style.getPropertyValue("--sub-alt-color"));
+    setVisible(true);
   }, []);
 
+  const ref = useRef<HTMLDivElement | null>(null);
+
   return (
-    <div className={styles.chart}>
-      <Line data={data} options={options} />
-    </div>
+    <CSSTransition
+      nodeRef={ref as Ref<HTMLDivElement | null>}
+      in={true}
+      appear={true}
+      timeout={300}
+      classNames={{
+        appear: styles.chartAppear,
+        appearActive: styles.chartAppearActive,
+        appearDone: styles.chartAppearDone,
+      }}
+    >
+      <div className={styles.chart} ref={ref}>
+        {visible ? <Line data={data} options={options} /> : <PerformanceChartFallback />}
+      </div>
+    </CSSTransition>
   );
 };

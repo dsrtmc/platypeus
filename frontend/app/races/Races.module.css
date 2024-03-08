@@ -8,6 +8,26 @@
     height: 100%;
 }
 
+.loginRequiredMessage {
+    color: var(--sub-color);
+    margin: 0 auto;
+    font-size: 1.5rem;
+}
+
+.link {
+    transition: color 150ms ease;
+    text-decoration: underline var(--sub-alt-color);
+}
+
+.link:hover {
+    color: var(--text-color);
+}
+
+.link:active {
+    transition: filter 150ms ease;
+    filter: opacity(0.8);
+}
+
 /* Race list */
 .refreshListButton {
     border: 0;

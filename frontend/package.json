@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
+    "dev": "node ./scripts/generatePossibleTypes.js && next dev --turbo",
+    "build": "node ./scripts/generatePossibleTypes.js && next build",
     "start": "next start",
     "lint": "next lint",
     "gen": "graphql-codegen --config codegen.ts"
@@ -12,11 +12,12 @@
   "dependencies": {
     "@apollo/client": "^3.9.5",
     "@apollo/experimental-nextjs-app-support": "^0.8.0",
-    "@types/node": "20.11.24",
+    "@types/node": "^20.11.25",
     "@types/react": "^18.2.22",
     "@types/react-dom": "18.2.19",
     "apollo-link-token-refresh": "^0.6.0",
     "chart.js": "^4.4.0",
+    "cross-fetch": "^4.0.0",
     "graphql": "^16.6.0",
     "graphql-ws": "^5.14.2",
     "jwt-decode": "^4.0.0",

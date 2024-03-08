@@ -211,6 +211,10 @@ export function Test({
     setWordIndex(wordIndex + 1);
     setWordCount((wc) => wc + 1);
     setLetterIndex(0);
+
+    if (mode === "words" && wordIndex + 1 >= modeSetting) {
+      onFinish();
+    }
   }
 
   function moveForwardOneLetter(key: string) {
