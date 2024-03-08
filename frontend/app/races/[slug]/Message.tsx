@@ -3,7 +3,7 @@ import styles from "./Race.module.css";
 import { OnChatboxEventSubscription } from "@/graphql/generated/graphql";
 
 interface Props {
-  message: OnChatboxEventSubscription["onChatboxEvent"]["messages"][number];
+  message: NonNullable<NonNullable<OnChatboxEventSubscription["onChatboxEvent"]["messages"]>["edges"]>[number]["node"];
   viewerName: string | undefined;
 }
 

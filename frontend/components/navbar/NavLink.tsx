@@ -10,13 +10,7 @@ interface Props {
   textPosition?: "left" | "right" | undefined;
 }
 
-export const NavLink: React.FC<Props> = ({
-  href,
-  Icon,
-  iconSize,
-  textPosition,
-  children,
-}: PropsWithChildren<Props>) => {
+export const NavLink: React.FC<PropsWithChildren<Props>> = ({ href, Icon, iconSize, textPosition, children }) => {
   return (
     <Link href={href} className={styles.item}>
       {textPosition === "left" && children}

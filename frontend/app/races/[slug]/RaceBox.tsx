@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
   CreateScoreDocument,
+  CreateScoreMutationVariables,
   FinishRaceDocument,
   FinishRaceForUserDocument,
   GetRaceQuery,
@@ -54,7 +55,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const [runRace, {}] = useMutation(RunRaceDocument);
 
   const ref = useRef<HTMLDivElement | null>(null);
-  const testRef = useRef<TestMethods | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
@@ -67,7 +67,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const [wordCount, setWordCount] = useState(0);
 
   // TODO: make it nicer, right now it returns true when we should prevent user input
-  function handleKeyDown(e: globalThis.MouseEvent): boolean {
+  function handleKeyDown(e: globalThis.KeyboardEvent): boolean {
     return !data?.onRaceEvent.running || userHasFinished || !focused;
   }
   // TODO: investigate those
@@ -78,36 +78,44 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
       variables: { input: { raceId: race!.id, userId: meData.me.id, wpm, wordsTyped: wordCount } },
     });
   }
-  async function handleSaveScore(score: ScoreType) {
+  // TODO: this type is funny, no shot i should be doing !s everywhere look it up bro maybe a DTO and shit xdddddddd
+  async function handleSaveScore(score: Partial<ScoreType>) {
     // Prevents multiple saving of the same score (as well as attempting to save on re-entering, which would crash out)
     if (userHasFinished) return;
-    await handleChangeWpm(score.wpm);
+    await handleChangeWpm(score.wpm!);
     await createScore({
       variables: {
         input: {
-          wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
-          rawWpm: Math.round(score.rawWpm),
-          accuracy: score.accuracy,
-          wpmStats: score.wpmStats,
-          rawStats: score.rawStats,
-          mode: score.mode,
-          modeSetting: score.modeSetting,
-          content: score.content,
-          language: score.language,
+          wpm: Math.round(score.wpm!), // since there's no way to enforce `int`, we round here just to be sure
+          rawWpm: Math.round(score.rawWpm!),
+          accuracy: score.accuracy!,
+          wpmStats: score.wpmStats!,
+          rawStats: score.rawStats!,
+          mode: score.mode!,
+          modeSetting: score.modeSetting!,
+          content: score.content!,
+          language: score.language!,
         },
       },
     });
   }
 
+  // lol
+  function viewerIsInTheRace() {
+    if (!meData?.me) return false;
+    return data?.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id);
+  }
+
   function handleClick(e: globalThis.MouseEvent) {
+    assertIsNode(e.target);
     if (!meData?.me || !data?.onRaceEvent) return;
     console.log(
       data.onRaceEvent.racers?.edges!.find((edge) => edge.node.id === meData.me!.id)
         ? "you are in the race"
         : "you are not in the race"
     );
-    if (ref && ref.current && data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id)) {
-      setFocused(!data.onRaceEvent.finished && ref.current!.contains(e.target));
+    if (ref && ref.current && viewerIsInTheRace()) {
+      setFocused(!data.onRaceEvent.finished && ref.current!.contains(e.target as Node));
     }
   }
 
@@ -118,7 +126,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
    * @param {string} count - The count of elements to add to the pool
    * @param {number} index - If using a static word pool, the index from which to start adding words
    */
-  function onPoolUpdate(count: number, index: number): string[] {
+  function onPoolUpdate(count: number, index?: number): string[] {
     if (!content) return [];
     const copy = content.slice(count);
     const words: string[] = [];
@@ -219,7 +227,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   // ↑ dont read this
   if (loading) return <p>loading race data...</p>;
   if (error) return <p>error: {JSON.stringify(error)}</p>;
-  if (!data) return <p>no race data</p>;
+  if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>;
   return (
     <div className={styles.raceBox}>
       {meData &&
@@ -253,7 +261,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           handleSaveScore={handleSaveScore}
           setWordCount={setWordCount}
           initialContent={data.onRaceEvent.content.split(" ").slice(0, LOADED_WORDS_COUNT)}
-          ref={testRef}
         />
       </div>
       {data?.onRaceEvent.host.id === meData?.me?.id && (
@@ -263,7 +270,8 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
             data.onRaceEvent.finished ||
             data.onRaceEvent.running ||
             data.onRaceEvent.started ||
-            data.onRaceEvent.racers?.edges?.length <= 0
+            !!data.onRaceEvent.racers?.edges ||
+            data.onRaceEvent.racers!.edges!.length <= 0
           }
           handleStart={handleStart}
         />

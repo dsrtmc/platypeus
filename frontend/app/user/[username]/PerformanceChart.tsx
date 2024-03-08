@@ -2,7 +2,7 @@
 
 import React, { Ref, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
-import { GetScoresQuery, UserPage_GetUserMonthlyScoreSummariesQuery } from "@/graphql/generated/graphql";
+import { UserPage_GetUserMonthlyScoreSummariesQuery } from "@/graphql/generated/graphql";
 import styles from "./User.module.css";
 import {
   CategoryScale,
@@ -17,7 +17,6 @@ import {
   LinearScale,
   LinearScaleOptions,
   LineElement,
-  LogarithmicScale,
   PointElement,
   Title,
   Tooltip,
@@ -182,7 +181,7 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
 
   return (
     <CSSTransition
-      nodeRef={ref as Ref<HTMLDivElement | null>}
+      nodeRef={ref as Ref<HTMLDivElement | undefined>}
       in={true}
       appear={true}
       timeout={300}

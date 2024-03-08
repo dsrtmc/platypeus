@@ -1,6 +1,3 @@
-using Server.Models;
-using Server.Services;
-
 namespace Server.Schema.Queries;
 
 [QueryType]

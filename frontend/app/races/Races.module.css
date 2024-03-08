@@ -45,45 +45,54 @@
     filter: opacity(0.25);
 }
 
-tr {
+.tr {
     display: table-row;
     height: 2rem;
 }
 
-thead {
+.tr:nth-child(odd) .td {
+    background-color: var(--sub-alt-color);
+}
+
+.tr:nth-child(even) .td, .head .td {
+    background-color: var(--bg-color);
+}
+
+
+.head {
     display: table-header-group;
 }
 
-tbody {
+.body {
     display: table-row-group;
 }
 
-tfoot {
+.foot {
     display: table-footer-group;
 }
 
-td {
+.td {
     display: table-cell;
 }
 
-td p {
+.td p {
     color: var(--text-color);
 }
 
-th p {
+.th p {
     color: var(--sub-color);
 }
 
-td, th {
+.td, .th {
     padding: .25rem 1rem;
 }
 
-tr td:first-child {
+.tr .td:first-child {
     border-top-left-radius: var(--roundness);
     border-bottom-left-radius: var(--roundness);
 }
 
-tr td:last-child {
+.tr .td:last-child {
     border-top-right-radius: var(--roundness);
     border-bottom-right-radius: var(--roundness);
 }
@@ -155,19 +164,8 @@ tr td:last-child {
     padding: 2rem;
 }
 
-.row {
-}
-
-.row:nth-child(odd) td {
-    background-color: var(--sub-alt-color);
-}
-
-.row:nth-child(even) td, .head .cell {
-    background-color: var(--bg-color);
-}
-
 /* idk why this one doesnt have priority and I have to use `!important` xd */
-.foot .cell {
+.foot .td {
     text-align: center;
     padding: 1rem 0.5rem;
     border-radius: 0 !important;
@@ -242,113 +240,11 @@ tr td:last-child {
 .checkbox {
 }
 
-input[type="checkbox"] {
-    position: relative;
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    background-color: var(--sub-alt-color);
-    height: 1rem;
-    width: 1rem;
-    border-radius: var(--roundness);
-    transition: background-color 150ms ease;
-}
-
-input[type="checkbox"]:hover {
-    background-color: var(--sub-color);
-}
-
-input[type="checkbox"]:active {
-    transition: filter 150ms ease;
-    filter: opacity(0.8);
-}
-
-input[type="checkbox"]:checked {
-    background-color: var(--sub-alt-color);
-}
-
-input[type="checkbox"]:after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    content: "X";
-    font-size: 0.8rem;
-    color: var(--text-color);
-    border-radius: var(--roundness);
-    display: none;
-}
-
-input[type="checkbox"]:checked:hover {
-    background-color: var(--sub-color);
-}
-
-input[type="checkbox"]:checked:after {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 150ms ease;
-}
-
-.radio {
-}
-
 .radioWrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: .5rem;
-}
-
-/* TODO: very ugly, fix, temporary :) */
-input[type="radio"] {
-    position: relative;
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    background-color: var(--sub-alt-color);
-    height: 1rem;
-    width: 1rem;
-    border-radius: var(--roundness);
-    transition: background-color 150ms ease;
-}
-
-input[type="radio"]:hover {
-    background-color: var(--sub-color);
-}
-
-input[type="radio"]:active {
-    transition: filter 150ms ease;
-    filter: opacity(0.8);
-}
-
-input[type="radio"]:checked {
-    background-color: var(--sub-alt-color);
-}
-
-input[type="radio"]:after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    content: "";
-    box-shadow: inset 1em 1em var(--sub-color);
-    color: var(--text-color);
-    border-radius: var(--roundness);
-    display: none;
-}
-
-input[type="radio"]:checked:hover {
-    background-color: var(--sub-color);
-}
-
-input[type="radio"]:checked:after {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 150ms ease;
 }
 
 .field {

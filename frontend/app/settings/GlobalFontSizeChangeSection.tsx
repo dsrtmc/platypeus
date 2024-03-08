@@ -1,7 +1,6 @@
 import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 import styles from "@/app/settings/Settings.module.css";
 import { DEFAULT_CONFIG, getConfig, setConfig } from "@/utils/configUtils";
-import { ConfigType } from "@/shared/types/configTypes";
 
 interface Props {}
 
@@ -23,7 +22,8 @@ export const GlobalFontSizeChangeSection: React.FC<Props> = ({}) => {
   }
 
   function handleFontSizeChange() {
-    if (value < MIN_FONT_SIZE || value > MAX_FONT_SIZE) return;
+    const numberValue = parseFloat(value);
+    if (numberValue < MIN_FONT_SIZE || numberValue > MAX_FONT_SIZE) return;
     let config = getConfig();
     if (!config) {
       console.error("`config` has not been found in the local storage.");

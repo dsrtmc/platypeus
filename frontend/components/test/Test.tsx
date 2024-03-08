@@ -4,15 +4,16 @@ import { Word } from "@/components/test/Word";
 import { Score as ScoreType } from "@/graphql/generated/graphql";
 import {
   createElement,
-  forwardRef,
+  FC,
   FunctionComponent,
   MutableRefObject,
   ReactElement,
+  Reducer,
+  ReducerAction,
   ReducerState,
-  Ref,
+  ReducerWithoutAction,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useReducer,
   useRef,
   useState,
@@ -21,7 +22,6 @@ import styles from "./Test.module.css";
 import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
-import { CSSTransition } from "react-transition-group";
 
 interface Props {
   focused: boolean;
@@ -48,8 +48,6 @@ interface Props {
   handleSaveScore: (score: Partial<ScoreType>) => void;
   setWordCount: (value: ((prevState: number) => number) | number) => void;
 
-  innerRef?: MutableRefObject<HTMLDivElement | null>;
-
   initialContent: string[];
 }
 
@@ -67,7 +65,9 @@ type State = {
   rawStats: number[];
 };
 
-const reducer = (current: State, update: Partial<State>) => ({ ...current, ...update });
+type Action = Partial<State>;
+
+const reducer = (current: State, update: Action): State => ({ ...current, ...update });
 
 const initialState: State = {
   correctCharacters: 0,
@@ -79,7 +79,7 @@ const initialState: State = {
   rawStats: [],
 };
 
-export function Test({
+export const Test: FC<Props> = ({
   focused,
   running,
   finished,
@@ -94,9 +94,8 @@ export function Test({
   handleChangeWpm,
   handleSaveScore,
   setWordCount,
-  innerRef,
   initialContent,
-}) {
+}) => {
   // TODO: for some reason raw seems weird on 30s test || NOTE: could not replicate, it all seems fine.
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
@@ -105,10 +104,11 @@ export function Test({
   const [letterIndex, setLetterIndex] = useState(-1);
   const [lineSkip, setLineSkip] = useState(true);
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const [wordPool, setWordPool] = useState<Array<ReactElement<Word>>>([]);
+  const [wordPool, setWordPool] = useState<Array<ReactElement<typeof Word>>>([]);
   const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(false);
 
+  // TODO: im gonna kill myself if i dont fix this retarded fucking type.
   const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
     useReducer(reducer, initialState as ReducerState<State>);
 
@@ -499,11 +499,11 @@ export function Test({
 
   // TODO: not sure if I should keep it here, it kinda looks funky during races, so I guess move it to `TestBox`?
   return (
-    <div className={styles.wordsWrapper} ref={innerRef}>
+    <div className={styles.wordsWrapper}>
       <div className={styles.words} ref={wordsDivRef} tabIndex={-1}>
         {wordPool.map((word) => word)}
       </div>
       <Caret x={caretPosition.x} y={caretPosition.y} running={running} focused={focused} ref={caretRef} />
     </div>
   );
-}
+};

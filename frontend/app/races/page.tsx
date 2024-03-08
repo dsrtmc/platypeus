@@ -10,11 +10,10 @@ interface Props {}
 
 export default async function RacesPage() {
   const { data } = await getClient().query({ query: MeDocument });
-  if (!data?.me)
-    return (
-      <div className={styles.main}>
-        {data?.me ? <CreateRaceForm /> : <LoginRequiredMessage />}
-        <RaceList />
-      </div>
-    );
+  return (
+    <div className={styles.main}>
+      {data?.me ? <CreateRaceForm /> : <LoginRequiredMessage />}
+      <RaceList />
+    </div>
+  );
 }

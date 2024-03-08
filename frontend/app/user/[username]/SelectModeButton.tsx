@@ -6,11 +6,7 @@ interface Props {
   handleSelectMode: () => void;
 }
 
-export const SelectModeButton: React.FC<Props> = ({
-  selected,
-  children,
-  handleSelectMode,
-}: PropsWithChildren<Props>) => {
+export const SelectModeButton: React.FC<PropsWithChildren<Props>> = ({ selected, children, handleSelectMode }) => {
   return (
     <button onClick={handleSelectMode} className={`${styles.selectModeButton} ${selected && styles.selected}`}>
       {children}

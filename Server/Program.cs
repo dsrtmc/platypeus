@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using DotNetEnv;
 using HotChocolate.Execution;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.RateLimiting;
@@ -8,7 +9,7 @@ using Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-DotNetEnv.Env.Load();
+Env.Load();
 
 // Database setup
 builder.Services.AddDbContextPool<DatabaseContext>(o =>

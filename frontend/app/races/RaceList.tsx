@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { startTransition, useCallback } from "react";
 import { GetRacesDocument, GetRacesQueryVariables, RaceSortInput } from "@/graphql/generated/graphql";
 import styles from "./Races.module.css";
-import { useQuery, useSuspenseQuery } from "@apollo/client";
+import { useSuspenseQuery } from "@apollo/client";
 import { RaceListItem } from "@/app/races/RaceListItem";
 import { RaceListRefreshButton } from "@/app/races/RaceListRefreshButton";
 import { RaceListEmptyMessage } from "@/app/races/RaceListEmptyMessage";
+import { start } from "repl";
 
 interface Props {}
 
@@ -17,38 +18,36 @@ export function RaceList({}) {
     racesFirst: 10,
     racersFirst: 10,
   };
-  const { data, loading, error, refetch, fetchMore } = useSuspenseQuery(GetRacesDocument, {
+  const { data, error, refetch, fetchMore } = useSuspenseQuery(GetRacesDocument, {
     variables,
   });
   async function handleRefetch() {
-    await refetch();
+    startTransition(() => {
+      refetch();
+    });
   }
 
   async function handleFetchMore() {
-    const response = await fetchMore({
-      variables: { ...variables, after: data?.races?.pageInfo.endCursor } as GetRacesQueryVariables,
-      updateQuery: (previousQueryResult, { fetchMoreResult }) => {
-        // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
-        if (!data?.races?.pageInfo.hasNextPage) return;
+    startTransition(() => {
+      fetchMore({
+        variables: { ...variables, after: data?.races?.pageInfo.endCursor } as GetRacesQueryVariables,
+        updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+          // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
+          if (!fetchMoreResult) return previousQueryResult;
+          // if (!data?.races?.pageInfo.hasNextPage) return; // TODO: uncomment and investigate, possibly stale `data` that's why ↑
+          const prevEdges = previousQueryResult.races!.edges ?? [];
+          const nextEdges = fetchMoreResult.races!.edges ?? [];
 
-        if (!fetchMoreResult.races || !previousQueryResult?.races) {
-          console.log("we got cancer");
           return {
-            scores: {
-              pageInfo: { hasNextPage: false },
-              edges: [],
+            races: {
+              ...previousQueryResult.races,
+              edges: [...prevEdges, ...nextEdges],
+              pageInfo: fetchMoreResult.races!.pageInfo,
             },
           };
-        }
-        return {
-          races: {
-            pageInfo: fetchMoreResult.races.pageInfo,
-            edges: [...previousQueryResult.races.edges, ...fetchMoreResult.races.edges],
-          },
-        };
-      },
+        },
+      });
     });
-    console.log("REsponse:", response);
   }
 
   /* prettier-ignore */
@@ -68,7 +67,7 @@ export function RaceList({}) {
     return () => {
       observer.unobserve(node);
     };
-  }, [handleFetchMore]);
+  }, [data, handleFetchMore]);
 
   console.log("The data we got:", data);
   if (!data?.races) return <div>no data</div>;
@@ -78,17 +77,17 @@ export function RaceList({}) {
       <div className={styles.wrapper}>
         <table className={styles.table}>
           <thead className={styles.head}>
-            <tr>
-              <th className={styles.left}>
+            <tr className={styles.tr}>
+              <th className={`${styles.left} ${styles.th}`}>
                 <p>author</p>
               </th>
-              <th className={styles.right}>
+              <th className={`${styles.right} ${styles.th}`}>
                 <p>racers</p>
               </th>
-              <th className={`${styles.right} ${styles.date}`}>
+              <th className={`${styles.right} ${styles.th} ${styles.date}`}>
                 <p>created</p>
               </th>
-              <th className={styles.right} />
+              <th className={`${styles.right} ${styles.th}`} />
             </tr>
           </thead>
           <tbody className={styles.body}>

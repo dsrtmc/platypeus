@@ -112,6 +112,110 @@ button:disabled {
     cursor: not-allowed;
 }
 
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+input[type="radio"] {
+    position: relative;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--sub-alt-color);
+    height: 1rem;
+    width: 1rem;
+    border-radius: var(--roundness);
+    transition: background-color 150ms ease;
+}
+
+input[type="radio"]:hover {
+    background-color: var(--sub-color);
+}
+
+input[type="radio"]:active {
+    transition: filter 150ms ease;
+    filter: opacity(0.8);
+}
+
+input[type="radio"]:checked {
+    background-color: var(--sub-alt-color);
+}
+
+input[type="radio"]:after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+    box-shadow: inset 1em 1em var(--sub-color);
+    color: var(--text-color);
+    border-radius: var(--roundness);
+    display: none;
+}
+
+input[type="radio"]:checked:hover {
+    background-color: var(--sub-color);
+}
+
+input[type="radio"]:checked:after {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 150ms ease;
+}
+
+input[type="checkbox"] {
+    position: relative;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--sub-alt-color);
+    height: 1rem;
+    width: 1rem;
+    border-radius: var(--roundness);
+    transition: background-color 150ms ease;
+}
+
+input[type="checkbox"]:hover {
+    background-color: var(--sub-color);
+}
+
+input[type="checkbox"]:active {
+    transition: filter 150ms ease;
+    filter: opacity(0.8);
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--sub-alt-color);
+}
+
+input[type="checkbox"]:after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "X";
+    font-size: 0.8rem;
+    color: var(--text-color);
+    border-radius: var(--roundness);
+    display: none;
+}
+
+input[type="checkbox"]:checked:hover {
+    background-color: var(--sub-color);
+}
+
+input[type="checkbox"]:checked:after {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 150ms ease;
+}
+
 #contentWrapper {
     align-items: center;
     display: grid;

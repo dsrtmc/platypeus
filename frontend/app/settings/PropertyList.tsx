@@ -1,4 +1,4 @@
-import React, { ReducerState, useReducer } from "react";
+import React from "react";
 import styles from "@/app/settings/Settings.module.css";
 import { PropertyEditor } from "@/app/settings/PropertyEditor";
 import { CssThemeVariables } from "@/shared/constants/themes";
@@ -19,13 +19,10 @@ const themeCssVariables = {
   "extra error": CssThemeVariables.ExtraError,
 };
 
-const reducer = (current: State, update: Partial<State>) => ({ ...current, ...update });
-
 export const PropertyList: React.FC<Props> = ({}) => {
-  const [state, dispatch] = useReducer(reducer, themeCssVariables as ReducerState<State>);
   return (
     <div className={styles.propertyList}>
-      {Object.entries(state).map(([name, cssName]) => (
+      {Object.entries(themeCssVariables).map(([name, cssName]) => (
         <PropertyEditor name={name} cssName={cssName} key={cssName} />
       ))}
     </div>

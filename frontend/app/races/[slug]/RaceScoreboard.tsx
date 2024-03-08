@@ -4,12 +4,13 @@ import { OnRaceEventSubscription } from "@/graphql/generated/graphql";
 import { RacerScoreCard } from "@/app/races/[slug]/RacerScoreCard";
 
 interface Props {
-  edges: OnRaceEventSubscription["onRaceEvent"]["racers"]["edges"];
+  edges: NonNullable<OnRaceEventSubscription["onRaceEvent"]["racers"]>["edges"];
   mode: string;
   modeSetting: number;
 }
 
 export const RaceScoreboard: React.FC<Props> = ({ edges, mode, modeSetting }) => {
+  if (!edges) return <div>no racers xd</div>;
   return (
     <div className={styles.scoreboard}>
       <h1>racer stats:</h1>

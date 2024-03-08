@@ -1,4 +1,3 @@
-# TODO: see if this big query is optimized (no double-fetching of racer)
 subscription OnRaceEvent($raceId: UUID!, $racersFirst: Int) {
     onRaceEvent(raceId: $raceId) {
         id

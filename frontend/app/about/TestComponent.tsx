@@ -1,8 +1,8 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { useState } from "react";
 import { useSuspenseQuery } from "@apollo/client";
-import { GetAllUsersDocument, MeDocument } from "@/graphql/generated/graphql";
+import { MeDocument } from "@/graphql/generated/graphql";
 
 interface Props {
   initial: { __typename?: "User"; id: any; username: string } | null | undefined;

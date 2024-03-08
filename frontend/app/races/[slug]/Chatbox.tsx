@@ -6,9 +6,9 @@ import {
   MeQuery,
   OnChatboxEventDocument,
   OnRaceEventSubscription,
-  SendMessageDocument,
+  SendMessageDocument
 } from "@/graphql/generated/graphql";
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
+import { useMutation, useSubscription } from "@apollo/client";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { IoSend } from "react-icons/io5";
 import { Message } from "@/app/races/[slug]/Message";

@@ -1,6 +1,6 @@
 const fs = require("fs");
 const https = require("https");
-const fetch = require("cross-fetch");
+require("dotenv").config({ path: "./.env.local" });
 
 const possibleTypesIntrospectionQuery = `
   {
@@ -20,7 +20,7 @@ const possibleTypesIntrospectionQuery = `
 const agent = new https.Agent({ rejectUnauthorized: false });
 
 // TODO: .env
-fetch(`https://localhost:7218/graphql`, {
+fetch(process.env["NEXT_PUBLIC_API_URL"], {
   agent,
   method: "POST",
   headers: { "Content-Type": "application/json" },

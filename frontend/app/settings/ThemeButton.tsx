@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Settings.module.css";
 import { ThemeType } from "@/shared/constants/themes";
 import { ConfigType } from "@/shared/types/configTypes";
+import { getConfig } from "@/utils/configUtils";
 
 // TODO: Could probably just pass `theme` as props but cba types are pissing me off
 interface Props {
@@ -14,7 +15,7 @@ export const ThemeButton: React.FC<Props> = ({ themeName, themeConfig }) => {
   const [selected, setSelected] = useState(false);
   function handleSelect(name: string, cfg: ThemeType[keyof ThemeType]) {
     return () => {
-      let config: ConfigType = JSON.parse(localStorage.getItem("config"));
+      let config = getConfig();
       for (const [property, val] of Object.entries(cfg)) {
         console.log("prop:", property, "val:", val);
         document.documentElement.style.setProperty(property, val);

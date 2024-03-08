@@ -12,6 +12,7 @@ export const Modal: React.FC<PropsWithChildren<Props>> = ({ visible, handleHide,
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   function handleMouseUp(e: globalThis.MouseEvent) {
+    assertIsNode(e.target);
     if (!contentRef || !contentRef.current || !visible) return;
     if (!contentRef.current!.contains(e.target)) {
       console.log("We clicked outside");

@@ -2,10 +2,7 @@
 
 import React, { useEffect } from "react";
 import { ConfigType } from "@/shared/types/configTypes";
-import { THEMES } from "@/shared/constants/themes";
 import { getConfig, setConfig, DEFAULT_CONFIG, makeConfig } from "@/utils/configUtils";
-import { Chart } from "chart.js";
-import { FontSizeChangeSection } from "@/app/settings/FontSizeChangeSection";
 
 interface Props {}
 
@@ -21,11 +18,7 @@ export const ConfigLoader: React.FC<Props> = ({}) => {
       config = makeConfig();
     }
     // Updates the config in case there are fields on `ConfigType` that are not defined in the loaded config.
-    Object.keys(DEFAULT_CONFIG).forEach((key) => {
-      if (!config![key]) {
-        config![key] = DEFAULT_CONFIG[key];
-      }
-    });
+    config = { ...DEFAULT_CONFIG, ...config };
     setConfig(config);
 
     const root = document.documentElement;

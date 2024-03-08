@@ -3,7 +3,7 @@ import styles from "./Race.module.css";
 import { OnRaceEventSubscription } from "@/graphql/generated/graphql";
 
 interface Props {
-  racer: OnRaceEventSubscription["onRaceEvent"]["racers"][number];
+  racer: NonNullable<NonNullable<OnRaceEventSubscription["onRaceEvent"]["racers"]>["edges"]>[number]["node"];
   progress: number;
 }
 
@@ -13,6 +13,7 @@ export const RacerScoreCard: React.FC<Props> = ({ racer, progress }) => {
   const [offset, setOffset] = useState(0);
   useEffect(() => {
     const parentWidth = ref.current?.parentElement?.clientWidth;
+    if (!parentWidth) return;
     setOffset((parentWidth - 250 ?? 1) * progress);
   }, [racer]);
   return (

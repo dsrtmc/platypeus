@@ -1,10 +1,8 @@
 using System.Security.Claims;
-using HotChocolate.Subscriptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
 using Server.Models;
-using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Schema.Types.Mutations;
 using Server.Services;

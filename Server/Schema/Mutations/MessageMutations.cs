@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using HotChocolate.Subscriptions;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;

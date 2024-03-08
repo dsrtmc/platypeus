@@ -1,15 +1,10 @@
 "use client";
 
-import React, { startTransition, useCallback, useEffect, useRef } from "react";
-import {
-  GetScoresForLeaderboardDocument,
-  GetScoresForLeaderboardQuery,
-  GetScoresForLeaderboardQueryVariables,
-} from "@/graphql/generated/graphql";
-import { SuspenseQueryHookOptions, useQuery, useSuspenseQuery } from "@apollo/client";
+import React, { startTransition, useCallback } from "react";
+import { GetScoresForLeaderboardDocument, GetScoresForLeaderboardQueryVariables } from "@/graphql/generated/graphql";
+import { useSuspenseQuery } from "@apollo/client";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 interface Props {
   mode: string;
@@ -17,17 +12,17 @@ interface Props {
 }
 
 // Unnecessary, I'll keep it in for now only so I can look at great-looking HOC code.
-const LeaderboardWithLabel = withLabel(Leaderboard);
-export function withLabel(Component) {
-  return ({ children, ...rest }) => {
-    return (
-      <div className={styles.box}>
-        <label>{children}</label>
-        <Component {...rest} />
-      </div>
-    );
-  };
-}
+// const LeaderboardWithLabel = withLabel(Leaderboard);
+// export function withLabel(Component) {
+//   return ({ children, ...rest }) => {
+//     return (
+//       <div className={styles.box}>
+//         <label>{children}</label>
+//         <Component {...rest} />
+//       </div>
+//     );
+//   };
+// }
 
 export function Leaderboard({ mode, modeSetting }: Props) {
   const { data, error, fetchMore } = useSuspenseQuery(GetScoresForLeaderboardDocument, {
@@ -51,26 +46,41 @@ export function Leaderboard({ mode, modeSetting }: Props) {
         fetchMore({
           variables,
           updateQuery: (previousQueryResult, { fetchMoreResult }) => {
-            if (!data?.scoresForLeaderboard?.pageInfo.hasNextPage) return;
+            // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
+            if (!fetchMoreResult) return previousQueryResult;
+            // if (!data?.races?.pageInfo.hasNextPage) return; // TODO: uncomment and investigate, possibly stale `data` that's why ↑
+            const prevEdges = previousQueryResult.scoresForLeaderboard!.edges ?? [];
+            const nextEdges = fetchMoreResult.scoresForLeaderboard!.edges ?? [];
 
-            if (!fetchMoreResult?.scoresForLeaderboard || !previousQueryResult?.scoresForLeaderboard) {
-              return {
-                scores: {
-                  pageInfo: { hasNextPage: false },
-                  edges: [],
-                },
-              };
-            }
             return {
               scoresForLeaderboard: {
-                pageInfo: fetchMoreResult.scoresForLeaderboard.pageInfo,
-                edges: [
-                  ...previousQueryResult.scoresForLeaderboard.edges,
-                  ...fetchMoreResult.scoresForLeaderboard.edges,
-                ],
+                ...previousQueryResult.scoresForLeaderboard,
+                edges: [...prevEdges, ...nextEdges],
+                pageInfo: fetchMoreResult.scoresForLeaderboard!.pageInfo,
               },
             };
           },
+          // updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+          //   if (!data?.scoresForLeaderboard?.pageInfo.hasNextPage) return;
+          //
+          //   if (!fetchMoreResult?.scoresForLeaderboard || !previousQueryResult?.scoresForLeaderboard) {
+          //     return {
+          //       scores: {
+          //         pageInfo: { hasNextPage: false },
+          //         edges: [],
+          //       },
+          //     };
+          //   }
+          //   return {
+          //     scoresForLeaderboard: {
+          //       pageInfo: fetchMoreResult.scoresForLeaderboard.pageInfo,
+          //       edges: [
+          //         ...previousQueryResult.scoresForLeaderboard.edges,
+          //         ...fetchMoreResult.scoresForLeaderboard.edges,
+          //       ],
+          //     },
+          //   };
+          // },
         });
       });
     }
@@ -107,27 +117,27 @@ export function Leaderboard({ mode, modeSetting }: Props) {
       <div className={styles.wrapper}>
         <table className={styles.table}>
           <thead className={styles.head}>
-            <tr>
-              <th className={styles.left}>
+            <tr className={styles.tr}>
+              <th className={`${styles.left} ${styles.th}`}>
                 <p>#</p>
               </th>
-              <th className={styles.left}>
+              <th className={`${styles.left} ${styles.th}`}>
                 <p>name</p>
                 <p className={styles.sub}>user</p>
               </th>
-              <th className={styles.right}>
+              <th className={`${styles.right} ${styles.th}`}>
                 <p>wpm</p>
                 <p className={styles.sub}>cpm</p>
               </th>
-              <th className={styles.right}>
+              <th className={`${styles.right} ${styles.th}`}>
                 <p>raw</p>
                 <p className={styles.sub}>acc</p>
               </th>
-              <th className={styles.right}>
+              <th className={`${styles.right} ${styles.th}`}>
                 <p>test</p>
                 <p className={styles.sub}>mode</p>
               </th>
-              <th className={styles.right}>
+              <th className={`${styles.right} ${styles.th}`}>
                 <p>date</p>
                 <p className={styles.sub}>time</p>
               </th>
@@ -135,28 +145,28 @@ export function Leaderboard({ mode, modeSetting }: Props) {
           </thead>
           <tbody className={styles.body}>
             {data.scoresForLeaderboard.edges!.map((edge, index) => (
-              <tr className={styles.row} key={edge.node.id}>
-                <td className={styles.left}>
+              <tr className={styles.tr} key={edge.node.id}>
+                <td className={`${styles.left} ${styles.td}`}>
                   <p>{index + 1}</p>
                 </td>
-                <td className={styles.left}>
+                <td className={`${styles.left} ${styles.td}`}>
                   <Link href={`/user/${edge.node.user?.username}`} className={styles.user}>
                     {edge.node.user?.username}
                   </Link>
                 </td>
-                <td className={styles.right}>
+                <td className={`${styles.right} ${styles.td}`}>
                   <p>{edge.node.wpm}</p>
                   <p className={styles.sub}>{edge.node.wpm * 5}</p>
                 </td>
-                <td className={styles.right}>
+                <td className={`${styles.right} ${styles.td}`}>
                   <p>{edge.node.rawWpm}</p>
-                  <p className={styles.sub}>{edge.node.accuracy.toFixed(2) * 100}%</p>
+                  <p className={styles.sub}>{(edge.node.accuracy * 100).toFixed(2)}%</p>
                 </td>
-                <td className={styles.right}>
+                <td className={`${styles.right} ${styles.td}`}>
                   <p>{edge.node.mode}</p>
                   <p className={styles.sub}>{edge.node.modeSetting}</p>
                 </td>
-                <td className={styles.right}>
+                <td className={`${styles.right} ${styles.td}`}>
                   <p>{new Date(edge.node.createdAt).toLocaleDateString()}</p>
                   <p className={styles.sub}>{new Date(edge.node.createdAt).toLocaleTimeString()}</p>
                 </td>

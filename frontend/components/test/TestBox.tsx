@@ -212,7 +212,7 @@ export function TestBox({ handleSaveScore }: Props) {
   if (visible) {
     return (
       <CSSTransition
-        nodeRef={ref as Ref<HTMLDivElement | null>}
+        nodeRef={ref as Ref<HTMLDivElement | undefined>}
         in={true}
         appear={true}
         timeout={300}
@@ -247,7 +247,7 @@ export function TestBox({ handleSaveScore }: Props) {
           <section className={styles.middle}>
             {/* TODO: eventually make it fade-in on the first render, not only on re-mount */}
             <CSSTransition
-              nodeRef={testRef as Ref<HTMLDivElement | null>}
+              nodeRef={testRef as Ref<HTMLDivElement | undefined>}
               in={mounted}
               timeout={150}
               classNames={{

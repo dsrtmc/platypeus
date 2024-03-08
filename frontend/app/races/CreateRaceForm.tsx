@@ -140,7 +140,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           // words
           <>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"5"} />5
+              <div className={styles.radioWrapper}>
+                <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"5"} />5
+              </div>
             </label>
             <label className={styles.label}>
               <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"25"} />

@@ -37,7 +37,7 @@ export const ScoreBox: FC<Props> = ({ score, handleStartNextTest }) => {
 
   return (
     <CSSTransition
-      nodeRef={ref as Ref<HTMLDivElement | null>}
+      nodeRef={ref as Ref<HTMLDivElement | undefined>}
       in={true}
       appear={true}
       timeout={300}

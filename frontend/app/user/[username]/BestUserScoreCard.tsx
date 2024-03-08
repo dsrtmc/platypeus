@@ -1,13 +1,10 @@
-import React, { Ref, useEffect, useRef, useState } from "react";
-import {
-  UserPage_GetUsersBestScoresQuery,
-  UserPage_GetUsersBestScoresQueryVariables,
-} from "@/graphql/generated/graphql";
+import React, { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
+import { UserPage_GetUsersBestScoresQuery } from "@/graphql/generated/graphql";
 import styles from "./User.module.css";
 import { CSSTransition } from "react-transition-group";
 
 interface Props {
-  score: NonNullable<UserPage_GetUsersBestScoresQuery["usersBestScores"]>[number];
+  score: NonNullable<UserPage_GetUsersBestScoresQuery["usersBestScores"]>[number] | undefined;
   mode: string;
   modeSetting: number;
 }
@@ -38,7 +35,7 @@ export const BestUserScoreCard: React.FC<Props> = ({ score, mode, modeSetting })
   return (
     <div className={styles.cardWrapper} ref={ref}>
       <CSSTransition
-        nodeRef={detailedCardRef as Ref<HTMLDivElement | null>}
+        nodeRef={detailedCardRef as Ref<HTMLElement | undefined>}
         in={showDetails}
         timeout={150}
         classNames={{
@@ -71,7 +68,7 @@ export const BestUserScoreCard: React.FC<Props> = ({ score, mode, modeSetting })
         </div>
       </CSSTransition>
       <CSSTransition
-        nodeRef={regularCardRef as Ref<HTMLDivElement | null>}
+        nodeRef={regularCardRef as Ref<HTMLDivElement | undefined>}
         in={!showDetails}
         timeout={150}
         classNames={{

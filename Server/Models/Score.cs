@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Server.Services;
-
 namespace Server.Models;
 
 public class Score : BaseEntity

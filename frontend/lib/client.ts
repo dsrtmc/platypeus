@@ -9,7 +9,7 @@ import { NextSSRApolloClient } from "@apollo/experimental-nextjs-app-support/ssr
 
 const createHttpLink = (cookie: string | undefined) => {
   const options: HttpOptions = {
-    uri: "http://localhost:5053/graphql",
+    uri: process.env["NEXT_PUBLIC_API_URL"],
     credentials: "include",
     ...(cookie && { headers: { cookie } }),
   };

@@ -1,6 +1,4 @@
 using System.Security.Claims;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
 using Server.Models;
 using Server.Services;
 

@@ -1,4 +1,3 @@
-import { HiHome } from "react-icons/hi";
 import styles from "./NotFound.module.css";
 import Link from "next/link";
 import { TiHome } from "react-icons/ti";

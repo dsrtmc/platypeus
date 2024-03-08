@@ -1,12 +1,11 @@
 "use client";
 
-import { useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { LoginDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
-import { BiLogIn } from "react-icons/bi";
 import { LoginButton } from "@/components/forms/LoginButton";
 import { useRouter } from "next/navigation";
 
@@ -14,6 +13,24 @@ type FormValues = {
   username: string;
   password: string;
 };
+
+// TODO: :P
+const LoginMutation = gql`
+  mutation LoginForm($input: LoginInput!) {
+    login(input: $input) {
+      user {
+        id
+        ...UserInfoFragment
+      }
+      errors {
+        code: __typename
+        ... on Error {
+          message
+        }
+      }
+    }
+  }
+`;
 
 export default function LoginForm() {
   const [login] = useMutation(LoginDocument);
@@ -35,18 +52,18 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
     const response = await login({
-      variables: { input: { username: data.username, password: null } },
+      variables: { input: { username: data.username, password: data.password } },
       update: (cache, { data }) => {
         if (!data) {
           return null;
         }
         // TODO: fix i guess xd idk graphql fragment or some shit idk
-        cache.writeQuery<MeQuery>({
-          query: MeDocument,
-          data: {
-            me: data.login.user,
-          },
-        });
+        // cache.writeQuery<MeQuery>({
+        //   query: MeDocument,
+        //   data: {
+        //     me: data.login.user,
+        //   },
+        // });
       },
     });
     console.log("Response:", response);

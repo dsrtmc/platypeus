@@ -38,12 +38,12 @@ export default function RegisterForm() {
         if (!data) {
           return null;
         }
-        cache.writeQuery<MeQuery>({
-          query: MeDocument,
-          data: {
-            me: data.register.user,
-          },
-        });
+        // cache.writeQuery<MeQuery>({
+        //   query: MeDocument,
+        //   data: {
+        //     me: data.register.user,
+        //   },
+        // });
       },
     });
     console.log("Register response:", response);
