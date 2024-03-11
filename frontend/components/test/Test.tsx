@@ -1,17 +1,20 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import { Score as ScoreType } from "@/graphql/generated/graphql";
+import { CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
 import {
+  ComponentProps,
   createElement,
   FC,
   FunctionComponent,
+  FunctionComponentElement,
   MutableRefObject,
   ReactElement,
   Reducer,
   ReducerAction,
   ReducerState,
   ReducerWithoutAction,
+  Ref,
   useCallback,
   useEffect,
   useReducer,
@@ -45,8 +48,10 @@ interface Props {
   onPoolUpdate: (count: number, index?: number) => string[];
   handleFinish: () => void;
   handleChangeWpm: (wpm: number) => void;
-  handleSaveScore: (score: Partial<ScoreType>) => void;
+  handleSaveScore: (score: CreateScoreInputType) => void;
   setWordCount: (value: ((prevState: number) => number) | number) => void;
+
+  innerRef?: MutableRefObject<HTMLDivElement | null>;
 
   initialContent: string[];
 }
@@ -94,6 +99,7 @@ export const Test: FC<Props> = ({
   handleChangeWpm,
   handleSaveScore,
   setWordCount,
+  innerRef,
   initialContent,
 }) => {
   // TODO: for some reason raw seems weird on 30s test || NOTE: could not replicate, it all seems fine.
@@ -104,13 +110,13 @@ export const Test: FC<Props> = ({
   const [letterIndex, setLetterIndex] = useState(-1);
   const [lineSkip, setLineSkip] = useState(true);
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const [wordPool, setWordPool] = useState<Array<ReactElement<typeof Word>>>([]);
+  const [wordPool, setWordPool] = useState<Array<FunctionComponentElement<typeof Word>>>([]);
   const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(false);
 
-  // TODO: im gonna kill myself if i dont fix this retarded fucking type.
+  // funniest type ever, gives a squiggly but passes the build stage? xD whereas if there's no squiggly, the build breaks? XD
   const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
-    useReducer(reducer, initialState as ReducerState<State>);
+    useReducer(reducer, initialState);
 
   function addToRefs(el: (typeof wordsRef.current)[number]) {
     if (el) {
@@ -352,12 +358,14 @@ export const Test: FC<Props> = ({
   }
 
   function createWordElements(words: string[]) {
-    return words.map((word) =>
-      createElement(Word as FunctionComponent<Word>, {
-        word: word,
-        ref: addToRefs,
-        key: `word-${generateRandomString(7)}`,
-      })
+    return words.map(
+      (word) =>
+        createElement(Word, {
+          word: word,
+          ref: addToRefs,
+          // TODO: hmm u probably don't want random keys actually
+          key: `word-${generateRandomString(7)}`,
+        }) as unknown as FunctionComponentElement<typeof Word>
     );
   }
 
@@ -369,7 +377,7 @@ export const Test: FC<Props> = ({
     dispatch(initialState);
     setWordPool(createWordElements(initialContent));
     dispatch({ content: initialContent });
-    wordsDivRef.current?.focus();
+    if (wordsDivRef?.current) wordsDivRef.current!.focus();
   }
 
   // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
@@ -443,7 +451,7 @@ export const Test: FC<Props> = ({
     let acc = newCorrectCount / newNonEmptyCount;
     if (!Number.isFinite(acc)) acc = 0;
 
-    const score: Partial<ScoreType> = {
+    const score: CreateScoreInputType = {
       wpm,
       rawWpm,
       mode,
@@ -499,7 +507,7 @@ export const Test: FC<Props> = ({
 
   // TODO: not sure if I should keep it here, it kinda looks funky during races, so I guess move it to `TestBox`?
   return (
-    <div className={styles.wordsWrapper}>
+    <div className={styles.wordsWrapper} ref={innerRef}>
       <div className={styles.words} ref={wordsDivRef} tabIndex={-1}>
         {wordPool.map((word) => word)}
       </div>

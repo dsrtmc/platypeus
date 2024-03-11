@@ -1,13 +1,9 @@
 import { registerApolloClient } from "@apollo/experimental-nextjs-app-support/rsc";
-import { ApolloClient, HttpLink, HttpOptions, InMemoryCache, split } from "@apollo/client";
+import { ApolloClient, HttpLink, HttpOptions, InMemoryCache } from "@apollo/client";
 import { headers } from "next/headers";
 import possibleTypes from "@/possibleTypes.json";
-import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
-import { createClient } from "graphql-ws";
-import { getMainDefinition } from "@apollo/client/utilities";
-import { NextSSRApolloClient } from "@apollo/experimental-nextjs-app-support/ssr";
 
-const createHttpLink = (cookie: string | undefined) => {
+const createHttpLink = (cookie?: string | null) => {
   const options: HttpOptions = {
     uri: process.env["NEXT_PUBLIC_API_URL"],
     credentials: "include",
@@ -24,9 +20,7 @@ export const { getClient }: { getClient: () => ApolloClient<any> } = registerApo
     }),
     link: createHttpLink(cookie),
     credentials: "include",
-    headers: {
-      cookie,
-    },
+    ...(cookie && { headers: { cookie } }),
   });
 });
 

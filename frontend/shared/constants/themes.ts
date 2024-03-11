@@ -1,3 +1,5 @@
+import { ThemeConfigType } from "@/shared/types/configTypes";
+
 export enum CssThemeVariables {
   Background = "--bg-color",
   Caret = "--caret-color",
@@ -9,20 +11,7 @@ export enum CssThemeVariables {
   ExtraError = "--error-extra-color",
 }
 
-export type ThemeType = {
-  [name: string]: {
-    "--bg-color": string;
-    "--main-color": string;
-    "--caret-color": string;
-    "--sub-color": string;
-    "--sub-alt-color": string;
-    "--text-color": string;
-    "--error-color": string;
-    "--error-extra-color": string;
-  };
-};
-
-export const THEMES: ThemeType = {
+export const THEMES: { [name: string]: ThemeConfigType } = {
   default: {
     "--bg-color": "#242933",
     "--main-color": "#ec4c56",

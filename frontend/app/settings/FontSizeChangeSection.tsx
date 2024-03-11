@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React from "react";
 import styles from "./Settings.module.css";
 import { GlobalFontSizeChangeSection } from "@/app/settings/GlobalFontSizeChangeSection";
 import { TestFontSizeChangeSection } from "@/app/settings/TestFontSizeChangeSection";

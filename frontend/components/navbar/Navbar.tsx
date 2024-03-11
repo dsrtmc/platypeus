@@ -1,10 +1,9 @@
 import { MeDocument } from "@/graphql/generated/graphql";
 import styles from "./Navbar.module.css";
-import { BsBarChartFill, BsInfoLg, BsKeyboardFill } from "react-icons/bs";
 import { AuthBox } from "@/components/navbar/AuthBox";
 import { getClient } from "@/lib/client";
 import { NavLink } from "@/components/navbar/NavLink";
-import { FaCarSide, FaCog, FaInfo } from "react-icons/fa";
+import { FaCog, FaInfo } from "react-icons/fa";
 import { FaChartSimple, FaKeyboard } from "react-icons/fa6";
 import { LuSwords } from "react-icons/lu";
 

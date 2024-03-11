@@ -27,6 +27,7 @@ import { LeaveRaceButton } from "@/app/races/[slug]/LeaveRaceButton";
 import { Timer } from "@/components/test/Timer";
 import { WordProgress } from "@/components/test/WordProgress";
 import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
+import { assertIsNode } from "@/utils/assertIsNode";
 
 interface Props {
   race: NonNullable<GetRaceQuery["race"]>;

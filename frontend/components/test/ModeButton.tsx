@@ -1,10 +1,11 @@
 import React from "react";
 import styles from "./Test.module.css";
+import { TestMode } from "@/shared/types/configTypes";
 
 interface Props {
-  mode: string;
+  mode: TestMode;
   selected: boolean;
-  onSelect: (mode: string) => () => void;
+  onSelect: (mode: TestMode) => () => void;
 }
 
 export const ModeButton: React.FC<Props> = ({ mode, selected, onSelect }) => {

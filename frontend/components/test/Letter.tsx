@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FC, PropsWithChildren } from "react";
+import { ChangeEvent } from "react";
 import styles from "./Test.module.css";
 
 interface Props {

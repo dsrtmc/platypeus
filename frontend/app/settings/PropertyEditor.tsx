@@ -1,7 +1,6 @@
 import React, { FormEvent, KeyboardEvent, useEffect, useState } from "react";
 import styles from "./Settings.module.css";
 import { getConfig, setConfig } from "@/utils/configUtils";
-import { ConfigType } from "@/shared/types/configTypes";
 
 interface Props {
   name: string;

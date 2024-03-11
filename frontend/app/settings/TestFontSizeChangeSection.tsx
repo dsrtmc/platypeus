@@ -1,6 +1,5 @@
-import React, { ChangeEvent, useEffect, useState, KeyboardEvent } from "react";
+import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 import styles from "@/app/settings/Settings.module.css";
-import { ConfigType } from "@/shared/types/configTypes";
 import { DEFAULT_CONFIG, getConfig, setConfig } from "@/utils/configUtils";
 
 interface Props {}

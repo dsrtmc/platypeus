@@ -1,18 +1,15 @@
 import { getClient } from "@/lib/client";
 import styles from "./User.module.css";
 import {
-  GetScoresDocument,
-  GetScoresQueryVariables,
   UserPage_GetUserDocument,
   UserPage_GetUserMonthlyScoreSummariesDocument,
-  UserPage_GetUserMonthlyScoreSummariesQueryVariables,
+  UserPage_GetUserMonthlyScoreSummariesQueryVariables
 } from "@/graphql/generated/graphql";
 import { PerformanceChart } from "@/app/user/[username]/PerformanceChart";
 import UserInfo from "@/app/user/[username]/UserInfo";
 import { BestUserScoresBox } from "@/app/user/[username]/BestUserScoresBox";
 import { notFound } from "next/navigation";
-import React, { Suspense, useRef } from "react";
-import { PerformanceChartFallback } from "@/app/user/[username]/PerformanceChartFallback";
+import React from "react";
 
 // TODO: CONSIDER GOING FOR ROUTE-SPECIFIC QUERIES SO THAT WE AVOID OVER-FETCHING
 export default async function UserPage({ params }: { params: { username: string } }) {

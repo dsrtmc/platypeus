@@ -1,9 +1,9 @@
 "use client";
 
-import { ApolloClient, ApolloLink, HttpLink, HttpOptions, InMemoryCache, split } from "@apollo/client";
-import { NextSSRApolloClient } from "@apollo/experimental-nextjs-app-support/ssr";
+import { ApolloLink, HttpLink, HttpOptions, split } from "@apollo/client";
 import {
   ApolloNextAppProvider,
+  NextSSRApolloClient,
   NextSSRInMemoryCache,
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
@@ -37,7 +37,7 @@ const createSplitLink = (cookie = "") => {
       const definition = getMainDefinition(query);
       return definition.kind === "OperationDefinition" && definition.operation === "subscription";
     },
-    wsLink,
+    wsLink!,
     createHttpLink(cookie)
   );
 };

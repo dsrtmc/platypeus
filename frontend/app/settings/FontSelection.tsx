@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { availableFonts } from "@/shared/constants/fonts";
 import { FontSelectionItem } from "@/app/settings/FontSelectionItem";
 import styles from "./Settings.module.css";
-import { DEFAULT_CONFIG, getConfig, setConfig } from "@/utils/configUtils";
+import { getConfig, setConfig } from "@/utils/configUtils";
 
 interface Props {}
 

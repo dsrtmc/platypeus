@@ -3,14 +3,15 @@ import { ModeSelection } from "@/components/test/ModeSelection";
 import { LanguageSelection } from "@/components/test/LanguageSelection";
 import { ModeSettingSelection } from "@/components/test/ModeSettingSelection";
 import styles from "./Test.module.css";
+import { TestLanguage, TestMode } from "@/shared/types/configTypes";
 
 interface Props {
   language: string;
   mode: string;
   modeSetting: number;
-  handleSelectLanguage: (language: string) => void;
-  handleSelectMode: (mode: string) => void;
-  handleSelectModeSetting: (time: number) => (e: MouseEvent<HTMLButtonElement>) => void;
+  handleSelectLanguage: (language: TestLanguage) => void;
+  handleSelectMode: (mode: TestMode) => void;
+  handleSelectModeSetting: (modeSetting: number) => (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const TestConfig: React.FC<Props> = ({

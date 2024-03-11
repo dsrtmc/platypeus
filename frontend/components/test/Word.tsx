@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./Test.module.css";
-import { ChangeEvent, FC, forwardRef, Fragment } from "react";
+import { ChangeEvent, forwardRef } from "react";
 import { Letter } from "@/components/test/Letter";
 
 interface Props {

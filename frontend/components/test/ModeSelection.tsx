@@ -1,14 +1,15 @@
 import React from "react";
 import styles from "./Test.module.css";
 import { ModeButton } from "@/components/test/ModeButton";
+import { TestMode } from "@/shared/types/configTypes";
 
 interface Props {
   selectedMode: string;
-  handleSelectMode: (mode: string) => void;
+  handleSelectMode: (mode: TestMode) => void;
 }
 
 export const ModeSelection: React.FC<Props> = ({ selectedMode, handleSelectMode }) => {
-  function onSelectMode(mode: string) {
+  function onSelectMode(mode: TestMode) {
     return () => handleSelectMode(mode);
   }
   return (

@@ -6,7 +6,7 @@ import { Test } from "@/components/test/Test";
 import { Timer } from "@/components/test/Timer";
 import { Counter } from "@/components/test/Counter";
 import { RestartButton } from "@/components/test/RestartButton";
-import { Score as ScoreType } from "@/graphql/generated/graphql";
+import { CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomWords } from "@/utils/generateRandomWords";
 import { WordProgress } from "@/components/test/WordProgress";
@@ -14,9 +14,12 @@ import { WORD_LISTS } from "@/utils/wordLists";
 import { TestConfig } from "@/components/test/TestConfig";
 import { CSSTransition } from "react-transition-group";
 import { getConfig, setConfig } from "@/utils/configUtils";
+import { TestLanguage, TestMode, ConfigType } from "@/shared/types/configTypes";
+import { assertIsNode } from "@/utils/assertIsNode";
+import { oneOf } from "prop-types";
 
 interface Props {
-  handleSaveScore: (score: ScoreType) => void;
+  handleSaveScore: (score: CreateScoreInputType) => void;
 }
 
 export function TestBox({ handleSaveScore }: Props) {
@@ -25,8 +28,8 @@ export function TestBox({ handleSaveScore }: Props) {
   const [focused, setFocused] = useState(true);
   const [finished, setFinished] = useState(false);
   const [running, setRunning] = useState(false);
-  const [language, setLanguage] = useState("english");
-  const [mode, setMode] = useState("words");
+  const [language, setLanguage] = useState<TestLanguage>("english");
+  const [mode, setMode] = useState<TestMode>("words");
   const [modeSetting, setModeSetting] = useState(0);
   const [testKey, setTestKey] = useState(0); // Useful for easy re-mounting
   const [testStartTime, setTestStartTime] = useState(0);
@@ -59,6 +62,7 @@ export function TestBox({ handleSaveScore }: Props) {
   }
 
   function handleMouseUp(e: globalThis.MouseEvent) {
+    assertIsNode(e.target);
     if (ref && ref.current) setFocused(ref.current!.contains(e.target));
   }
 
@@ -67,8 +71,7 @@ export function TestBox({ handleSaveScore }: Props) {
     setRunning(true);
   }
 
-  // TODO: useLocalStorage hook?
-  function handleSelectMode(mode: string) {
+  function handleSelectMode(mode: TestMode) {
     const config = getConfig();
     if (config && config[mode]) {
       setModeSetting(config[mode]);
@@ -90,7 +93,7 @@ export function TestBox({ handleSaveScore }: Props) {
     };
   }
 
-  function handleSelectLanguage(language: string) {
+  function handleSelectLanguage(language: TestLanguage) {
     const config = getConfig();
     if (config) {
       config.language = language;

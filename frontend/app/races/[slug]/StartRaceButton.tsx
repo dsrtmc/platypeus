@@ -1,4 +1,4 @@
-import { FC, MouseEvent, useState } from "react";
+import { FC, MouseEvent } from "react";
 import styles from "./Race.module.css";
 
 interface Props {

@@ -1,16 +1,31 @@
+import { WORD_LISTS } from "@/utils/wordLists";
+
 export type ConfigType = {
   placeholder: string;
   themeName: string;
-  themeConfig: {
-    [key: string]: string;
-  };
+  themeConfig: ThemeConfigType;
   time: number;
   words: number;
-  mode: string;
-  language: string;
+  mode: TestMode;
+  language: TestLanguage;
   fontFamily: string;
   fontSize: number;
   testFontSizeMultiplier: number;
+};
+
+export type TestMode = "time" | "words";
+
+export type TestLanguage = keyof typeof WORD_LISTS;
+
+export type ThemeConfigType = {
+  "--bg-color": string;
+  "--main-color": string;
+  "--caret-color": string;
+  "--sub-color": string;
+  "--sub-alt-color": string;
+  "--text-color": string;
+  "--error-color": string;
+  "--error-extra-color": string;
 };
 
 export type ThemeCssVariablesType = {
@@ -23,5 +38,3 @@ export type ThemeCssVariablesType = {
   error: "--error-color";
   "extra error": "--error-extra-color";
 };
-
-type ThemeConfigType = {};

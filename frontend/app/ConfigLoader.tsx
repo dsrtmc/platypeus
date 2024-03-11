@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { ConfigType } from "@/shared/types/configTypes";
-import { getConfig, setConfig, DEFAULT_CONFIG, makeConfig } from "@/utils/configUtils";
+import { DEFAULT_CONFIG, getConfig, makeConfig, setConfig } from "@/utils/configUtils";
+import { ThemeCssVariablesType, ThemeConfigType } from "@/shared/types/configTypes";
 
 interface Props {}
 
@@ -23,7 +23,7 @@ export const ConfigLoader: React.FC<Props> = ({}) => {
 
     const root = document.documentElement;
     for (const property in config.themeConfig) {
-      root.style.setProperty(property, config.themeConfig[property]);
+      root.style.setProperty(property, config.themeConfig[property as keyof ThemeConfigType]);
     }
     root.style.setProperty("--font-size", config.fontSize + "px");
     root.style.setProperty("--test-font-size-multiplier", config.testFontSizeMultiplier.toString());
@@ -31,5 +31,6 @@ export const ConfigLoader: React.FC<Props> = ({}) => {
 
     console.log("Config loaded.");
   }, []);
+
   return null;
 };

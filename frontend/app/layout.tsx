@@ -1,12 +1,10 @@
 import "./globals.css";
-import { Inter, Itim, IBM_Plex_Mono, JetBrains_Mono } from "next/font/google";
 import { ReactNode } from "react";
 import { ApolloWrapper } from "@/lib/apollo-provider";
 import { ContentWrapper } from "@/components/ContentWrapper";
 import { Header } from "@/components/header/Header";
 import { ConfigLoader } from "@/app/ConfigLoader";
 import { availableFonts } from "@/shared/constants/fonts";
-import { isNavigatingToNewRootLayout } from "next/dist/client/components/router-reducer/is-navigating-to-new-root-layout";
 
 // const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 // const itim = Itim({ weight: "400", subsets: ["latin"], variable: "--font-itim", display: "swap" });

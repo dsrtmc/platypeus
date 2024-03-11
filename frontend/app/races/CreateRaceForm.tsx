@@ -1,17 +1,14 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Field, FieldName, FieldPath, SubmitHandler, useForm, UseFormWatch } from "react-hook-form";
+import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
 import { CreateRaceDocument } from "@/graphql/generated/graphql";
 import { useRouter } from "next/navigation";
 import styles from "./Races.module.css";
-import { BiLogIn } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
 import { generateRandomWords } from "@/utils/generateRandomWords";
-import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
 import { WORD_LISTS } from "@/utils/wordLists";
-import { deepEqual } from "assert";
 
 interface Props {}
 

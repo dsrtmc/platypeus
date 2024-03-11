@@ -1,4 +1,4 @@
-import { Inter, Itim, IBM_Plex_Mono, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Inter, Itim, JetBrains_Mono } from "next/font/google";
 import { NextFont } from "next/dist/compiled/@next/font";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
