@@ -2,17 +2,25 @@
 
 import { FC, Ref, useEffect, useRef } from "react";
 import { RestartButton } from "@/components/test/RestartButton";
-import { Score as ScoreType } from "@/graphql/generated/graphql";
+import { ScoreInfoFragmentDoc } from "@/graphql/generated/graphql";
 import { Score } from "@/components/test/Score";
 import styles from "./Score.module.css";
 import { CSSTransition } from "react-transition-group";
+import { useFragment } from "@apollo/client";
 
 interface Props {
-  score: ScoreType;
+  scoreId: string;
   handleStartNextTest: () => void;
 }
 
-export const ScoreBox: FC<Props> = ({ score, handleStartNextTest }) => {
+export const ScoreBox: FC<Props> = ({ scoreId, handleStartNextTest }) => {
+  const { complete, data } = useFragment({
+    fragment: ScoreInfoFragmentDoc,
+    from: {
+      __typename: "Score",
+      id: scoreId,
+    },
+  });
   const restartButtonRef = useRef<HTMLButtonElement | null>(null);
 
   function handleKeyDown(e: globalThis.KeyboardEvent) {
@@ -35,6 +43,7 @@ export const ScoreBox: FC<Props> = ({ score, handleStartNextTest }) => {
 
   const ref = useRef<HTMLDivElement | null>(null);
 
+  if (!complete) return null;
   return (
     <CSSTransition
       nodeRef={ref as Ref<HTMLDivElement | undefined>}
@@ -48,7 +57,7 @@ export const ScoreBox: FC<Props> = ({ score, handleStartNextTest }) => {
       }}
     >
       <div className={styles.scoreWrapper} ref={ref}>
-        <Score score={score} />
+        <Score score={data} />
         <RestartButton onReset={handleStartNextTest} ref={restartButtonRef} />
       </div>
     </CSSTransition>

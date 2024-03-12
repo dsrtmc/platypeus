@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
-import { useMutation } from "@apollo/client";
-import { CreateRaceDocument } from "@/graphql/generated/graphql";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { gql, useMutation } from "@apollo/client";
+import { CreateRaceForm_CreateRaceDocument } from "@/graphql/generated/graphql";
 import { useRouter } from "next/navigation";
 import styles from "./Races.module.css";
 import { FaPlus } from "react-icons/fa";
@@ -18,12 +18,26 @@ type FormValues = {
   modeSetting: string;
 };
 
-/*
- * Insane type-related issues with RHF, but apparently it could be caused by my IDE.
- * Does error out a lot on Rider, no squigglies on VS Code.
- */
+const CreateRace = gql`
+  mutation CreateRaceForm_CreateRace($input: CreateRaceInput!) {
+    createRace(input: $input) {
+      race {
+        id
+        unlisted
+        slug
+      }
+      errors {
+        code: __typename
+        ... on Error {
+          message
+        }
+      }
+    }
+  }
+`;
+
 export const CreateRaceForm: React.FC<Props> = ({}) => {
-  const [createRace, { data }] = useMutation(CreateRaceDocument);
+  const [createRace, { data }] = useMutation(CreateRaceForm_CreateRaceDocument);
   const router = useRouter();
   const {
     register,
@@ -76,7 +90,6 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
   // but the docs only mention optimization, and this is not an issue here at all.
   // Also, its only purpose is to avoid discrepancy between the "selected" setting (UI) and the actually selected one.
   useEffect(() => {
-    const mode = watch("mode");
     setValue("modeSetting", "5");
   }, [watch("mode")]);
 
@@ -86,27 +99,17 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
       <h1 className={styles.header}>create a race</h1>
       <label className={styles.label}>
         unlisted?
-        <input {...register("unlisted" as FieldPath<FormValues>)} type={"checkbox"} className={styles.checkbox} />
+        <input {...register("unlisted")} type={"checkbox"} className={styles.checkbox} />
       </label>
       <section className={styles.horizontalGroup}>
         <div className={styles.label}>mode:</div>
         <div className={styles.spacer} />
         <label className={styles.label}>
-          <input
-            {...register("mode" as FieldPath<FormValues>)}
-            type={"radio"}
-            value={"time"}
-            className={styles.radio}
-          />
+          <input {...register("mode")} type={"radio"} value={"time"} className={styles.radio} />
           time
         </label>
         <label htmlFor={"words"} className={styles.label}>
-          <input
-            {...register("mode" as FieldPath<FormValues>)}
-            type={"radio"}
-            value={"words"}
-            className={styles.radio}
-          />
+          <input {...register("mode")} type={"radio"} value={"words"} className={styles.radio} />
           words
         </label>
       </section>
@@ -116,18 +119,18 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
         {watch("mode") === "time" ? (
           <>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"5"} />5
+              <input {...register("modeSetting")} type={"radio"} value={"5"} />5
             </label>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"15"} />
+              <input {...register("modeSetting")} type={"radio"} value={"15"} />
               15
             </label>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"30"} />
+              <input {...register("modeSetting")} type={"radio"} value={"30"} />
               30
             </label>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"60"} />
+              <input {...register("modeSetting")} type={"radio"} value={"60"} />
               60
             </label>
           </>
@@ -138,19 +141,19 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           <>
             <label className={styles.label}>
               <div className={styles.radioWrapper}>
-                <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"5"} />5
+                <input {...register("modeSetting")} type={"radio"} value={"5"} />5
               </div>
             </label>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"25"} />
+              <input {...register("modeSetting")} type={"radio"} value={"25"} />
               25
             </label>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"50"} />
+              <input {...register("modeSetting")} type={"radio"} value={"50"} />
               50
             </label>
             <label className={styles.label}>
-              <input {...register("modeSetting" as FieldPath<FormValues>)} type={"radio"} value={"100"} />
+              <input {...register("modeSetting")} type={"radio"} value={"100"} />
               100
             </label>
           </>

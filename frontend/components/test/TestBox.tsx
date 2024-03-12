@@ -34,7 +34,6 @@ export function TestBox({ handleSaveScore }: Props) {
   const [testKey, setTestKey] = useState(0); // Useful for easy re-mounting
   const [testStartTime, setTestStartTime] = useState(0);
   const [wordCount, setWordCount] = useState(0);
-  const [content, setContent] = useState([""]);
   const [initialContent, setInitialContent] = useState([""]);
   const [timePassed, setTimePassed] = useState(modeSetting);
   const [wpm, setWpm] = useState(0);

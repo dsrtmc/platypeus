@@ -287,8 +287,19 @@ export const Test: FC<Props> = ({
     const nextWord = wordsRef.current[wordIndex + 1];
     if (!nextWord) return;
     if (currentWord.getBoundingClientRect().y < nextWord.getBoundingClientRect().y) {
-      if (lineSkip) {
-        setLineSkip(false);
+      // if (lineSkip) {
+      //   const newWordPool = wordPool.slice();
+      //   const newWords = onPoolUpdate(wordIndex, 0);
+      //   newWordPool.push(...createWordElements(newWords));
+      //
+      //   setWordPool(newWordPool);
+      //
+      //   dispatch({ content: content.concat(newWords) });
+      //
+      //   setLineSkip(false);
+      // } else {
+      if (!lineSkip) {
+        setLineSkip(true);
         return;
       }
       let numberOfWordsToAddToPool = 0;

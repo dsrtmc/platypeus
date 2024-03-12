@@ -1,10 +1,10 @@
 import React, { FC } from "react";
-import type { CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
+import type { ScoreInfoFragment } from "@/graphql/generated/graphql";
 import styles from "./Score.module.css";
 import { ScoreChart } from "@/components/test/ScoreChart";
 
 interface Props {
-  score: CreateScoreInputType;
+  score: ScoreInfoFragment;
 }
 
 export const Score: FC<Props> = ({ score }) => {

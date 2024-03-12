@@ -1,8 +1,0 @@
-query Me {
-    me {
-        id
-        username
-        email
-        ...UserInfoFragment
-    }
-}

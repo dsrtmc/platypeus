@@ -1,7 +1,7 @@
 "use client";
 
 import { gql, useMutation } from "@apollo/client";
-import { LoginDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
+import { LoginForm_LoginDocument } from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
 import { useEffect } from "react";
 import Link from "next/link";
@@ -14,9 +14,8 @@ type FormValues = {
   password: string;
 };
 
-// TODO: :P
 const LoginMutation = gql`
-  mutation LoginForm($input: LoginInput!) {
+  mutation LoginForm_Login($input: LoginInput!) {
     login(input: $input) {
       user {
         id
@@ -33,7 +32,7 @@ const LoginMutation = gql`
 `;
 
 export default function LoginForm() {
-  const [login] = useMutation(LoginDocument);
+  const [login] = useMutation(LoginForm_LoginDocument);
   const router = useRouter();
 
   const {

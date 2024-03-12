@@ -6,40 +6,54 @@ import {
   CreateScoreDocument,
   Score as ScoreType,
   CreateScoreInput as CreateScoreInputType,
+  MainBox_CreateScoreDocument,
 } from "@/graphql/generated/graphql";
 import { ScoreBox } from "@/components/test/ScoreBox";
 import { TestBox } from "@/components/test/TestBox";
-import { useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
+
+const CreateScoreFragment = gql`
+  fragment ScoreInfo on Score {
+    wpm
+    rawWpm
+    mode
+    modeSetting
+    content
+    language
+    accuracy
+    wpmStats
+    rawStats
+    user {
+      username
+    }
+  }
+`;
+
+const CreateScoreMutation = gql`
+  mutation MainBox_CreateScore($input: CreateScoreInput!) {
+    createScore(input: $input) {
+      score {
+        id
+        ...ScoreInfo
+      }
+    }
+  }
+`;
 
 interface Props {}
 
-const initialScoreInput: ScoreType = {
-  id: undefined,
-  wpm: 0,
-  rawWpm: 0,
-  accuracy: 0,
-  mode: "",
-  modeSetting: 0,
-  content: "",
-  wpmStats: [],
-  rawStats: [],
-  language: "",
-  createdAt: undefined,
-  updatedAt: undefined,
-};
-
 export const MainBox: FC<Props> = ({}) => {
-  const [scoreData, setScoreData] = useState<ScoreType>(initialScoreInput);
+  const [scoreId, setScoreId] = useState("");
   const [showScore, setShowScore] = useState(false);
 
-  const [createScore] = useMutation(CreateScoreDocument);
+  const [createScore] = useMutation(MainBox_CreateScoreDocument);
 
   async function handleSaveScore(score: CreateScoreInputType) {
     // TODO: some validation of course, anti-cheat (LONG SHOT)
-    const response = await createScore({
+    const { data } = await createScore({
       variables: {
         input: {
-          wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
+          wpm: Math.round(score.wpm), // since there's no way to enforce an `int`, we round here just to be sure
           rawWpm: Math.round(score.rawWpm),
           accuracy: score.accuracy,
           wpmStats: score.wpmStats,
@@ -51,21 +65,19 @@ export const MainBox: FC<Props> = ({}) => {
         },
       },
     });
-    // setScoreData(response.data?.createScore.score);
-    // TODO: ↑↑↑↑↑↑↑↑↑↑↑↑
+    if (!data?.createScore.score) return; // TODO: better error handling here
     setShowScore(true);
-    setScoreData(response.data?.createScore.score);
+    setScoreId(data.createScore.score?.id);
   }
 
   function handleStartNextTest() {
     setShowScore(false);
-    setScoreData(initialScoreInput);
   }
 
   return (
     <div className={styles.box}>
       {showScore ? (
-        <ScoreBox score={scoreData} handleStartNextTest={handleStartNextTest} />
+        <ScoreBox scoreId={scoreId} handleStartNextTest={handleStartNextTest} />
       ) : (
         <TestBox handleSaveScore={handleSaveScore} />
       )}

@@ -3,23 +3,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
-  CreateScoreDocument,
-  CreateScoreMutationVariables,
-  FinishRaceDocument,
-  FinishRaceForUserDocument,
-  GetRaceQuery,
-  JoinRaceDocument,
-  LeaveRaceDocument,
-  MeDocument,
-  OnRaceEventDocument,
-  RunRaceDocument,
+  RaceBox_CreateScoreDocument,
+  RaceBox_FinishRaceDocument,
+  RaceBox_FinishRaceForUserDocument,
+  RaceBox_JoinRaceDocument,
+  RaceBox_LeaveRaceDocument,
+  RaceBox_MeDocument,
+  RaceBox_OnRaceEventDocument,
+  RaceBox_RunRaceDocument,
+  RaceBox_StartRaceDocument,
+  RaceBox_UpdateStatsForUserDocument,
+  RacePage_GetRaceQuery,
   Score as ScoreType,
-  StartRaceDocument,
-  UpdateStatsForUserDocument,
 } from "@/graphql/generated/graphql";
 import { Chatbox } from "@/app/races/[slug]/Chatbox";
 import styles from "./Race.module.css";
-import { Test, TestMethods } from "@/components/test/Test";
+import { Test } from "@/components/test/Test";
 import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
 import { StartRaceButton } from "@/app/races/[slug]/StartRaceButton";
 import { JoinRaceButton } from "@/app/races/[slug]/JoinRaceButton";
@@ -30,7 +29,7 @@ import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
 import { assertIsNode } from "@/utils/assertIsNode";
 
 interface Props {
-  race: NonNullable<GetRaceQuery["race"]>;
+  race: NonNullable<RacePage_GetRaceQuery["race"]>;
 }
 
 // The length of race start countdown in seconds
@@ -38,19 +37,19 @@ const COUNTDOWN_TIME = 5;
 
 // TODO: add error handling whenever we execute a mutation (not just in this file)
 export const RaceBox: React.FC<Props> = ({ race }) => {
-  const { data, loading, error } = useSubscription(OnRaceEventDocument, {
+  const { data, loading, error } = useSubscription(RaceBox_OnRaceEventDocument, {
     variables: { raceId: race!.id, racersFirst: 10 },
   });
-  const { data: meData } = useQuery(MeDocument);
+  const { data: meData } = useQuery(RaceBox_MeDocument);
 
-  const [finishRaceForUser, {}] = useMutation(FinishRaceForUserDocument);
-  const [updateStatsForUser, {}] = useMutation(UpdateStatsForUserDocument);
-  const [finishRace, {}] = useMutation(FinishRaceDocument);
-  const [joinRace, {}] = useMutation(JoinRaceDocument);
-  const [leaveRace, {}] = useMutation(LeaveRaceDocument);
-  const [createScore, {}] = useMutation(CreateScoreDocument);
-  const [startRace, {}] = useMutation(StartRaceDocument);
-  const [runRace, {}] = useMutation(RunRaceDocument);
+  const [finishRaceForUser, {}] = useMutation(RaceBox_FinishRaceForUserDocument);
+  const [updateStatsForUser, {}] = useMutation(RaceBox_UpdateStatsForUserDocument);
+  const [finishRace, {}] = useMutation(RaceBox_FinishRaceDocument);
+  const [joinRace, {}] = useMutation(RaceBox_JoinRaceDocument);
+  const [leaveRace, {}] = useMutation(RaceBox_LeaveRaceDocument);
+  const [createScore, {}] = useMutation(RaceBox_CreateScoreDocument);
+  const [startRace, {}] = useMutation(RaceBox_StartRaceDocument);
+  const [runRace, {}] = useMutation(RaceBox_RunRaceDocument);
 
   const ref = useRef<HTMLDivElement | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -60,7 +59,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const [testStartTime, setTestStartTime] = useState(0);
   const [timePassed, setTimePassed] = useState(0);
   const [userHasFinished, setUserHasFinished] = useState(false);
-  const [content, setContent] = useState<Array<string> | null>(null);
+  const [content, setContent] = useState<Array<string> | null>(race.content.split(" "));
   const [countdown, setCountdown] = useState(race.running ? 0 : COUNTDOWN_TIME);
   const [wordCount, setWordCount] = useState(0);
 
@@ -129,13 +128,15 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
    * @param {string} count - The count of elements to add to the pool
    * @param {number} index - If using a static word pool, the index from which to start adding words
    */
+  // TODO: fix this shit doesnt even work lmao TOP PRIORITY
   function onPoolUpdate(count: number, index?: number): string[] {
     if (!content) return [];
-    const copy = content.slice(count);
+    const copy = content.slice(index);
     const words: string[] = [];
-    for (let i = LOADED_WORDS_COUNT - count; i < LOADED_WORDS_COUNT; i++) {
-      if (copy[i]) words.push(copy[i]);
-    }
+    // for (let i = LOADED_WORDS_COUNT - count; i < LOADED_WORDS_COUNT; i++) {
+    //   if (copy[i]) words.push(copy[i]);
+    // }
+    words.push(...copy.slice(index, count + index!));
     setContent(copy);
     return words;
   }

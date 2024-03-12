@@ -1,31 +1,62 @@
 "use client";
 
 import React, { startTransition, useCallback } from "react";
-import { GetScoresForLeaderboardDocument, GetScoresForLeaderboardQueryVariables } from "@/graphql/generated/graphql";
-import { useSuspenseQuery } from "@apollo/client";
+import {
+  Leaderboard_GetScoresForLeaderboardDocument,
+  Leaderboard_GetScoresForLeaderboardQueryVariables,
+} from "@/graphql/generated/graphql";
+import { gql, useSuspenseQuery } from "@apollo/client";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
 import Link from "next/link";
+
+const GetScoresForLeaderboardQuery = gql`
+  query Leaderboard_GetScoresForLeaderboard(
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+    $mode: String!
+    $modeSetting: Int!
+  ) {
+    scoresForLeaderboard(
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+      mode: $mode
+      modeSetting: $modeSetting
+    ) {
+      edges {
+        node {
+          id
+          wpm
+          rawWpm
+          accuracy
+          user {
+            username
+          }
+          mode
+          modeSetting
+          content
+          createdAt
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
 
 interface Props {
   mode: string;
   modeSetting: number;
 }
 
-// Unnecessary, I'll keep it in for now only so I can look at great-looking HOC code.
-// const LeaderboardWithLabel = withLabel(Leaderboard);
-// export function withLabel(Component) {
-//   return ({ children, ...rest }) => {
-//     return (
-//       <div className={styles.box}>
-//         <label>{children}</label>
-//         <Component {...rest} />
-//       </div>
-//     );
-//   };
-// }
-
 export function Leaderboard({ mode, modeSetting }: Props) {
-  const { data, error, fetchMore } = useSuspenseQuery(GetScoresForLeaderboardDocument, {
+  const { data, error, fetchMore } = useSuspenseQuery(Leaderboard_GetScoresForLeaderboardDocument, {
     variables: {
       first: 25,
       mode,
@@ -36,7 +67,7 @@ export function Leaderboard({ mode, modeSetting }: Props) {
   function handleFetchMore() {
     console.log("The next cursor:", data?.scoresForLeaderboard?.pageInfo?.endCursor);
     if (data?.scoresForLeaderboard?.pageInfo?.hasNextPage) {
-      const variables: GetScoresForLeaderboardQueryVariables = {
+      const variables: Leaderboard_GetScoresForLeaderboardQueryVariables = {
         first: 10,
         after: data?.scoresForLeaderboard?.pageInfo?.endCursor,
         mode,
@@ -60,6 +91,7 @@ export function Leaderboard({ mode, modeSetting }: Props) {
               },
             };
           },
+          // TODO
           // updateQuery: (previousQueryResult, { fetchMoreResult }) => {
           //   if (!data?.scoresForLeaderboard?.pageInfo.hasNextPage) return;
           //
@@ -92,7 +124,6 @@ export function Leaderboard({ mode, modeSetting }: Props) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(async (entry) => {
           if (entry.isIntersecting) {
-            // uncomment for infinite scroll
             await handleFetchMore();
           }
         });
@@ -160,7 +191,7 @@ export function Leaderboard({ mode, modeSetting }: Props) {
                 </td>
                 <td className={`${styles.right} ${styles.td}`}>
                   <p>{edge.node.rawWpm}</p>
-                  <p className={styles.sub}>{(edge.node.accuracy * 100).toFixed(2)}%</p>
+                  <p className={styles.sub}>{Math.round(edge.node.accuracy * 100)}%</p>
                 </td>
                 <td className={`${styles.right} ${styles.td}`}>
                   <p>{edge.node.mode}</p>

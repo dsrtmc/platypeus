@@ -40,8 +40,6 @@
     font-family: var(--font-family);
     font-size: var(--font-size);
     
-    font-weight: 500;
-    
     /* Firefox */
     scrollbar-color: var(--sub-color) transparent !important;
 }

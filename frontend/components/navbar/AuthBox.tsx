@@ -1,23 +1,32 @@
 "use client";
 
-import styles from "@/components/navbar/Navbar.module.css";
 import React, { useEffect, useState } from "react";
-import { useMutation, useSuspenseQuery } from "@apollo/client";
-import { LogoutDocument, MeDocument, MeQuery } from "@/graphql/generated/graphql";
+import { gql, useMutation, useSuspenseQuery } from "@apollo/client";
+import { AuthBox_LogoutDocument, Navbar_MeDocument, Navbar_MeQuery } from "@/graphql/generated/graphql";
 import { BiLogIn, BiLogOut, BiSolidUser } from "react-icons/bi";
 import { NavLink } from "@/components/navbar/NavLink";
 import { NavButton } from "@/components/navbar/NavButton";
 import { useRouter } from "next/navigation";
 
 interface Props {
-  initial: MeQuery["me"];
+  initial: Navbar_MeQuery["me"];
 }
 
+const LogoutMutation = gql`
+  mutation AuthBox_Logout {
+    logout {
+      boolean
+    }
+  }
+`;
+
 export const AuthBox: React.FC<Props> = ({ initial }) => {
-  const { data } = useSuspenseQuery(MeDocument);
-  const [user, setUser] = useState(data?.me ? data.me : initial);
-  const [logout, { client }] = useMutation(LogoutDocument);
   const router = useRouter();
+
+  const { data } = useSuspenseQuery(Navbar_MeDocument);
+  const [logout, { client }] = useMutation(AuthBox_LogoutDocument);
+
+  const [user, setUser] = useState(data?.me ? data.me : initial);
 
   useEffect(() => {
     if (data) setUser(data.me);
@@ -34,7 +43,7 @@ export const AuthBox: React.FC<Props> = ({ initial }) => {
   }
 
   return (
-    <div className={styles.box}>
+    <>
       {user ? (
         <>
           <NavLink href={`/user/${user.username}`} Icon={BiSolidUser} textPosition={"left"} iconSize={"1.15rem"}>
@@ -50,6 +59,6 @@ export const AuthBox: React.FC<Props> = ({ initial }) => {
           <NavLink href={"/login"} Icon={BiLogIn} iconSize={"1.15rem"} />
         </>
       )}
-    </div>
+    </>
   );
 };

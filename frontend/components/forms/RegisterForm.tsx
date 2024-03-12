@@ -1,7 +1,7 @@
 "use client";
 
-import { useMutation } from "@apollo/client";
-import { MeDocument, MeQuery, RegisterDocument } from "@/graphql/generated/graphql";
+import { gql, useMutation } from "@apollo/client";
+import { RegisterForm_RegisterDocument } from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
 import { useEffect } from "react";
 import Link from "next/link";
@@ -14,8 +14,24 @@ type FormValues = {
   password: string;
 };
 
+const RegisterMutation = gql`
+  mutation RegisterForm_Register($input: RegisterInput!) {
+    register(input: $input) {
+      user {
+        ...UserInfoFragment
+      }
+      errors {
+        code: __typename
+        ... on Error {
+          message
+        }
+      }
+    }
+  }
+`;
+
 export default function RegisterForm() {
-  const [registerUser] = useMutation(RegisterDocument);
+  const [registerUser] = useMutation(RegisterForm_RegisterDocument);
 
   const {
     register,
