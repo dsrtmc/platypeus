@@ -1,15 +1,20 @@
+"use client";
+
 import React, { useState } from "react";
 import styles from "./Test.module.css";
 import { HiMiniLanguage } from "react-icons/hi2";
 import { WORD_LISTS } from "@/utils/wordLists";
 import { LanguageList } from "@/components/test/LanguageList";
-import { Modal } from "@/components/Modal";
+// import { Modal } from "@/components/Modal";
 import { TestLanguage } from "@/shared/types/configTypes";
+import dynamic from "next/dynamic";
 
 interface Props {
   selectedLanguage: string;
   handleSelectLanguage: (language: TestLanguage) => void;
 }
+
+const Modal = dynamic(() => import("@/components/Modal").then((mod) => mod.Modal));
 
 export const LanguageSelection: React.FC<Props> = ({ selectedLanguage, handleSelectLanguage }) => {
   const [visibleModal, setVisibleModal] = useState(false);

@@ -3,18 +3,10 @@
 import { Word } from "@/components/test/Word";
 import { CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
 import {
-  ComponentProps,
   createElement,
   FC,
-  FunctionComponent,
   FunctionComponentElement,
   MutableRefObject,
-  ReactElement,
-  Reducer,
-  ReducerAction,
-  ReducerState,
-  ReducerWithoutAction,
-  Ref,
   useCallback,
   useEffect,
   useReducer,
@@ -22,9 +14,12 @@ import {
   useState,
 } from "react";
 import styles from "./Test.module.css";
-import { generateRandomString } from "@/utils/generateRandomString";
 import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
+import { generateRandomWords } from "@/utils/generateRandomWords";
+import { generateRandomString } from "@/utils/generateRandomString";
+
+const MAX_TEST_TIME = 60;
 
 interface Props {
   focused: boolean;
@@ -38,13 +33,8 @@ interface Props {
   mode: string;
   language: string;
 
-  /**
-   * Returns 0 if we're free to continue with our input handling;
-   * if we should prevent reading further inputs, returns a non-zero value.
-   * @param {KeyboardEvent} e - the global keyboard event
-   * @returns {number} 0 if all OK, non-0 value if we should stop handling inputs
-   */
-  onKeyDown: (e: globalThis.KeyboardEvent) => boolean;
+  onKeyDown: (e: globalThis.KeyboardEvent) => void;
+  preventInput: boolean;
   onPoolUpdate: (count: number, index?: number) => string[];
   handleFinish: () => void;
   handleChangeWpm: (wpm: number) => void;
@@ -94,6 +84,7 @@ export const Test: FC<Props> = ({
   mode,
   language,
   onKeyDown,
+  preventInput,
   onPoolUpdate,
   handleFinish,
   handleChangeWpm,
@@ -109,10 +100,9 @@ export const Test: FC<Props> = ({
   const [wordIndex, setWordIndex] = useState(-1);
   const [letterIndex, setLetterIndex] = useState(-1);
   const [lineSkip, setLineSkip] = useState(true);
-  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [wordPool, setWordPool] = useState<Array<FunctionComponentElement<typeof Word>>>([]);
   const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
-  const [visible, setVisible] = useState(false);
 
   // funniest type ever, gives a squiggly but passes the build stage? xD whereas if there's no squiggly, the build breaks? XD
   const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
@@ -217,10 +207,6 @@ export const Test: FC<Props> = ({
     setWordIndex(wordIndex + 1);
     setWordCount((wc) => wc + 1);
     setLetterIndex(0);
-
-    if (mode === "words" && wordIndex + 1 >= modeSetting) {
-      onFinish();
-    }
   }
 
   function moveForwardOneLetter(key: string) {
@@ -236,13 +222,6 @@ export const Test: FC<Props> = ({
     }
 
     setLetterIndex(letterIndex + 1);
-
-    // TODO: find a better spot for this? seems really really really really really really out of place
-    // could technically remove the `if` because it's never supposed to happen on a time-based test
-    const nextWord = wordsRef.current[wordIndex + 1];
-    if (letterIndex >= currentWord.children.length - 1 && !nextWord) {
-      onFinish();
-    }
   }
 
   function moveBackOneWord() {
@@ -329,7 +308,6 @@ export const Test: FC<Props> = ({
       const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
       setWordIndex(newIndex);
 
-      // TODO: FIX ACTUALLY UPDATING THE CONTENT
       dispatch({ content: content.concat(newWords) });
     }
   }
@@ -352,19 +330,19 @@ export const Test: FC<Props> = ({
     dispatch({ allWordsLength: allWordsLength });
 
     // if we ever somehow divide by 0 here we're in bigger trouble
-    dispatch({ accuracy: newCorrectCount / newNonEmptyCount });
+    dispatch({ accuracy: newCorrectCount / (newNonEmptyCount ?? 1) });
 
     handleChangeWpm(wpm);
   }
 
   function createWordElements(words: string[]) {
     return words.map(
-      (word) =>
+      (word, index) =>
         createElement(Word, {
-          word: word,
+          word,
+          wordIndex: index,
           ref: addToRefs,
-          // TODO: hmm u probably don't want random keys actually
-          key: `word-${generateRandomString(7)}`,
+          key: `${word}-${generateRandomString(7)}`, // TODO: stop using random
         }) as unknown as FunctionComponentElement<typeof Word>
     );
   }
@@ -374,9 +352,8 @@ export const Test: FC<Props> = ({
     setLetterIndex(0);
     setLineSkip(true);
     wordsRef.current = [];
-    dispatch(initialState);
     setWordPool(createWordElements(initialContent));
-    dispatch({ content: initialContent });
+    dispatch({ ...initialState, content: initialContent });
     if (wordsDivRef?.current) wordsDivRef.current!.focus();
   }
 
@@ -384,9 +361,9 @@ export const Test: FC<Props> = ({
   const handleKeyDown = useCallback(
     (e: globalThis.KeyboardEvent) => {
       if (e.key === " ") e.preventDefault();
+      if (preventInput) return;
+      onKeyDown(e);
       // TODO: maybe name it better xd
-      const result = onKeyDown(e);
-      if (result) return;
       if (e.key.length === 1) {
         if (e.ctrlKey && e.key !== "a") return;
         e.preventDefault();
@@ -410,7 +387,7 @@ export const Test: FC<Props> = ({
         }
       }
     },
-    [wordIndex, letterIndex, focused, running]
+    [wordIndex, letterIndex, focused, running, finished]
   );
 
   useEffect(() => {
@@ -420,6 +397,14 @@ export const Test: FC<Props> = ({
   useEffect(() => {
     const currentWord = wordsRef.current[wordIndex];
     if (!currentWord) return;
+
+    const nextWord = wordsRef.current[wordIndex + 1];
+    const shouldFinish =
+      (letterIndex > currentWord.children.length - 1 && !nextWord) || (mode === "words" && wordIndex >= modeSetting);
+
+    if (shouldFinish) {
+      onFinish();
+    }
 
     const currentLetter = currentWord.children[letterIndex];
     if (currentLetter) {
@@ -466,14 +451,10 @@ export const Test: FC<Props> = ({
   }
 
   useEffect(() => {
-    console.log("Running:", running);
-    console.log("Finished:", finished);
     if (running && !finished) {
       updateStats(timePassed);
 
-      // TODO: again, not sure if mode checking here is a good thing to do
-      // TODO: ↑ if we go with that, then -> (if mode === "words" && timePassed > 60) or something like that
-      if (mode === "time" && timePassed >= modeSetting) {
+      if (timePassed >= MAX_TEST_TIME || (mode === "time" && timePassed >= modeSetting)) {
         onFinish();
       }
     }
@@ -493,19 +474,10 @@ export const Test: FC<Props> = ({
     };
   }, [handleKeyDown, handleResize]);
 
-  // TODO: figure it out. the issue right now is that the component unmounts instantly without performing the animation which makes perfect sense, but that's not what we want.
-  useEffect(() => {
-    setVisible(true);
-    return () => {
-      setVisible(false);
-    };
-  }, []);
-
   // TODO: name xd
   // TODO: probably look at these refs here, innerRef and others.
   const wordsDivRef = useRef<HTMLDivElement | null>(null);
 
-  // TODO: not sure if I should keep it here, it kinda looks funky during races, so I guess move it to `TestBox`?
   return (
     <div className={styles.wordsWrapper} ref={innerRef}>
       <div className={styles.words} ref={wordsDivRef} tabIndex={-1}>

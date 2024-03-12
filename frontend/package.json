@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node ./scripts/generatePossibleTypes.js && next dev --turbo",
     "build": "node ./scripts/generatePossibleTypes.js && next build",
-    "start": "next start",
+    "start": "node ./scripts/generatePossibleTypes.js && next start",
     "lint": "next lint",
     "gen": "graphql-codegen --config codegen.ts"
   },

@@ -52,13 +52,11 @@ export function TestBox({ handleSaveScore }: Props) {
         restartButtonRef.current!.focus();
       }
     } else if (e.key.length === 1) {
-      if (finished || !focused) return true;
       if (!running) handleStart();
       if (restartButtonRef && restartButtonRef.current) {
         restartButtonRef.current!.blur();
       }
     }
-    return false;
   }
 
   function handleMouseUp(e: globalThis.MouseEvent) {
@@ -106,13 +104,12 @@ export function TestBox({ handleSaveScore }: Props) {
     setWpm(wpm);
   }
 
-  function initializePool(mode: string, modeSetting: number) {
+  function initializePool(mode: TestMode, modeSetting: number, language: TestLanguage) {
     let count = mode === "words" ? modeSetting : 50;
     setInitialContent(generateRandomWords(WORD_LISTS[language], count));
   }
 
   function handleReset() {
-    console.log("1");
     setMounted(true);
     setFocused(true);
     setFinished(false);
@@ -120,8 +117,7 @@ export function TestBox({ handleSaveScore }: Props) {
     setTimePassed(0);
     setWpm(0);
     setWordCount(0);
-    // TODO: maybe make that better somehow heh xd
-    initializePool(mode, modeSetting);
+    initializePool(mode, modeSetting, language);
     setTestKey((k) => k + 1); // Does a re-mount of `Test`, therefore causing a reset
   }
 
@@ -130,7 +126,6 @@ export function TestBox({ handleSaveScore }: Props) {
    * @param {string} count - The number of elements to add to the pool
    */
   function onPoolUpdate(count: number) {
-    // TODO: make it better
     const words: string[] = [];
     if (mode === "time") {
       for (let i = 0; i < count; i++) {
@@ -150,20 +145,21 @@ export function TestBox({ handleSaveScore }: Props) {
 
   // TODO: sit down one day and think about those useEffect()s, some of them here and in `Test.tsx` are likely to be unnecessary.
   useEffect(() => {
+    let newMode = mode;
+    let newModeSetting = modeSetting;
+    let newLanguage = language;
+
     const config = getConfig();
-    // TODO: fix this funny code lol
-    let _mode = mode;
-    let _modeSetting = modeSetting;
-    let _language = language;
     if (config) {
-      _mode = config.mode;
-      setMode(_mode);
-      _modeSetting = config[_mode];
-      setModeSetting(_modeSetting);
-      _language = config.language;
-      setLanguage(_language);
+      newMode = config.mode;
+      newModeSetting = config[newMode];
+      newLanguage = config.language;
+      setMode(newMode);
+      setModeSetting(newModeSetting);
+      setLanguage(newLanguage);
     }
-    initializePool(_mode, _modeSetting);
+
+    initializePool(mode, modeSetting, language);
     setVisible(true);
   }, []);
 
@@ -212,91 +208,86 @@ export function TestBox({ handleSaveScore }: Props) {
 
   // TODO: make sure a user cannot just sit in test for a million years and stack up an array with infinite length
 
-  if (visible) {
-    return (
-      <CSSTransition
-        nodeRef={ref as Ref<HTMLDivElement | undefined>}
-        in={true}
-        appear={true}
-        timeout={300}
-        classNames={{
-          appear: styles.boxAppear,
-          appearActive: styles.boxAppearActive,
-          appearDone: styles.boxAppearDone,
-        }}
-      >
-        <div className={styles.box} ref={ref}>
-          <section>
-            <TestConfig
-              language={language}
-              mode={mode}
+  if (!visible) return null;
+  return (
+    <CSSTransition
+      nodeRef={ref as Ref<HTMLDivElement | undefined>}
+      in={true}
+      appear={true}
+      timeout={300}
+      classNames={{
+        appear: styles.boxAppear,
+        appearActive: styles.boxAppearActive,
+        appearDone: styles.boxAppearDone,
+      }}
+    >
+      <div className={styles.box} ref={ref}>
+        <section>
+          <TestConfig
+            language={language}
+            mode={mode}
+            modeSetting={modeSetting}
+            handleSelectMode={handleSelectMode}
+            handleSelectLanguage={handleSelectLanguage}
+            handleSelectModeSetting={handleSelectModeSetting}
+          />
+        </section>
+        <section className={styles.top}>
+          <section className={styles.left}>
+            {mode === "time" ? (
+              <Timer time={modeSetting - timePassed} />
+            ) : (
+              <WordProgress count={wordCount} setting={modeSetting} />
+            )}
+            <Counter count={wpm} />
+          </section>
+        </section>
+        <section className={styles.middle}>
+          <CSSTransition
+            nodeRef={testRef as Ref<HTMLDivElement | undefined>}
+            in={mounted}
+            timeout={150}
+            classNames={{
+              enter: styles.wordsEnter,
+              enterActive: styles.wordsEnterActive,
+              enterDone: styles.wordsEnterDone,
+              exit: styles.wordsExit,
+              exitActive: styles.wordsExitActive,
+              exitDone: styles.wordsExitDone,
+            }}
+            onExited={() => handleReset()}
+          >
+            <Test
+              focused={focused}
+              running={running}
+              finished={finished}
+              timePassed={timePassed}
               modeSetting={modeSetting}
-              handleSelectMode={handleSelectMode}
-              handleSelectLanguage={handleSelectLanguage}
-              handleSelectModeSetting={handleSelectModeSetting}
+              startTime={testStartTime}
+              mode={mode}
+              language={language}
+              onKeyDown={handleKeyDown}
+              preventInput={finished || !focused}
+              onPoolUpdate={onPoolUpdate}
+              handleFinish={handleFinish}
+              handleChangeWpm={handleChangeWpm}
+              handleSaveScore={handleSaveScore}
+              setWordCount={setWordCount}
+              initialContent={initialContent}
+              innerRef={testRef}
+              key={testKey}
             />
-          </section>
-          <section className={styles.top}>
-            <section className={styles.left}>
-              {/* TODO: Is there a better way to handle checking the mode? */}
-              {mode === "time" ? (
-                <Timer time={modeSetting - timePassed} />
-              ) : (
-                <WordProgress count={wordCount} setting={modeSetting} />
-              )}
-              <Counter count={wpm} />
-            </section>
-          </section>
-          <section className={styles.middle}>
-            {/* TODO: eventually make it fade-in on the first render, not only on re-mount */}
-            <CSSTransition
-              nodeRef={testRef as Ref<HTMLDivElement | undefined>}
-              in={mounted}
-              timeout={150}
-              classNames={{
-                enter: styles.wordsEnter,
-                enterActive: styles.wordsEnterActive,
-                enterDone: styles.wordsEnterDone,
-                exit: styles.wordsExit,
-                exitActive: styles.wordsExitActive,
-                exitDone: styles.wordsExitDone,
-              }}
-              onExited={() => {
-                console.log("But we call reset :)");
-                handleReset();
-              }}
-            >
-              <Test
-                focused={focused}
-                running={running}
-                finished={finished}
-                timePassed={timePassed}
-                modeSetting={modeSetting}
-                startTime={testStartTime}
-                mode={mode}
-                language={language}
-                onKeyDown={handleKeyDown}
-                onPoolUpdate={onPoolUpdate}
-                handleFinish={handleFinish}
-                handleChangeWpm={handleChangeWpm}
-                handleSaveScore={handleSaveScore}
-                setWordCount={setWordCount}
-                initialContent={initialContent}
-                innerRef={testRef}
-                key={testKey}
-              />
-            </CSSTransition>
-          </section>
-          <section className={styles.bottom}>
-            <RestartButton
-              onReset={() => {
-                setMounted(false);
-              }}
-              ref={restartButtonRef}
-            />
-          </section>
-        </div>
-      </CSSTransition>
-    );
-  }
+          </CSSTransition>
+        </section>
+        <section className={styles.bottom}>
+          <RestartButton
+            onReset={() => {
+              setMounted(false);
+            }}
+            ref={restartButtonRef}
+          />
+        </section>
+      </div>
+    </CSSTransition>
+  );
 }

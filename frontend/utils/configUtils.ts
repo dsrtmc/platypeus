@@ -1,5 +1,6 @@
 import { ConfigType } from "@/shared/types/configTypes";
 import { THEMES } from "@/shared/constants/themes";
+import { config } from "dotenv";
 
 export const DEFAULT_CONFIG: ConfigType = {
   placeholder: "placeholder",
@@ -11,6 +12,7 @@ export const DEFAULT_CONFIG: ConfigType = {
   language: "english",
   fontFamily: "monospace",
   fontSize: 16,
+  wrapperWidth: 1000,
   testFontSizeMultiplier: 2,
 };
 
@@ -23,14 +25,10 @@ export function getConfig(): ConfigType | null {
   if (typeof window === "undefined") return null;
   let config: ConfigType | null = null;
 
-  // todo: could probably make it nicer with a clear head :P
   const configString = localStorage.getItem("config");
   if (configString) config = JSON.parse(configString);
 
-  if (!config) {
-    config = makeConfig();
-  }
-  return config;
+  return config ?? makeConfig();
 }
 
 export function setConfig(config: ConfigType) {

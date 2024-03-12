@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useEffect, useRef } from "react";
 import styles from "@/components/Modal.module.css";
 import { CSSTransition } from "react-transition-group";
+import { assertIsNode } from "@/utils/assertIsNode";
 
 interface Props {
   visible: boolean;

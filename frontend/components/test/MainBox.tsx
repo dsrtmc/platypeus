@@ -2,14 +2,19 @@
 
 import { FC, useState } from "react";
 import styles from "./Test.module.css";
-import { CreateScoreDocument, CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
+import {
+  CreateScoreDocument,
+  Score as ScoreType,
+  CreateScoreInput as CreateScoreInputType,
+} from "@/graphql/generated/graphql";
 import { ScoreBox } from "@/components/test/ScoreBox";
 import { TestBox } from "@/components/test/TestBox";
 import { useMutation } from "@apollo/client";
 
 interface Props {}
 
-const initialScoreInput: CreateScoreInputType = {
+const initialScoreInput: ScoreType = {
+  id: undefined,
   wpm: 0,
   rawWpm: 0,
   accuracy: 0,
@@ -19,17 +24,19 @@ const initialScoreInput: CreateScoreInputType = {
   wpmStats: [],
   rawStats: [],
   language: "",
+  createdAt: undefined,
+  updatedAt: undefined,
 };
 
 export const MainBox: FC<Props> = ({}) => {
-  const [scoreData, setScoreData] = useState<CreateScoreInputType>(initialScoreInput);
+  const [scoreData, setScoreData] = useState<ScoreType>(initialScoreInput);
   const [showScore, setShowScore] = useState(false);
 
   const [createScore] = useMutation(CreateScoreDocument);
 
   async function handleSaveScore(score: CreateScoreInputType) {
     // TODO: some validation of course, anti-cheat (LONG SHOT)
-    await createScore({
+    const response = await createScore({
       variables: {
         input: {
           wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
@@ -47,7 +54,7 @@ export const MainBox: FC<Props> = ({}) => {
     // setScoreData(response.data?.createScore.score);
     // TODO: ↑↑↑↑↑↑↑↑↑↑↑↑
     setShowScore(true);
-    setScoreData(score);
+    setScoreData(response.data?.createScore.score);
   }
 
   function handleStartNextTest() {

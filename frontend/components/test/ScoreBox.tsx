@@ -2,7 +2,7 @@
 
 import { FC, Ref, useEffect, useRef } from "react";
 import { RestartButton } from "@/components/test/RestartButton";
-import { CreateScoreInput as ScoreType } from "@/graphql/generated/graphql";
+import { Score as ScoreType } from "@/graphql/generated/graphql";
 import { Score } from "@/components/test/Score";
 import styles from "./Score.module.css";
 import { CSSTransition } from "react-transition-group";

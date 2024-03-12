@@ -23,6 +23,7 @@ import {
 } from "chart.js";
 import { PerformanceChartFallback } from "@/app/user/[username]/PerformanceChartFallback";
 import { CSSTransition } from "react-transition-group";
+import { ConfigCssVariables, ThemeCssVariables } from "@/shared/types/configTypes";
 
 interface Props {
   scores: UserPage_GetUserMonthlyScoreSummariesQuery["userMonthlyScoreSummaries"];
@@ -170,15 +171,16 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
   // TODO: use global variables as an enum?
   useEffect(() => {
     let style = getComputedStyle(document.body);
-    setFontFamily(style.getPropertyValue("font-family"));
-    setMainColor(style.getPropertyValue("--main-color"));
-    setSubColor(style.getPropertyValue("--sub-color"));
-    setSubAltColor(style.getPropertyValue("--sub-alt-color"));
+    setFontFamily(style.getPropertyValue(ConfigCssVariables.FontFamily));
+    setMainColor(style.getPropertyValue(ThemeCssVariables.MainColor));
+    setSubColor(style.getPropertyValue(ThemeCssVariables.SubColor));
+    setSubAltColor(style.getPropertyValue(ThemeCssVariables.SubAltColor));
     setVisible(true);
   }, []);
 
   const ref = useRef<HTMLDivElement | null>(null);
 
+  // TODO: fix this stupid font issue where it doesn't load until a rerender
   return (
     <CSSTransition
       nodeRef={ref as Ref<HTMLDivElement | undefined>}

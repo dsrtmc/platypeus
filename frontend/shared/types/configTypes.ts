@@ -10,6 +10,7 @@ export type ConfigType = {
   language: TestLanguage;
   fontFamily: string;
   fontSize: number;
+  wrapperWidth: number;
   testFontSizeMultiplier: number;
 };
 
@@ -38,3 +39,23 @@ export type ThemeCssVariablesType = {
   error: "--error-color";
   "extra error": "--error-extra-color";
 };
+
+export enum ConfigCssVariables {
+  FontFamily = "--font-family",
+  FontSize = "--font-size",
+  TestFontSizeMultiplier = "--test-font-size-multiplier",
+  WrapperWidth = "--wrapper-width",
+  CaretSpeed = "--caret-speed",
+  Roundness = "--roundness",
+}
+
+export enum ThemeCssVariables {
+  BackgroundColor = "--bg-color",
+  CaretColor = "--caret-color",
+  MainColor = "--main-color",
+  SubColor = "--sub-color",
+  SubAltColor = "--sub-alt-color",
+  TextColor = "--text-color",
+  ErrorColor = "--error-color",
+  ExtraErrorColor = "--error-extra-color",
+}

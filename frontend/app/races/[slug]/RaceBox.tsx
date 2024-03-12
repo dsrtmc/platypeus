@@ -36,14 +36,11 @@ interface Props {
 // The length of race start countdown in seconds
 const COUNTDOWN_TIME = 5;
 
-// TODO: ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ lowkey i like that idea.
-// TODO: Maybe we just load the race server-side first in `../page.tsx` and then we don't have to struggle w/ initial states here
 // TODO: add error handling whenever we execute a mutation (not just in this file)
 export const RaceBox: React.FC<Props> = ({ race }) => {
   const { data, loading, error } = useSubscription(OnRaceEventDocument, {
     variables: { raceId: race!.id, racersFirst: 10 },
   });
-  console.log("THE DATA:", data);
   const { data: meData } = useQuery(MeDocument);
 
   const [finishRaceForUser, {}] = useMutation(FinishRaceForUserDocument);
@@ -68,9 +65,13 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const [wordCount, setWordCount] = useState(0);
 
   // TODO: make it nicer, right now it returns true when we should prevent user input
-  function handleKeyDown(e: globalThis.KeyboardEvent): boolean {
-    return !data?.onRaceEvent.running || userHasFinished || !focused;
+  function handleKeyDown(e: globalThis.KeyboardEvent) {
+    if (!data?.onRaceEvent.running || userHasFinished || !focused) {
+      console.log("a");
+      e.stopPropagation();
+    }
   }
+
   // TODO: investigate those
   async function handleChangeWpm(wpm: number) {
     if (!meData?.me) return;
@@ -79,6 +80,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
       variables: { input: { raceId: race!.id, userId: meData.me.id, wpm, wordsTyped: wordCount } },
     });
   }
+
   // TODO: this type is funny, no shot i should be doing !s everywhere look it up bro maybe a DTO and shit xdddddddd
   async function handleSaveScore(score: Partial<ScoreType>) {
     // Prevents multiple saving of the same score (as well as attempting to save on re-entering, which would crash out)
@@ -256,6 +258,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           mode={data.onRaceEvent.mode}
           language={"english"}
           onKeyDown={handleKeyDown}
+          preventInput={!data?.onRaceEvent.running || userHasFinished || !focused}
           onPoolUpdate={onPoolUpdate}
           handleFinish={handleFinishForUser}
           handleChangeWpm={handleChangeWpm}
@@ -271,7 +274,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
             data.onRaceEvent.finished ||
             data.onRaceEvent.running ||
             data.onRaceEvent.started ||
-            !!data.onRaceEvent.racers?.edges ||
+            !data.onRaceEvent.racers?.edges ||
             data.onRaceEvent.racers!.edges!.length <= 0
           }
           handleStart={handleStart}

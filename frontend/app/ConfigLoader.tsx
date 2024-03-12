@@ -2,7 +2,8 @@
 
 import React, { useEffect } from "react";
 import { DEFAULT_CONFIG, getConfig, makeConfig, setConfig } from "@/utils/configUtils";
-import { ThemeCssVariablesType, ThemeConfigType } from "@/shared/types/configTypes";
+import { ThemeCssVariablesType, ThemeConfigType, ConfigCssVariables } from "@/shared/types/configTypes";
+import Config from "chart.js/dist/core/core.config";
 
 interface Props {}
 
@@ -25,9 +26,11 @@ export const ConfigLoader: React.FC<Props> = ({}) => {
     for (const property in config.themeConfig) {
       root.style.setProperty(property, config.themeConfig[property as keyof ThemeConfigType]);
     }
-    root.style.setProperty("--font-size", config.fontSize + "px");
-    root.style.setProperty("--test-font-size-multiplier", config.testFontSizeMultiplier.toString());
-    root.style.setProperty("--font-family", config.fontFamily);
+    root.style.setProperty(ConfigCssVariables.FontSize, config.fontSize + "px");
+    root.style.setProperty(ConfigCssVariables.TestFontSizeMultiplier, config.testFontSizeMultiplier.toString());
+    root.style.setProperty(ConfigCssVariables.FontFamily, config.fontFamily);
+
+    root.style.setProperty(ConfigCssVariables.WrapperWidth, config.wrapperWidth + "px");
 
     console.log("Config loaded.");
   }, []);

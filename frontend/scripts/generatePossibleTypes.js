@@ -19,7 +19,6 @@ const possibleTypesIntrospectionQuery = `
 // TODO: only in development, never do that in prod
 const agent = new https.Agent({ rejectUnauthorized: false });
 
-// TODO: .env
 fetch(process.env["NEXT_PUBLIC_API_URL"], {
   agent,
   method: "POST",
