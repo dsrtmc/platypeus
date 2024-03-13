@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
@@ -11,11 +12,15 @@ namespace Server.Schema.Mutations;
 [MutationType]
 public static class RacerMutations
 {
-    // TODO: make it cookie based again
-    public static async Task<MutationResult<Racer, InvalidUserError, InvalidRaceError, InvalidRacerError>> UpdateStatsForUser(
-        Guid userId, Guid raceId, DatabaseContext db, int wpm, int wordsTyped,
+    public static async Task<MutationResult<Racer, NotAuthenticatedError, InvalidUserError, InvalidRaceError, InvalidRacerError>> UpdateStats(
+        Guid raceId, DatabaseContext db, int wpm, int wordsTyped, IHttpContextAccessor accessor,
         [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
+        var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+        if (claim is null)
+            return new NotAuthenticatedError();
+
+        var userId = new Guid(claim.Value);
         var user = await db.Users.FindAsync(userId);
         if (user is null)
             return new InvalidUserError(userId);

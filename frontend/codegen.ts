@@ -6,7 +6,6 @@ const config: CodegenConfig = {
   schema: "../Server/schema.graphql",
   documents: ["graphql/src/**/*.graphql", "app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
   generates: {
-    // TODO: i like doing "__generated__" more i think
     "graphql/generated/": {
       preset: "client",
       plugins: [],

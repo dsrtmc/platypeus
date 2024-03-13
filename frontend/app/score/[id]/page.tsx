@@ -1,9 +1,20 @@
 import { getClient } from "@/lib/client";
-import { GetScoreDocument } from "@/graphql/generated/graphql";
+import { ScorePage_GetScoreDocument } from "@/graphql/generated/graphql";
+import { gql } from "@apollo/client";
+
+const GetScore = gql`
+  query ScorePage_GetScore($where: ScoreFilterInput) {
+    score(where: $where) {
+      id
+      wpm
+      rawWpm
+    }
+  }
+`;
 
 export default async function ScorePage({ params }: { params: { id: string } }) {
   const { data } = await getClient().query({
-    query: GetScoreDocument,
+    query: ScorePage_GetScoreDocument,
     variables: {
       where: {
         id: {

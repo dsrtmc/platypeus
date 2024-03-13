@@ -8,8 +8,13 @@
 .chatbox {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     margin: auto;
     gap: 1rem;
+    height: 15rem;
+    width: 100%;
+    color: var(--sub-color);
 }
 
 .textarea {
@@ -120,7 +125,8 @@
     overflow-x: auto;
     overflow-y: scroll;
     word-break: break-word;
-    height: 10rem;
+    height: 100%;
+    width: 100%;
 }
 
 .messageList {
@@ -131,6 +137,10 @@
 }
 
 .message {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: .5rem;
     color: var(--sub-color);
 }
 
@@ -148,6 +158,7 @@
 
 .bottom {
     display: flex;
+    width: 100%;
 }
 
 .startRaceButton {
@@ -213,4 +224,22 @@
     flex: 0;
     min-width: 10ch;
     background-color: slategray;
+}
+
+.spinner {
+    color: var(--sub-color);
+    animation: spin 500ms linear infinite;
+    font-size: 2rem;
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
 }

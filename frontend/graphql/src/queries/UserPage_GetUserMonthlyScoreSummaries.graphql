@@ -1,8 +1,0 @@
-query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {
-    userMonthlyScoreSummaries(userId: $userId) {
-        wpm
-        rawWpm
-        accuracy
-        date
-    }
-}

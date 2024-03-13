@@ -18,7 +18,7 @@ const Me = gql`
   query Navbar_Me {
     me {
       id
-      ...UserInfoFragment
+      ...UserInfo
     }
   }
 `;

@@ -9,16 +9,15 @@ interface Props {
 }
 
 export const ModeSelection: React.FC<Props> = ({ selectedMode, handleSelectMode }) => {
+  const selection: Array<TestMode> = ["time", "words"];
   function onSelectMode(mode: TestMode) {
     return () => handleSelectMode(mode);
   }
   return (
     <div className={styles.modeSelection}>
-      {/* TODO: dynamic */}
-      <ModeButton mode={"time"} selected={"time" === selectedMode} onSelect={onSelectMode} />
-      <ModeButton mode={"words"} selected={"words" === selectedMode} onSelect={onSelectMode} />
-      {/*<button onClick={onSelectMode("time")}>time</button>*/}
-      {/*<button onClick={onSelectMode("words")}>words</button>*/}
+      {selection.map((mode) => (
+        <ModeButton mode={mode} selected={mode === selectedMode} onSelect={onSelectMode} />
+      ))}
     </div>
   );
 };

@@ -4,14 +4,14 @@ import { forwardRef } from "react";
 interface Props {
   x: number;
   y: number;
-  running: boolean;
-  focused: boolean;
+  blinking: boolean;
+  hidden: boolean;
 }
 
-export const Caret = forwardRef<HTMLDivElement, Props>(({ x, y, running, focused }, ref) => {
+export const Caret = forwardRef<HTMLDivElement, Props>(({ x, y, blinking, hidden }, ref) => {
   return (
     <div
-      className={`${styles.caret} ${!running && styles.blinking} ${!focused && styles.hidden}`}
+      className={`${styles.caret} ${!blinking && styles.blinking} ${!hidden && styles.hidden}`}
       style={{ left: x, top: y }}
       ref={ref}
     />

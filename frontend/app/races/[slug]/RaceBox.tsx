@@ -12,7 +12,7 @@ import {
   RaceBox_OnRaceEventDocument,
   RaceBox_RunRaceDocument,
   RaceBox_StartRaceDocument,
-  RaceBox_UpdateStatsForUserDocument,
+  RaceBox_UpdateStatsDocument,
   RacePage_GetRaceQuery,
   Score as ScoreType,
 } from "@/graphql/generated/graphql";
@@ -43,7 +43,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const { data: meData } = useQuery(RaceBox_MeDocument);
 
   const [finishRaceForUser, {}] = useMutation(RaceBox_FinishRaceForUserDocument);
-  const [updateStatsForUser, {}] = useMutation(RaceBox_UpdateStatsForUserDocument);
+  const [updateStats, {}] = useMutation(RaceBox_UpdateStatsDocument);
   const [finishRace, {}] = useMutation(RaceBox_FinishRaceDocument);
   const [joinRace, {}] = useMutation(RaceBox_JoinRaceDocument);
   const [leaveRace, {}] = useMutation(RaceBox_LeaveRaceDocument);
@@ -75,8 +75,8 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   async function handleChangeWpm(wpm: number) {
     if (!meData?.me) return;
     if (userHasFinished) return;
-    await updateStatsForUser({
-      variables: { input: { raceId: race!.id, userId: meData.me.id, wpm, wordsTyped: wordCount } },
+    await updateStats({
+      variables: { input: { raceId: race!.id, wpm, wordsTyped: wordCount } },
     });
   }
 
@@ -126,17 +126,16 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
    * Returns n elements to be added to the word pool while removing the first n elements
    * to account for index differences between `Test`'s content and this one.
    * @param {string} count - The count of elements to add to the pool
-   * @param {number} index - If using a static word pool, the index from which to start adding words
    */
   // TODO: fix this shit doesnt even work lmao TOP PRIORITY
-  function onPoolUpdate(count: number, index?: number): string[] {
+  function onPoolUpdate(count: number): string[] {
     if (!content) return [];
-    const copy = content.slice(index);
+    const copy = content.slice(count);
     const words: string[] = [];
-    // for (let i = LOADED_WORDS_COUNT - count; i < LOADED_WORDS_COUNT; i++) {
-    //   if (copy[i]) words.push(copy[i]);
-    // }
-    words.push(...copy.slice(index, count + index!));
+    for (let i = LOADED_WORDS_COUNT - count; i < LOADED_WORDS_COUNT; i++) {
+      if (copy[i]) words.push(copy[i]);
+    }
+    // words.push(...copy.slice(index, count + index!));
     setContent(copy);
     return words;
   }
@@ -231,11 +230,13 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   // ↑ dont read this
   if (loading) return <p>loading race data...</p>;
   if (error) return <p>error: {JSON.stringify(error)}</p>;
-  if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>;
+  // if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>; // why did i do if (!meData?.me)?
+  if (!data?.onRaceEvent) return <p>no data</p>;
   return (
     <div className={styles.raceBox}>
       {meData &&
         meData.me &&
+        !data.onRaceEvent.started &&
         !data.onRaceEvent.running &&
         (!data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id) ? (
           <JoinRaceButton handleJoinRace={handleJoinRace} />
@@ -269,14 +270,13 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         />
       </div>
       {data?.onRaceEvent.host.id === meData?.me?.id && (
-        // TODO: looks like the length doesn't get updated the way it should? useState??????? LOL!!!!!!!!!!! love react
         <StartRaceButton
           disabled={
             data.onRaceEvent.finished ||
             data.onRaceEvent.running ||
             data.onRaceEvent.started ||
             !data.onRaceEvent.racers?.edges ||
-            data.onRaceEvent.racers!.edges!.length <= 0
+            data.onRaceEvent.racers!.edges!.length <= 0 // TODO: set to 1 before deploy
           }
           handleStart={handleStart}
         />
@@ -296,7 +296,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
       <h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.started ? "true" : "false"}</h1>
       <h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>
       <div className={styles.hr} />
-      <Chatbox chatboxId={data.onRaceEvent.chatboxId} meData={meData} />
+      <Chatbox chatboxId={data.onRaceEvent.chatboxId} me={meData?.me} />
     </div>
   );
 };

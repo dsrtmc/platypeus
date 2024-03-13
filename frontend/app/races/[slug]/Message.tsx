@@ -11,7 +11,7 @@ export const Message: React.FC<Props> = ({ message, viewerName }) => {
   return (
     <li className={styles.message}>
       <span className={message.author.username === viewerName ? styles.me : styles.author}>
-        {message.author.username}:&nbsp;
+        {message.author.username}:
       </span>
       <span className={styles.content}>{message.content}</span>
     </li>

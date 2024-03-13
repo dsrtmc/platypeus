@@ -4,7 +4,7 @@ const Me = gql`
   query RaceBox_Me {
     me {
       id
-      ...UserInfoFragment
+      ...UserInfo
     }
   }
 `;
@@ -60,9 +60,9 @@ const FinishRaceForUser = gql`
   }
 `;
 
-const UpdateStatsForUser = gql`
-  mutation RaceBox_UpdateStatsForUser($input: UpdateStatsForUserInput!) {
-    updateStatsForUser(input: $input) {
+const UpdateStats = gql`
+  mutation RaceBox_UpdateStats($input: UpdateStatsInput!) {
+    updateStats(input: $input) {
       racer {
         id
       }

@@ -18,7 +18,7 @@ const RegisterMutation = gql`
   mutation RegisterForm_Register($input: RegisterInput!) {
     register(input: $input) {
       user {
-        ...UserInfoFragment
+        ...UserInfo
       }
       errors {
         code: __typename

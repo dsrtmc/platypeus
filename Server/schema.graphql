@@ -149,7 +149,7 @@ type Mutation {
   joinRace(input: JoinRaceInput!): JoinRacePayload! @cost(complexity: 5)
   leaveRace(input: LeaveRaceInput!): LeaveRacePayload! @cost(complexity: 5)
   createRace(input: CreateRaceInput!): CreateRacePayload! @cost(complexity: 5)
-  updateStatsForUser(input: UpdateStatsForUserInput!): UpdateStatsForUserPayload! @cost(complexity: 5)
+  updateStats(input: UpdateStatsInput!): UpdateStatsPayload! @cost(complexity: 5)
   finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload! @cost(complexity: 5)
   createScore(input: CreateScoreInput!): CreateScorePayload! @cost(complexity: 5)
   deleteUser(input: DeleteUserInput!): DeleteUserPayload! @cost(complexity: 5)
@@ -355,9 +355,9 @@ type TooFewRacersError implements Error {
   message: String!
 }
 
-type UpdateStatsForUserPayload {
+type UpdateStatsPayload {
   racer: Racer
-  errors: [UpdateStatsForUserError!] @cost(complexity: 5)
+  errors: [UpdateStatsError!] @cost(complexity: 5)
 }
 
 type User {
@@ -423,7 +423,7 @@ union SendMessageError = NotAuthenticatedError | InvalidChatboxError
 
 union StartRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError | RaceAlreadyRunningError | TooFewRacersError
 
-union UpdateStatsForUserError = InvalidUserError | InvalidRaceError | InvalidRacerError
+union UpdateStatsError = NotAuthenticatedError | InvalidUserError | InvalidRaceError | InvalidRacerError
 
 input BooleanOperationFilterInput {
   eq: Boolean
@@ -708,8 +708,7 @@ input StringOperationFilterInput {
   nendsWith: String
 }
 
-input UpdateStatsForUserInput {
-  userId: UUID!
+input UpdateStatsInput {
   raceId: UUID!
   wpm: Int!
   wordsTyped: Int!

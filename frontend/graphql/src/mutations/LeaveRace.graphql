@@ -1,7 +1,0 @@
-mutation LeaveRace($input: LeaveRaceInput!) {
-    leaveRace(input: $input) {
-        race {
-            id
-        }
-    }
-}

@@ -13,7 +13,7 @@ const Me = gql`
   query RacesPage_Me {
     me {
       id
-      ...UserInfoFragment
+      ...UserInfo
     }
   }
 `;

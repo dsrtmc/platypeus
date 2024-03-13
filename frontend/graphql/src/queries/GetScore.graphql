@@ -1,7 +1,0 @@
-query GetScore($where: ScoreFilterInput) {
-    score(where: $where) {
-        id
-        wpm
-        rawWpm
-    }
-}

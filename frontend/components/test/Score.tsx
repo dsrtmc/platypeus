@@ -44,7 +44,6 @@ export const Score: FC<Props> = ({ score }) => {
         </div>
         <div className={`${styles.group} ${styles.last}`}>
           <div className={styles.top}>content</div>
-          {/* TODO: xd fix ^  IH :) I HATE CSS I HATE CSS */}
           <div className={`${styles.bottom} ${styles.content}`}>{score.content}</div>
         </div>
       </div>

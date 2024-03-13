@@ -186,7 +186,7 @@ public static class RaceMutations
         if (race is null)
             return new InvalidRaceError(raceId);
 
-        if (race.Running)
+        if (race.Started || race.Running)
             return new RaceIsRunningError();
 
         var racer = race.Racers.FirstOrDefault(r => r.User.Id == userId);

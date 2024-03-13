@@ -19,7 +19,7 @@ const LoginMutation = gql`
     login(input: $input) {
       user {
         id
-        ...UserInfoFragment
+        ...UserInfo
       }
       errors {
         code: __typename

@@ -3,20 +3,53 @@
 import React, { FC, KeyboardEvent, useRef } from "react";
 import styles from "./Race.module.css";
 import {
-  MeQuery,
-  OnChatboxEventDocument,
+  Chatbox_OnChatboxEventDocument,
+  Chatbox_SendMessageDocument,
   OnRaceEventSubscription,
-  SendMessageDocument
+  UserInfoFragment,
 } from "@/graphql/generated/graphql";
-import { useMutation, useSubscription } from "@apollo/client";
+import { gql, useMutation, useSubscription } from "@apollo/client";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { IoSend } from "react-icons/io5";
 import { Message } from "@/app/races/[slug]/Message";
 import TextareaAutosize from "react-textarea-autosize";
+import { ChatboxFallback } from "@/app/races/[slug]/ChatboxFallback";
+
+const OnChatboxEvent = gql`
+  subscription Chatbox_OnChatboxEvent($chatboxId: UUID!, $messagesLast: Int) {
+    onChatboxEvent(chatboxId: $chatboxId) {
+      messages(last: $messagesLast) {
+        edges {
+          node {
+            id
+            author {
+              username
+            }
+            content
+            createdAt
+          }
+        }
+      }
+    }
+  }
+`;
+
+const SendMessage = gql`
+  mutation Chatbox_SendMessage($input: SendMessageInput!) {
+    sendMessage(input: $input) {
+      message {
+        content
+        chatbox {
+          id
+        }
+      }
+    }
+  }
+`;
 
 interface Props {
   chatboxId: OnRaceEventSubscription["onRaceEvent"]["chatboxId"];
-  meData: MeQuery; // TODO: probably stupid? idk maybe not LOL idk maybe
+  me?: UserInfoFragment | null;
 }
 
 const maxMessageLength = 200;
@@ -25,15 +58,16 @@ type FormValues = {
   content: string;
 };
 
-export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
-  const { data, loading, error } = useSubscription(OnChatboxEventDocument, {
+export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
+  console.log("Me:", me);
+  const { data, loading, error } = useSubscription(Chatbox_OnChatboxEventDocument, {
     variables: {
       chatboxId,
       messagesLast: 50,
     },
   });
 
-  const [sendMessage, _] = useMutation(SendMessageDocument);
+  const [sendMessage, _] = useMutation(Chatbox_SendMessageDocument);
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -47,6 +81,11 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
     defaultValues: {
       content: "",
     },
+  });
+
+  const { ref, ...rest } = register("content" as FieldPath<FormValues>, {
+    required: true,
+    maxLength: { value: maxMessageLength, message: "You've hit the 200 character count limit." },
   });
 
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
@@ -70,37 +109,40 @@ export const Chatbox: FC<Props> = ({ chatboxId, meData }) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSubmit(onSubmit)();
+    } else if (e.key === "Escape") {
+      if (textareaRef.current) textareaRef.current.blur();
     }
   }
 
-  // TODO: look up all `if (!data)` or `if (loading)` and make them look nicer
-  if (!data) return <div>no data yet</div>;
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  if (loading) return <ChatboxFallback />;
+  if (!data) return <div className={styles.chatbox}>there was an issue with retrieving the chatbox.</div>;
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.chatbox}>
       <div className={styles.messageListWrapper} ref={wrapperRef}>
         <ul className={styles.messageList}>
           {data?.onChatboxEvent.messages?.edges!.map((edge) => (
-            // TODO: colors xd
-            <Message message={edge.node} viewerName={meData.me?.username} key={edge.node.id} />
+            <Message message={edge.node} viewerName={me?.username} key={edge.node.id} />
           ))}
         </ul>
       </div>
       <div className={styles.bottom}>
-        {/* TODO: `.blur()` on Escape click, however if I pass a ref here some funny stuff happens and it crashes */}
-        {/* TODO: for some reason we have spell check LOL? */}
         <TextareaAutosize
           maxRows={3}
-          placeholder={meData.me ? "Message the group" : "Log in to use the chatroom"}
-          disabled={!meData.me}
+          placeholder={me ? "Message the group" : "Log in to use the chatroom"}
+          disabled={!me}
           onKeyDown={handleKeyDown}
-          {...register("content" as FieldPath<FormValues>, {
-            required: true,
-            maxLength: { value: maxMessageLength, message: "You've hit the 200 character count limit." },
-          })}
+          ref={(e) => {
+            ref(e);
+            textareaRef.current = e;
+          }}
+          {...rest}
           aria-invalid={errors.content ? "true" : "false"}
+          spellCheck={false}
           className={styles.textarea}
         />
-        <button type={"submit"} className={styles.sendButton} disabled={!meData.me}>
+        <button type={"submit"} className={styles.sendButton} disabled={!me}>
           <IoSend />
         </button>
       </div>

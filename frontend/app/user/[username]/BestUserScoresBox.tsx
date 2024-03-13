@@ -2,10 +2,23 @@
 
 import React, { Suspense, useState } from "react";
 import { UserPage_GetUserQuery, UserPage_GetUsersBestScoresDocument } from "@/graphql/generated/graphql";
-import { useSuspenseQuery } from "@apollo/client";
+import { gql, useSuspenseQuery } from "@apollo/client";
 import { BestUserScoreCard } from "@/app/user/[username]/BestUserScoreCard";
 import styles from "./User.module.css";
 import { SelectModeButton } from "@/app/user/[username]/SelectModeButton";
+
+const GetUsersBestScores = gql`
+  query UserPage_GetUsersBestScores($userId: UUID!, $mode: String!, $modeSettings: [Int!]!) {
+    usersBestScores(userId: $userId, mode: $mode, modeSettings: $modeSettings) {
+      wpm
+      rawWpm
+      mode
+      modeSetting
+      accuracy
+      createdAt
+    }
+  }
+`;
 
 interface Props {
   user: NonNullable<UserPage_GetUserQuery["user"]>;

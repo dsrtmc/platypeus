@@ -1,7 +1,0 @@
-mutation JoinRace($input: JoinRaceInput!) {
-    joinRace(input: $input) {
-        race {
-            id
-        }
-    }
-}

@@ -1,11 +1,11 @@
 import React from "react";
-import { GetRacesQuery } from "@/graphql/generated/graphql";
 import Link from "next/link";
 import styles from "./Races.module.css";
 import { RaceJoinLink } from "@/app/races/RaceJoinLink";
+import { RaceList_GetRacesQuery } from "@/graphql/generated/graphql";
 
 interface Props {
-  race: NonNullable<NonNullable<GetRacesQuery["races"]>["edges"]>[number]["node"]; // the funniest type known to man
+  race: NonNullable<NonNullable<RaceList_GetRacesQuery["races"]>["edges"]>[number]["node"]; // the funniest type known to man
 }
 
 export const RaceListItem: React.FC<Props> = ({ race }) => {

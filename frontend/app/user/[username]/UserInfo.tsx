@@ -5,7 +5,7 @@ interface Props {
   user: NonNullable<UserPage_GetUserQuery["user"]>;
 }
 
-export default async function UserInfo({ user }: Props) {
+export default function UserInfo({ user }: Props) {
   return (
     <div className={styles.userInfo}>
       <div className={styles.userStats}>

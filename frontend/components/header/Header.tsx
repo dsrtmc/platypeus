@@ -9,6 +9,7 @@ export const Header: React.FC<Props> = ({}) => {
   return (
     <header className={styles.header}>
       <Logo />
+      {/* ignore this error, using the `@ts-expect-error` directive throws a build error lol */}
       <Navbar />
     </header>
   );

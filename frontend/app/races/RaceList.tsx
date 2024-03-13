@@ -1,9 +1,9 @@
 "use client";
 
 import React, { startTransition, useCallback } from "react";
-import { GetRacesDocument, GetRacesQueryVariables, RaceSortInput } from "@/graphql/generated/graphql";
+import { RaceList_GetRacesDocument, RaceList_GetRacesQueryVariables, RaceSortInput } from "@/graphql/generated/graphql";
 import styles from "./Races.module.css";
-import { useSuspenseQuery } from "@apollo/client";
+import { gql, useSuspenseQuery } from "@apollo/client";
 import { RaceListItem } from "@/app/races/RaceListItem";
 import { RaceListRefreshButton } from "@/app/races/RaceListRefreshButton";
 import { RaceListEmptyMessage } from "@/app/races/RaceListEmptyMessage";
@@ -11,14 +11,55 @@ import { start } from "repl";
 
 interface Props {}
 
+const GetRaces = gql`
+  query RaceList_GetRaces(
+    $after: String
+    $before: String
+    $racesFirst: Int
+    $racesLast: Int
+    $order: [RaceSortInput!]
+    $where: RaceFilterInput
+    $racersFirst: Int
+  ) {
+    races(after: $after, before: $before, first: $racesFirst, last: $racesLast, order: $order, where: $where) {
+      edges {
+        node {
+          id
+          createdAt
+          racers(first: $racersFirst) {
+            edges {
+              node {
+                user {
+                  username
+                }
+                wpm
+              }
+            }
+          }
+          host {
+            username
+          }
+          unlisted
+          slug
+          finished
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export function RaceList({}) {
-  const variables: GetRacesQueryVariables = {
+  const variables: RaceList_GetRacesQueryVariables = {
     where: { and: [{ running: { eq: false } }, { finished: { eq: false } }, { unlisted: { eq: false } }] },
     order: [{ createdAt: "DESC" }] as RaceSortInput,
     racesFirst: 10,
     racersFirst: 10,
   };
-  const { data, error, refetch, fetchMore } = useSuspenseQuery(GetRacesDocument, {
+  const { data, error, refetch, fetchMore } = useSuspenseQuery(RaceList_GetRacesDocument, {
     variables,
   });
   async function handleRefetch() {
@@ -30,7 +71,7 @@ export function RaceList({}) {
   async function handleFetchMore() {
     startTransition(() => {
       fetchMore({
-        variables: { ...variables, after: data?.races?.pageInfo.endCursor } as GetRacesQueryVariables,
+        variables: { ...variables, after: data?.races?.pageInfo.endCursor } as RaceList_GetRacesQueryVariables,
         updateQuery: (previousQueryResult, { fetchMoreResult }) => {
           // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
           if (!fetchMoreResult) return previousQueryResult;

@@ -16,7 +16,6 @@ import {
 import styles from "./Test.module.css";
 import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
-import { generateRandomWords } from "@/utils/generateRandomWords";
 import { generateRandomString } from "@/utils/generateRandomString";
 
 const MAX_TEST_TIME = 60;
@@ -35,7 +34,7 @@ interface Props {
 
   onKeyDown: (e: globalThis.KeyboardEvent) => void;
   preventInput: boolean;
-  onPoolUpdate: (count: number, index?: number) => string[];
+  onPoolUpdate: (count: number) => string[];
   handleFinish: () => void;
   handleChangeWpm: (wpm: number) => void;
   handleSaveScore: (score: CreateScoreInputType) => void;
@@ -93,7 +92,6 @@ export const Test: FC<Props> = ({
   innerRef,
   initialContent,
 }) => {
-  // TODO: for some reason raw seems weird on 30s test || NOTE: could not replicate, it all seems fine.
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
 
@@ -102,7 +100,7 @@ export const Test: FC<Props> = ({
   const [lineSkip, setLineSkip] = useState(true);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [wordPool, setWordPool] = useState<Array<FunctionComponentElement<typeof Word>>>([]);
-  const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
+  const [caretPosition, setCaretPosition] = useState({ x: 500, y: 500 });
 
   // funniest type ever, gives a squiggly but passes the build stage? xD whereas if there's no squiggly, the build breaks? XD
   const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
@@ -287,39 +285,36 @@ export const Test: FC<Props> = ({
     const nextWord = wordsRef.current[wordIndex + 1];
     if (!nextWord) return;
     if (currentWord.getBoundingClientRect().y < nextWord.getBoundingClientRect().y) {
-      // if (lineSkip) {
-      //   const newWordPool = wordPool.slice();
-      //   const newWords = onPoolUpdate(wordIndex, 0);
-      //   newWordPool.push(...createWordElements(newWords));
-      //
-      //   setWordPool(newWordPool);
-      //
-      //   dispatch({ content: content.concat(newWords) });
-      //
-      //   setLineSkip(false);
-      // } else {
-      if (!lineSkip) {
-        setLineSkip(true);
-        return;
+      if (lineSkip) {
+        const newWordPool = wordPool.slice();
+        const newWords = onPoolUpdate(wordIndex);
+        newWordPool.push(...createWordElements(newWords));
+
+        setWordPool(newWordPool);
+
+        dispatch({ content: content.concat(newWords) });
+
+        setLineSkip(false);
+      } else {
+        let numberOfWordsToAddToPool = 0;
+        let i = 0;
+        while (wordsRef.current[i].getBoundingClientRect().y < currentWord.getBoundingClientRect().y && i < wordIndex) {
+          numberOfWordsToAddToPool++;
+          i++;
+        }
+
+        wordsRef.current.splice(0, numberOfWordsToAddToPool);
+
+        const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
+        const newWords = onPoolUpdate(numberOfWordsToAddToPool);
+        newWordPool.push(...createWordElements(newWords));
+
+        setWordPool(newWordPool);
+        const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
+        setWordIndex(newIndex);
+
+        dispatch({ content: content.concat(newWords) });
       }
-      let numberOfWordsToAddToPool = 0;
-      let i = 0;
-      while (wordsRef.current[i].getBoundingClientRect().y < currentWord.getBoundingClientRect().y && i < wordIndex) {
-        numberOfWordsToAddToPool++;
-        i++;
-      }
-
-      wordsRef.current.splice(0, numberOfWordsToAddToPool);
-
-      const newWordPool = wordPool.slice(numberOfWordsToAddToPool);
-      const newWords = onPoolUpdate(numberOfWordsToAddToPool, wordIndex);
-      newWordPool.push(...createWordElements(newWords));
-
-      setWordPool(newWordPool);
-      const newIndex = wordIndex - numberOfWordsToAddToPool + 1;
-      setWordIndex(newIndex);
-
-      dispatch({ content: content.concat(newWords) });
     }
   }
 
@@ -494,7 +489,7 @@ export const Test: FC<Props> = ({
       <div className={styles.words} ref={wordsDivRef} tabIndex={-1}>
         {wordPool.map((word) => word)}
       </div>
-      <Caret x={caretPosition.x} y={caretPosition.y} running={running} focused={focused} ref={caretRef} />
+      <Caret x={caretPosition.x} y={caretPosition.y} blinking={running} hidden={focused} ref={caretRef} />
     </div>
   );
 };

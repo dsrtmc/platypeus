@@ -8,7 +8,7 @@ const Me = gql`
   query Login_Me {
     me {
       id
-      ...UserInfoFragment
+      ...UserInfo
     }
   }
 `;

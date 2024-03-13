@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "@/components/test/Score.module.css";
 import { Line } from "react-chartjs-2";
-import type { CreateScoreInput as CreateScoreInputType, MainBoxCreateScoreFragment } from "@/graphql/generated/graphql";
+import type { ScoreInfoFragment } from "@/graphql/generated/graphql";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -23,7 +23,7 @@ import {
 } from "chart.js";
 
 interface Props {
-  score: MainBoxCreateScoreFragment;
+  score: ScoreInfoFragment;
 }
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
@@ -75,6 +75,7 @@ export const ScoreChart: React.FC<Props> = ({ score }) => {
         ticks: {
           ...ticks,
           color: subColor,
+          maxTicksLimit: 15,
         },
         title: {
           display: true,

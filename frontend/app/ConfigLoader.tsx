@@ -7,11 +7,6 @@ import Config from "chart.js/dist/core/core.config";
 
 interface Props {}
 
-/*
- * NOTE: Not sure whether that component is required, but for now I think it's
- * a good way to ensure something happens on every page on the client,
- * after the server-side render.
- */
 export const ConfigLoader: React.FC<Props> = ({}) => {
   useEffect(() => {
     let config = getConfig();

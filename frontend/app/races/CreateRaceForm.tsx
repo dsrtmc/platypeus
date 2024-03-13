@@ -43,7 +43,6 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     register,
     handleSubmit,
     formState: { errors },
-    setFocus,
     watch,
     setValue,
   } = useForm<FormValues>({
@@ -54,14 +53,9 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     },
   });
 
-  // TODO: move it somewhere else?
   function generateContent(mode: "time" | "words", modeSetting: number): string {
-    switch (mode) {
-      case "time":
-        return generateRandomWords(WORD_LISTS["english"], 7 * modeSetting).join(" ");
-      case "words":
-        return generateRandomWords(WORD_LISTS["english"], modeSetting).join(" ");
-    }
+    const count = mode === "time" ? 7 * modeSetting : modeSetting;
+    return generateRandomWords(WORD_LISTS["english"], count).join(" ");
   }
 
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
@@ -72,10 +66,6 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
           unlisted: data.unlisted,
           mode: data.mode,
           modeSetting: parseInt(data.modeSetting),
-          // TODO: is that a good idea to just use a string? :/
-          // the issue is that we have to de-stringify it later anyways, but idk another way to carry it over
-          // IF WE DO USE A STRING, REMEMBER TO ADJUST CSS FOR `Score.tsx` SO THAT IF SOMEONE'S MODE SETTING
-          // IS 1000, IT DOESN'T BREAK THE LAYOUT.
           content: generateContent(data.mode, parseInt(data.modeSetting)),
         },
       },
@@ -86,9 +76,11 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     router.push(`/races/${response.data?.createRace.race?.slug}`);
   };
 
-  // TODO: apparently you're not supposed to use `watch()` inside of the useEffect()'s dependency array,
-  // but the docs only mention optimization, and this is not an issue here at all.
-  // Also, its only purpose is to avoid discrepancy between the "selected" setting (UI) and the actually selected one.
+  /*
+   * TODO: apparently you're not supposed to use `watch()` inside of the useEffect()'s dependency array,
+   * but the docs only mention optimization, and this is not an issue here at all.
+   * also, its only purpose is to avoid discrepancy between the "selected" setting (UI) and the actually selected one.
+   */
   useEffect(() => {
     setValue("modeSetting", "5");
   }, [watch("mode")]);
@@ -135,9 +127,6 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
             </label>
           </>
         ) : (
-          // TODO: Even though when selecting "word" and "25" being selected, it is not actually registered
-          // ^^^^^ and it stays at 5. FIX THIS FIX THIS VERY IMPORTANT!
-          // words
           <>
             <label className={styles.label}>
               <div className={styles.radioWrapper}>

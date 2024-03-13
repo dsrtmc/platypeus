@@ -9,7 +9,7 @@ import { gql, useSuspenseQuery } from "@apollo/client";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
 import Link from "next/link";
 
-const GetScoresForLeaderboardQuery = gql`
+const GetScoresForLeaderboard = gql`
   query Leaderboard_GetScoresForLeaderboard(
     $after: String
     $before: String

@@ -2,12 +2,7 @@
 
 import { FC, useState } from "react";
 import styles from "./Test.module.css";
-import {
-  CreateScoreDocument,
-  Score as ScoreType,
-  CreateScoreInput as CreateScoreInputType,
-  MainBox_CreateScoreDocument,
-} from "@/graphql/generated/graphql";
+import { CreateScoreInput as CreateScoreInputType, MainBox_CreateScoreDocument } from "@/graphql/generated/graphql";
 import { ScoreBox } from "@/components/test/ScoreBox";
 import { TestBox } from "@/components/test/TestBox";
 import { gql, useMutation } from "@apollo/client";
