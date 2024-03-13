@@ -1,0 +1,14 @@
+.toast {
+    position: absolute;
+    top: 0;
+    width: 6rem;
+    height: 6rem;
+}
+
+.error {
+    background-color: red;
+}
+
+.notification {
+    background-color: lightgreen;
+}
