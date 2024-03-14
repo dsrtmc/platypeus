@@ -1,9 +1,11 @@
 import React from "react";
 import styles from "./Race.module.css";
-import { OnChatboxEventSubscription } from "@/graphql/generated/graphql";
+import { Chatbox_OnChatboxEventSubscription } from "@/graphql/generated/graphql";
 
 interface Props {
-  message: NonNullable<NonNullable<OnChatboxEventSubscription["onChatboxEvent"]["messages"]>["edges"]>[number]["node"];
+  message: NonNullable<
+    NonNullable<Chatbox_OnChatboxEventSubscription["onChatboxEvent"]["messages"]>["edges"]
+  >[number]["node"];
   viewerName: string | undefined;
 }
 

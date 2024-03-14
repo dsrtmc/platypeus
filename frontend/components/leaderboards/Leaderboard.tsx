@@ -153,8 +153,8 @@ export function Leaderboard({ mode, modeSetting }: Props) {
                 <p>#</p>
               </th>
               <th className={`${styles.left} ${styles.th}`}>
-                <p>name</p>
-                <p className={styles.sub}>user</p>
+                <p>user</p>
+                <p className={styles.sub}>name</p>
               </th>
               <th className={`${styles.right} ${styles.th}`}>
                 <p>wpm</p>

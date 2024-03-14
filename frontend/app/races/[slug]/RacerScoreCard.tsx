@@ -1,9 +1,10 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styles from "./Race.module.css";
-import { OnRaceEventSubscription } from "@/graphql/generated/graphql";
+import { RaceBox_OnRaceEventSubscription } from "@/graphql/generated/graphql";
+import { FaCheck } from "react-icons/fa";
 
 interface Props {
-  racer: NonNullable<NonNullable<OnRaceEventSubscription["onRaceEvent"]["racers"]>["edges"]>[number]["node"];
+  racer: NonNullable<NonNullable<RaceBox_OnRaceEventSubscription["onRaceEvent"]["racers"]>["edges"]>[number]["node"];
   progress: number;
 }
 
@@ -18,14 +19,15 @@ export const RacerScoreCard: React.FC<Props> = ({ racer, progress }) => {
   return (
     <div key={racer.user.username} className={styles.racerCard} ref={ref}>
       <div className={styles.left}>
-        <div style={{ position: "absolute", left: `${offset}px`, top: -0.5 + "rem" }}>{racer.user.username}</div>
-        {/*<div style={{ marginLeft: `max(calc(${offset}px - 8ch), 0)px` }}>{racer.user.username}</div>*/}
+        <div style={{ position: "absolute", left: `${offset}px`, top: -0.5 + "rem" }} className={styles.user}>
+          {racer.user.username}
+        </div>
         <div className={styles.progressBar} />
       </div>
-      <h2>{(progress * 100).toFixed(2)}%</h2>
+      <div className={styles.accuracy}>{Math.round(progress * 100)}%</div>
       <div className={styles.right}>
-        <div>{racer.finished && "finished"}</div>
-        <div>{racer.wpm}wpm</div>
+        <div className={styles.wpm}>{racer.wpm} wpm</div>
+        <div className={styles.finished}>{racer.finished && <FaCheck style={{ fontSize: "0.8rem" }} />}</div>
       </div>
     </div>
   );

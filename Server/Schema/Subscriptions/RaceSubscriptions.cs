@@ -12,6 +12,12 @@ public class RaceSubscriptions
     // TODO: bad idea to send the entire object over-the-wire, investigate the mention of a data loader
     // TODO: some validation idk if needed u know like if race is null and stuff
     // TODO: race condition issues
+    // TODO: had this idea that i need to approach with a sober mind:
+    // - shouldn't we just have the server handle finishing the race n shit?
+    // - like, I guess every time someone sends any event, the server can check multiple conditions, like:
+    //   - if any user has finished on time mode, finish the race for everyone else
+    //   - if time passed >= mode setting, finish the race etc.
+    // it's probably a better idea to handle it all on the server but hmm idk it'd require some thought
     public async IAsyncEnumerable<Race?> OnRaceEventStream(
         Guid raceId, [Service] DatabaseContext db,
         [Service] ITopicEventReceiver eventReceiver)

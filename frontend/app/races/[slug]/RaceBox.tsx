@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
+  CreateScoreInput as CreateScoreInputType,
   RaceBox_CreateScoreDocument,
   RaceBox_FinishRaceDocument,
   RaceBox_FinishRaceForUserDocument,
@@ -27,6 +28,7 @@ import { Timer } from "@/components/test/Timer";
 import { WordProgress } from "@/components/test/WordProgress";
 import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
 import { assertIsNode } from "@/utils/assertIsNode";
+import { Countdown } from "@/app/races/[slug]/Countdown";
 
 interface Props {
   race: NonNullable<RacePage_GetRaceQuery["race"]>;
@@ -57,11 +59,19 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   const [focused, setFocused] = useState(false);
   const [testStartTime, setTestStartTime] = useState(0);
-  const [timePassed, setTimePassed] = useState(0);
   const [userHasFinished, setUserHasFinished] = useState(false);
   const [content, setContent] = useState<Array<string> | null>(race.content.split(" "));
-  const [countdown, setCountdown] = useState(race.running ? 0 : COUNTDOWN_TIME);
   const [wordCount, setWordCount] = useState(0);
+
+  const initialTimePassed = Math.round(
+    race.started ? (new Date().getTime() - new Date(race.startTime).getTime()) / 1000 : 0
+  );
+  const [timePassed, setTimePassed] = useState(initialTimePassed);
+
+  const initialCountdown = race.started
+    ? Math.round(new Date(race.startTime).getTime() / 1000 + COUNTDOWN_TIME - new Date().getTime() / 1000)
+    : COUNTDOWN_TIME;
+  const [countdown, setCountdown] = useState(initialCountdown);
 
   // TODO: make it nicer, right now it returns true when we should prevent user input
   function handleKeyDown(e: globalThis.KeyboardEvent) {
@@ -80,23 +90,22 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     });
   }
 
-  // TODO: this type is funny, no shot i should be doing !s everywhere look it up bro maybe a DTO and shit xdddddddd
-  async function handleSaveScore(score: Partial<ScoreType>) {
+  async function handleSaveScore(score: CreateScoreInputType) {
     // Prevents multiple saving of the same score (as well as attempting to save on re-entering, which would crash out)
     if (userHasFinished) return;
     await handleChangeWpm(score.wpm!);
     await createScore({
       variables: {
         input: {
-          wpm: Math.round(score.wpm!), // since there's no way to enforce `int`, we round here just to be sure
-          rawWpm: Math.round(score.rawWpm!),
-          accuracy: score.accuracy!,
-          wpmStats: score.wpmStats!,
-          rawStats: score.rawStats!,
-          mode: score.mode!,
-          modeSetting: score.modeSetting!,
-          content: score.content!,
-          language: score.language!,
+          wpm: Math.round(score.wpm), // since there's no way to enforce `int`, we round here just to be sure
+          rawWpm: Math.round(score.rawWpm),
+          accuracy: score.accuracy,
+          wpmStats: score.wpmStats,
+          rawStats: score.rawStats,
+          mode: score.mode,
+          modeSetting: score.modeSetting,
+          content: score.content,
+          language: score.language,
         },
       },
     });
@@ -121,13 +130,11 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     }
   }
 
-  // TODO: think if there's a better way to do that because holy fuck is it confusing
   /**
-   * Returns n elements to be added to the word pool while removing the first n elements
+   * Returns `n` elements to be added to the word pool while removing the first n elements
    * to account for index differences between `Test`'s content and this one.
    * @param {string} count - The count of elements to add to the pool
    */
-  // TODO: fix this shit doesnt even work lmao TOP PRIORITY
   function onPoolUpdate(count: number): string[] {
     if (!content) return [];
     const copy = content.slice(count);
@@ -135,7 +142,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     for (let i = LOADED_WORDS_COUNT - count; i < LOADED_WORDS_COUNT; i++) {
       if (copy[i]) words.push(copy[i]);
     }
-    // words.push(...copy.slice(index, count + index!));
+
     setContent(copy);
     return words;
   }
@@ -175,6 +182,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         const timeLeftToBegin = Math.round(
           (new Date(data.onRaceEvent.startTime).getTime() + COUNTDOWN_TIME * 1000 - new Date().getTime()) / 1000
         );
+        console.log("we call it here like retards?:", timeLeftToBegin);
         setCountdown(timeLeftToBegin);
       }, 1000);
     }
@@ -220,6 +228,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, [data?.onRaceEvent.finished, data?.onRaceEvent.racers]);
+
   // TODO: the cache update is fucked whenever you do a `joinRace` so idk bro fix it i guess lol // I GUESS IT GOT FIXED? LOL
   // TODO: would probably make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
   // TODO: maybe figure out a better error page? right now it shows an ugly "theres a funny error: {}" which is not too user-friendly in case-
@@ -233,23 +242,16 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   // if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>; // why did i do if (!meData?.me)?
   if (!data?.onRaceEvent) return <p>no data</p>;
   return (
-    <div className={styles.raceBox}>
-      {meData &&
-        meData.me &&
-        !data.onRaceEvent.started &&
-        !data.onRaceEvent.running &&
-        (!data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id) ? (
-          <JoinRaceButton handleJoinRace={handleJoinRace} />
+    <div className={styles.box}>
+      <div className={styles.top}>
+        {data.onRaceEvent.mode === "time" ? (
+          <Timer time={Math.max(data.onRaceEvent.modeSetting - timePassed, 0)} />
         ) : (
-          <LeaveRaceButton handleLeaveRace={handleLeaveRace} />
-        ))}
-      {data.onRaceEvent.mode === "time" ? (
-        <Timer time={Math.max(data.onRaceEvent.modeSetting - timePassed, 0)} />
-      ) : (
-        <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
-      )}
-      {/* TODO: maybe an unnecessary ref idk */}
-      <div ref={ref}>
+          <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
+        )}
+        {data.onRaceEvent.started && !data.onRaceEvent.running && <Countdown countdown={countdown} />}
+      </div>
+      <div className={styles.middle} ref={ref}>
         <Test
           focused={focused}
           running={data.onRaceEvent.running}
@@ -269,32 +271,39 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           initialContent={data.onRaceEvent.content.split(" ").slice(0, LOADED_WORDS_COUNT)}
         />
       </div>
-      {data?.onRaceEvent.host.id === meData?.me?.id && (
-        <StartRaceButton
-          disabled={
-            data.onRaceEvent.finished ||
-            data.onRaceEvent.running ||
-            data.onRaceEvent.started ||
-            !data.onRaceEvent.racers?.edges ||
-            data.onRaceEvent.racers!.edges!.length <= 0 // TODO: set to 1 before deploy
-          }
-          handleStart={handleStart}
-        />
-      )}
-      {/* TODO: ↓ */}
-      {!data.onRaceEvent.running && !data.onRaceEvent.finished && (
-        <h1 style={{ fontSize: "3rem" }}>countdown: {countdown}</h1>
-      )}
+      <div className={styles.bottom}>
+        {meData &&
+          meData.me &&
+          !data.onRaceEvent.started &&
+          !data.onRaceEvent.running &&
+          (!data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id) ? (
+            <JoinRaceButton handleJoinRace={handleJoinRace} />
+          ) : (
+            <LeaveRaceButton handleLeaveRace={handleLeaveRace} />
+          ))}
+        {data?.onRaceEvent.host.id === meData?.me?.id && (
+          <StartRaceButton
+            disabled={
+              data.onRaceEvent.finished ||
+              data.onRaceEvent.running ||
+              data.onRaceEvent.started ||
+              !data.onRaceEvent.racers?.edges ||
+              data.onRaceEvent.racers!.edges!.length <= 0 // TODO: set to 1 before deploy
+            }
+            handleStart={handleStart}
+          />
+        )}
+      </div>
       <RaceScoreboard
         edges={data.onRaceEvent.racers?.edges}
         mode={data.onRaceEvent.mode}
         modeSetting={data.onRaceEvent.modeSetting}
       />
-      <h1 style={{ fontSize: "1.5rem" }}>start typing once the countdown reaches zero</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>status:</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.started ? "true" : "false"}</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>
+      {/* dev */}
+      {/*<h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>*/}
+      {/*<h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.started ? "true" : "false"}</h1>*/}
+      {/*<h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>*/}
+      {/* dev */}
       <div className={styles.hr} />
       <Chatbox chatboxId={data.onRaceEvent.chatboxId} me={meData?.me} />
     </div>

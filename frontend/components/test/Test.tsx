@@ -428,6 +428,8 @@ export const Test: FC<Props> = ({
     handleFinish();
 
     const currentWord = wordsRef.current[wordIndex];
+    if (!currentWord) return;
+
     const { correctCount, nonEmptyCount } = calculateCurrentWord(currentWord);
 
     const newCorrectCount = correctCharacters + correctCount;
@@ -442,6 +444,8 @@ export const Test: FC<Props> = ({
     let acc = newCorrectCount / newNonEmptyCount;
     if (!Number.isFinite(acc)) acc = 0;
 
+    // TODO: we only pass language here for creating the score, I'm not sure if that makes sense -> surely we can just pass the partial
+    // and update the mode/modeSetting/language from the parent box? (well we need mode and modeSetting here)
     const score: CreateScoreInputType = {
       wpm,
       rawWpm,

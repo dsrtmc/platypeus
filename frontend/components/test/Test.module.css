@@ -3,6 +3,7 @@
     justify-content: flex-end;
     flex-basis: 0;
     gap: 0;
+    height: 100%;
 }
 
 .top {

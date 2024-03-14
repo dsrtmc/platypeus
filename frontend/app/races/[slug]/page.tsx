@@ -3,7 +3,9 @@ import { RaceBox } from "@/app/races/[slug]/RaceBox";
 import { getClient } from "@/lib/client";
 import { RacePage_GetRaceDocument } from "@/graphql/generated/graphql";
 import { notFound } from "next/navigation";
-import { gql } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
+import styles from "./Race.module.css";
+import { FadeTransition } from "@/app/FadeTransition";
 
 interface Props {}
 
@@ -26,6 +28,7 @@ const GetRace = gql`
       host {
         username
       }
+      started
       content
       unlisted
       running
@@ -46,13 +49,11 @@ export default async function RacePage({ params }: { params: { slug: string } })
       racersFirst: 0,
     },
   });
-  console.log("Data:", data);
   if (!data?.race) {
     notFound();
   }
   return (
-    // TODO: add a funny error page in case someone types in an ugly ID
-    <div>
+    <div className={styles.mainBox}>
       <RaceBox race={data.race} />
     </div>
   );

@@ -13,8 +13,8 @@ export const StartRaceButton: FC<Props> = ({ disabled, handleStart }) => {
   }
   return (
     // TODO: wtf? why does it work with `hasError || disabled`? hasError comes from `finally` in parent and `finally` is state so it should work?
-    <button onClick={onStart} disabled={disabled} className={styles.startRaceButton}>
-      Start race
+    <button onClick={onStart} disabled={disabled} className={styles.raceButton}>
+      start race
     </button>
   );
 };

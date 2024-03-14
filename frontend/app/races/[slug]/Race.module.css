@@ -1,8 +1,70 @@
-.raceBox {
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*align-items: center;*/
-    /*gap: 2rem;*/
+.mainBox {
+    height: 100%;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 2rem;
+    height: 100%;
+    width: 100%;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.middle {
+    flex: 0;
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.raceButton {
+    border: 0;
+    background-color: var(--sub-alt-color);
+    padding: .4rem .8rem;
+    border-radius: var(--roundness);
+    color: var(--text-color);
+    transition: color 150ms ease, background-color 150ms ease, filter 150ms ease;
+}
+
+.raceButton:hover {
+    color: var(--sub-alt-color);
+    background-color: var(--text-color);
+}
+
+.raceButton:active {
+    transition: filter 150ms ease;
+    filter: opacity(0.8);
+}
+
+.raceButton:disabled {
+    filter: opacity(0.5);
+}
+
+.raceButton:disabled:active {
+    filter: opacity(0.4);
+}
+
+.countdownSection {
+    display: flex;
+    align-items: flex-end;
+    color: var(--sub-color);
+    font-size: 1.5rem;
+    gap: 1rem;
+}
+
+.countdownNumber {
+    font-size: 2rem;
+    color: var(--main-color);
 }
 
 .chatbox {
@@ -12,10 +74,60 @@
     align-items: center;
     margin: auto;
     gap: 1rem;
-    height: 15rem;
     width: 100%;
     color: var(--sub-color);
+    justify-self: flex-end;
 }
+
+.chatboxBottom {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-self: flex-end;
+}
+
+.messageListWrapper {
+    flex-direction: column-reverse;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: scroll;
+    word-break: break-word;
+    height: 15rem;
+    width: 100%;
+}
+
+.messageList {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    gap: 0.5rem;
+}
+
+.message {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: .5rem;
+    color: var(--sub-color);
+}
+
+.author {
+    color: var(--sub-color);
+}
+
+.me {
+    color: var(--main-color);
+}
+
+.content {
+    color: var(--text-color);
+}
+
+.hr {
+    height: 2px;
+    background-image: linear-gradient(to right, transparent, var(--sub-alt-color), transparent);
+}
+
 
 .textarea {
     outline: none;
@@ -25,7 +137,7 @@
     border-radius: var(--roundness);
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
-    padding: 6px 10px;
+    padding: .4rem .6rem.4rem .6rem;
     transition: filter 200ms ease;
     width: 100%;
     font-size: 0.9rem;
@@ -50,6 +162,7 @@
     color: var(--sub-color);
 }
 
+/* TODO: I guess the button is ugly, it doesn't follow the textarea's resize */
 .sendButton {
     display: flex;
     justify-content: center;
@@ -59,9 +172,9 @@
     color: var(--sub-color);
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
-    /*border-bottom-left-radius: 0;*/
-    /*border-top-left-radius: 0;*/
-    padding: 6px 8px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    padding: .4rem .6rem;
     transition: color 100ms ease;
 }
 
@@ -119,81 +232,6 @@
     color: var(--text-color);
 }
 
-.messageListWrapper {
-    flex-direction: column-reverse;
-    display: flex;
-    overflow-x: auto;
-    overflow-y: scroll;
-    word-break: break-word;
-    height: 100%;
-    width: 100%;
-}
-
-.messageList {
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    gap: 0.2rem;
-}
-
-.message {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: .5rem;
-    color: var(--sub-color);
-}
-
-.author {
-    color: var(--sub-color);
-}
-
-.me {
-    color: var(--main-color);
-}
-
-.content {
-    color: var(--text-color);
-}
-
-.bottom {
-    display: flex;
-    width: 100%;
-}
-
-.startRaceButton {
-    all: unset;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    border: 2px solid transparent;
-    color: var(--text-color);
-    background-color: var(--sub-alt-color);
-    border-radius: var(--roundness);
-    padding: 4px 6px;
-    transition: color, background-color 200ms ease;
-}
-
-.startRaceButton:focus:enabled {
-    border: 2px solid var(--main-color);
-}
-
-.startRaceButton:hover:enabled {
-    color: var(--sub-alt-color);
-    background-color: var(--text-color);
-}
-
-.startRaceButton:disabled {
-    filter: opacity(50%);
-}
-
-.hr {
-    height: 2px;
-    background-image: linear-gradient(to right, transparent, var(--sub-alt-color), transparent);
-    margin: 1rem 0;
-}
-
 .scoreboard {
     display: flex;
     flex-direction: column;
@@ -202,18 +240,37 @@
     gap: 1rem;
 }
 
+.italic {
+    font-style: italic;
+}
+
+.emptyScoreboardMessage {
+    color: var(--sub-color);
+}
+
 .racerCard {
     position: relative;
     display: flex;
+    justify-content: space-between;
     align-items: flex-end;
     gap: 1rem;
     width: 100%;
+}
+
+.user {
+    color: var(--text-color);
+}
+
+.accuracy {
+    width: 3rem;
+    text-align: right;
 }
 
 .progressBar {
     width: 100%;
     height: 2px;
     background-color: var(--main-color);
+    border-radius: var(--roundness);
 }
 
 .left {
@@ -221,9 +278,27 @@
 }
 
 .right {
-    flex: 0;
-    min-width: 10ch;
-    background-color: slategray;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 6rem;
+}
+
+.wpm {
+    color: var(--sub-color);
+    text-align: right;
+}
+
+.finished {
+    color: var(--main-color);
+}
+
+.loadingWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
 }
 
 .spinner {

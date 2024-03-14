@@ -3,8 +3,8 @@ import { MainBox } from "@/components/test/MainBox";
 
 export default async function HomePage() {
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
       <MainBox />
-    </main>
+    </div>
   );
 }

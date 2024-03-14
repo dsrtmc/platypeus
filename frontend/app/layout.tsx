@@ -9,6 +9,8 @@ import { ErrorProvider } from "@/app/ErrorProvider";
 import { ErrorToast } from "@/app/ErrorToast";
 import { NotificationProvider } from "@/app/NotificationProvider";
 import { NotificationToast } from "@/app/NotificationToast";
+import { Providers } from "@/app/Providers";
+import { Toasts } from "@/app/Toasts";
 
 export const metadata = {
   title: "Create Next App",
@@ -25,18 +27,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <body>
         <ApolloWrapper>
-          {/* TODO: i guess make one <Providers> if that's a real thing? idk */}
-          <ErrorProvider>
-            <NotificationProvider>
-              <ContentWrapper>
-                <Header />
-                <ConfigLoader />
-                {children}
-                <ErrorToast />
-                <NotificationToast />
-              </ContentWrapper>
-            </NotificationProvider>
-          </ErrorProvider>
+          <Providers>
+            <ContentWrapper>
+              <Header />
+              <ConfigLoader />
+              {/* actually no idea why I have to specify height 100% for it to take all available space */}
+              <main style={{ height: "100%" }}>{children}</main>
+              <Toasts />
+            </ContentWrapper>
+          </Providers>
         </ApolloWrapper>
       </body>
     </html>

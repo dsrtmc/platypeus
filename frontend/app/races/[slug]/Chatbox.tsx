@@ -5,7 +5,7 @@ import styles from "./Race.module.css";
 import {
   Chatbox_OnChatboxEventDocument,
   Chatbox_SendMessageDocument,
-  OnRaceEventSubscription,
+  RaceBox_OnRaceEventSubscription,
   UserInfoFragment,
 } from "@/graphql/generated/graphql";
 import { gql, useMutation, useSubscription } from "@apollo/client";
@@ -48,7 +48,7 @@ const SendMessage = gql`
 `;
 
 interface Props {
-  chatboxId: OnRaceEventSubscription["onRaceEvent"]["chatboxId"];
+  chatboxId: RaceBox_OnRaceEventSubscription["onRaceEvent"]["chatboxId"];
   me?: UserInfoFragment | null;
 }
 
@@ -59,7 +59,7 @@ type FormValues = {
 };
 
 export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
-  console.log("Me:", me);
+  console.log("logs every chatbox rerender?");
   const { data, loading, error } = useSubscription(Chatbox_OnChatboxEventDocument, {
     variables: {
       chatboxId,
@@ -91,10 +91,11 @@ export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
     console.log("Data:", data);
+    const trimmedContent = data.content.trim();
     await sendMessage({
       variables: {
         input: {
-          content: data.content,
+          content: trimmedContent,
           chatboxId,
         },
       },
@@ -127,10 +128,10 @@ export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
           ))}
         </ul>
       </div>
-      <div className={styles.bottom}>
+      <div className={styles.chatboxBottom}>
         <TextareaAutosize
           maxRows={3}
-          placeholder={me ? "Message the group" : "Log in to use the chatroom"}
+          placeholder={me ? "message the group" : "log in to use the chatroom"}
           disabled={!me}
           onKeyDown={handleKeyDown}
           ref={(e) => {

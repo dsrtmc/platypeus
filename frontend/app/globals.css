@@ -223,7 +223,6 @@ input[type="checkbox"]:checked:after {
     max-width: var(--wrapper-width);
     min-height: 100vh;
     padding: 2rem;
-    transition: padding-top .125s;
     width: 100%;
     z-index: 999;
     margin: auto;
