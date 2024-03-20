@@ -27,6 +27,10 @@
     align-items: center;
 }
 
+.spacer {
+    width: max-content;
+}
+
 .raceButton {
     border: 0;
     background-color: var(--sub-alt-color);
@@ -70,20 +74,14 @@
 .chatbox {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     margin: auto;
     gap: 1rem;
     width: 100%;
     color: var(--sub-color);
     justify-self: flex-end;
-}
-
-.chatboxBottom {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-self: flex-end;
+    height: 25rem;
 }
 
 .messageListWrapper {
@@ -91,8 +89,7 @@
     display: flex;
     overflow-x: auto;
     overflow-y: scroll;
-    word-break: break-word;
-    height: 15rem;
+    min-height: 15rem;
     width: 100%;
 }
 
@@ -106,7 +103,7 @@
 .message {
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     gap: .5rem;
     color: var(--sub-color);
 }
@@ -120,14 +117,22 @@
 }
 
 .content {
+    word-break: break-word;
     color: var(--text-color);
 }
 
 .hr {
     height: 2px;
-    background-image: linear-gradient(to right, transparent, var(--sub-alt-color), transparent);
+    background-color: var(--sub-color);
+    border-radius: var(--roundness);
 }
 
+.chatboxBottom {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-self: flex-end;
+}
 
 .textarea {
     outline: none;
@@ -176,6 +181,7 @@
     border-top-left-radius: 0;
     padding: .4rem .6rem;
     transition: color 100ms ease;
+    height: 100%;
 }
 
 .sendButton:hover {

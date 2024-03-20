@@ -39,6 +39,7 @@ interface Props {
   handleChangeWpm: (wpm: number) => void;
   handleSaveScore: (score: CreateScoreInputType) => void;
   setWordCount: (value: ((prevState: number) => number) | number) => void;
+  showCaret: boolean;
 
   innerRef?: MutableRefObject<HTMLDivElement | null>;
 
@@ -89,6 +90,7 @@ export const Test: FC<Props> = ({
   handleChangeWpm,
   handleSaveScore,
   setWordCount,
+  showCaret,
   innerRef,
   initialContent,
 }) => {
@@ -493,7 +495,7 @@ export const Test: FC<Props> = ({
       <div className={styles.words} ref={wordsDivRef} tabIndex={-1}>
         {wordPool.map((word) => word)}
       </div>
-      <Caret x={caretPosition.x} y={caretPosition.y} blinking={running} hidden={focused} ref={caretRef} />
+      <Caret x={caretPosition.x} y={caretPosition.y} blinking={running} hidden={showCaret && focused} ref={caretRef} />
     </div>
   );
 };

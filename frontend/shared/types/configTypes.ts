@@ -1,5 +1,25 @@
 import { WORD_LISTS } from "@/utils/wordLists";
 
+export enum ConfigCssVariable {
+  FontFamily = "--font-family",
+  FontSize = "--font-size",
+  TestFontSizeMultiplier = "--test-font-size-multiplier",
+  WrapperWidth = "--wrapper-width",
+  CaretSpeed = "--caret-speed",
+  Roundness = "--roundness",
+}
+
+export enum ThemeCssVariable {
+  BackgroundColor = "--bg-color",
+  CaretColor = "--caret-color",
+  MainColor = "--main-color",
+  SubColor = "--sub-color",
+  SubAltColor = "--sub-alt-color",
+  TextColor = "--text-color",
+  ErrorColor = "--error-color",
+  ExtraErrorColor = "--error-extra-color",
+}
+
 export type ConfigType = {
   placeholder: string;
   themeName: string;
@@ -19,43 +39,16 @@ export type TestMode = "time" | "words";
 export type TestLanguage = keyof typeof WORD_LISTS;
 
 export type ThemeConfigType = {
-  "--bg-color": string;
-  "--main-color": string;
-  "--caret-color": string;
-  "--sub-color": string;
-  "--sub-alt-color": string;
-  "--text-color": string;
-  "--error-color": string;
-  "--error-extra-color": string;
+  [name in ThemeCssVariable]: string;
 };
 
-export type ThemeCssVariablesType = {
-  background: "--bg-color";
-  "caret color": "--caret-color";
-  main: "--main-color";
-  sub: "--sub-color";
-  "sub alt": "--sub-alt-color";
-  text: "--text-color";
-  error: "--error-color";
-  "extra error": "--error-extra-color";
+export const ThemeCssVariableToName: { [cssName in ThemeCssVariable]: string } = {
+  [ThemeCssVariable.BackgroundColor]: "background",
+  [ThemeCssVariable.MainColor]: "main",
+  [ThemeCssVariable.CaretColor]: "caret color",
+  [ThemeCssVariable.SubColor]: "sub",
+  [ThemeCssVariable.SubAltColor]: "sub alt",
+  [ThemeCssVariable.TextColor]: "text",
+  [ThemeCssVariable.ErrorColor]: "error",
+  [ThemeCssVariable.ExtraErrorColor]: "extra error",
 };
-
-export enum ConfigCssVariables {
-  FontFamily = "--font-family",
-  FontSize = "--font-size",
-  TestFontSizeMultiplier = "--test-font-size-multiplier",
-  WrapperWidth = "--wrapper-width",
-  CaretSpeed = "--caret-speed",
-  Roundness = "--roundness",
-}
-
-export enum ThemeCssVariables {
-  BackgroundColor = "--bg-color",
-  CaretColor = "--caret-color",
-  MainColor = "--main-color",
-  SubColor = "--sub-color",
-  SubAltColor = "--sub-alt-color",
-  TextColor = "--text-color",
-  ErrorColor = "--error-color",
-  ExtraErrorColor = "--error-extra-color",
-}

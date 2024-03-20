@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useRef, useState } from "react";
 import React, { PropsWithChildren } from "react";
+import { CgUserRemove } from "react-icons/cg";
 
 interface Props {}
 
@@ -18,10 +19,14 @@ export const NotificationContext = createContext<NotificationContextType | null>
 
 export const NotificationProvider: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   const [notification, setNotification] = useState<NotificationType>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   function customNotificationSetter(notification: NotificationType) {
-    console.log("Hitler!:", notification);
     setNotification(notification);
-    setTimeout(() => setNotification(null), 3000);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => setNotification(null), 3000);
   }
   return (
     <NotificationContext.Provider value={{ notification, setNotification: customNotificationSetter }}>

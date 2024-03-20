@@ -206,6 +206,7 @@ export function TestBox({ handleSaveScore }: Props) {
   }, [mode, modeSetting, language]);
 
   // TODO: make sure a user cannot just sit in test for a million years and stack up an array with infinite length
+  const [showCaret, setShowCaret] = useState(false);
 
   if (!visible) return null;
   return (
@@ -254,6 +255,9 @@ export function TestBox({ handleSaveScore }: Props) {
               exitActive: styles.wordsExitActive,
               exitDone: styles.wordsExitDone,
             }}
+            onEnter={() => {
+              setShowCaret(true);
+            }}
             onExited={() => handleReset()}
           >
             <Test
@@ -274,6 +278,7 @@ export function TestBox({ handleSaveScore }: Props) {
               setWordCount={setWordCount}
               initialContent={initialContent}
               innerRef={testRef}
+              showCaret={showCaret}
               key={testKey}
             />
           </CSSTransition>
@@ -281,6 +286,7 @@ export function TestBox({ handleSaveScore }: Props) {
         <section className={styles.bottom}>
           <RestartButton
             onReset={() => {
+              setShowCaret(false);
               setMounted(false);
             }}
             ref={restartButtonRef}

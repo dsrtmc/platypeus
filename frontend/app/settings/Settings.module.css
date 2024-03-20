@@ -119,7 +119,7 @@
     border-radius: var(--roundness);
 }
 
-.fontChangeSection {
+.generalConfigSection {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -156,7 +156,7 @@
     width: 100%;
 }
 
-.fontSizeChangeWrapper {
+.valueChangeWrapper {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -164,7 +164,7 @@
     width: 100%;
 }
 
-.fontSizeChangeField {
+.valueChangeField {
     border: 0;
     color: var(--text-color);
     background-color: var(--sub-alt-color);
@@ -173,7 +173,7 @@
     border-radius: var(--roundness);
 }
 
-.fontSizeChangeButton {
+.valueChangeButton {
     border: 0;
     background: none;
     color: var(--sub-color);
@@ -181,16 +181,16 @@
     transition: color 150ms ease;
 }
 
-.fontSizeChangeButton:hover {
+.valueChangeButton:hover {
     color: var(--text-color);
 }
 
-.fontSizeChangeButton:active {
+.valueChangeButton:active {
     transition: color 150ms ease;
     filter: opacity(0.8%);
 }
 
-.fontSizeChangeButton:nth-last-child(1) {
+.valueChangeButton:nth-last-child(1) {
     margin-left: auto;
 }
 

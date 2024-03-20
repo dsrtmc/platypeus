@@ -6,10 +6,9 @@ interface Props {}
 
 export const WrapperConfigSection: React.FC<Props> = ({}) => {
   return (
-    <div>
+    <div className={styles.generalConfigSection}>
       <h1 className={styles.headerSmall}>wrapper</h1>
       <WrapperSizeChangeSection />
-      hello you can customzie the wrapper<code>here</code>
     </div>
   );
 };

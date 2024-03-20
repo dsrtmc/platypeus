@@ -9,7 +9,7 @@ interface Props {}
 
 export const FontConfigSection: React.FC<Props> = ({}) => {
   return (
-    <div className={styles.fontChangeSection}>
+    <div className={styles.generalConfigSection}>
       <h1 className={styles.headerSmall}>font</h1>
       <FontSelection />
       <FontSizeChangeSection />

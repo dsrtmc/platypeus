@@ -6,7 +6,7 @@ import styles from "./page.module.css";
 
 interface Props {}
 
-const duration = 300;
+const duration = 200;
 
 const style = {
   transition: `opacity ${duration}ms ease-in-out`,

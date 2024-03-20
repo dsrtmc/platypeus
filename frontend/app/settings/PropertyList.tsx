@@ -1,29 +1,22 @@
+"use client";
+
 import React from "react";
 import styles from "@/app/settings/Settings.module.css";
 import { PropertyEditor } from "@/app/settings/PropertyEditor";
 import { CssThemeVariables } from "@/shared/constants/themes";
+import { ThemeConfigType, ThemeCssVariable } from "@/shared/types/configTypes";
+import { ThemeCssVariableToName } from "@/shared/types/configTypes";
 
-interface Props {}
+interface Props {
+  theme: ThemeConfigType | null;
+}
 
-type State = typeof themeCssVariables;
-
-// name: cssName
-const themeCssVariables = {
-  background: CssThemeVariables.Background,
-  caret: CssThemeVariables.Caret,
-  main: CssThemeVariables.Main,
-  sub: CssThemeVariables.Sub,
-  "sub alt": CssThemeVariables.SubAlt,
-  text: CssThemeVariables.Text,
-  error: CssThemeVariables.Error,
-  "extra error": CssThemeVariables.ExtraError,
-};
-
-export const PropertyList: React.FC<Props> = ({}) => {
+export const PropertyList: React.FC<Props> = ({ theme }) => {
+  if (!theme) return <div>no theme loaded yet lol</div>;
   return (
     <div className={styles.propertyList}>
-      {Object.entries(themeCssVariables).map(([name, cssName]) => (
-        <PropertyEditor name={name} cssName={cssName} key={cssName} />
+      {Object.entries(theme).map(([cssName, config]) => (
+        <PropertyEditor cssName={cssName as ThemeCssVariable} config={config} key={cssName} />
       ))}
     </div>
   );

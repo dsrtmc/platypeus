@@ -3,6 +3,7 @@ import styles from "@/app/settings/Settings.module.css";
 import { DEFAULT_CONFIG, getConfig, setConfig } from "@/utils/configUtils";
 import { ErrorContext } from "@/app/ErrorProvider";
 import { NotificationContext } from "@/app/NotificationProvider";
+import { ConfigCssVariable } from "@/shared/types/configTypes";
 
 interface Props {}
 
@@ -27,7 +28,7 @@ export const TestFontSizeChangeSection: React.FC<Props> = ({}) => {
   function handleFontSizeChange() {
     const numberValue = parseFloat(value);
     if (numberValue < MIN_TEST_FONT_SIZE || numberValue > MAX_TEST_FONT_SIZE) {
-      setError({ code: "INVALID_FONT_VALUE", message: "Invalid font value." });
+      setError({ code: "INVALID_FONT_VALUE", message: "invalid font value." });
       return;
     }
 
@@ -40,7 +41,7 @@ export const TestFontSizeChangeSection: React.FC<Props> = ({}) => {
     setConfig(config);
 
     const root = document.documentElement;
-    root.style.setProperty("--test-font-size-multiplier", value);
+    root.style.setProperty(ConfigCssVariable.TestFontSizeMultiplier, value);
 
     setNotification({ message: "successfully changed font." });
   }
@@ -56,33 +57,33 @@ export const TestFontSizeChangeSection: React.FC<Props> = ({}) => {
     setConfig(config);
 
     const root = document.documentElement;
-    root.style.setProperty("--test-font-size-multiplier", testFontSizeMultiplier.toString());
+    root.style.setProperty(ConfigCssVariable.TestFontSizeMultiplier, testFontSizeMultiplier.toString());
     setValue(testFontSizeMultiplier.toString());
   }
 
   useEffect(() => {
     const root = document.documentElement;
     const cs = getComputedStyle(root);
-    let testFontSizeMultiplier = cs.getPropertyValue("--test-font-size-multiplier");
+    let testFontSizeMultiplier = cs.getPropertyValue(ConfigCssVariable.TestFontSizeMultiplier);
     setValue(testFontSizeMultiplier);
   }, []);
 
   return (
-    <div className={styles.fontSizeChangeWrapper}>
+    <div className={styles.valueChangeWrapper}>
       <input
         value={value}
         onChange={handleInput}
         onKeyDown={handleKeyDown}
-        className={styles.fontSizeChangeField}
+        className={styles.valueChangeField}
         type={"number"}
         min={0.5}
         max={5}
         step={0.25}
       />
-      <button onClick={handleFontSizeChange} className={styles.fontSizeChangeButton} type={"button"}>
+      <button onClick={handleFontSizeChange} className={styles.valueChangeButton} type={"button"}>
         set test's font size
       </button>
-      <button onClick={resetToDefault} className={styles.fontSizeChangeButton}>
+      <button onClick={resetToDefault} className={styles.valueChangeButton}>
         reset to default
       </button>
     </div>

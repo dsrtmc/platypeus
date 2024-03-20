@@ -1,30 +1,31 @@
+"use client";
+
 import React, { FormEvent, KeyboardEvent, useEffect, useState } from "react";
 import styles from "./Settings.module.css";
 import { getConfig, setConfig } from "@/utils/configUtils";
+import { ThemeCssVariable, ThemeCssVariableToName } from "@/shared/types/configTypes";
 
 interface Props {
-  name: string;
-  cssName: string;
+  cssName: ThemeCssVariable;
+  config: string;
 }
 
-export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
-  const [value, setValue] = useState("");
+export const PropertyEditor: React.FC<Props> = ({ cssName, config }) => {
+  console.log("it should rerender, because the theme changed");
+  console.log("config:", config);
+  const [value, setValue] = useState(config);
+  console.log("value:", value);
 
   // NOTE: is it bad to getComputedStyle() per every component? unlikely to cause performance issues but keep it in mind
-  useEffect(() => {
-    const root = document.documentElement;
-    const cs = getComputedStyle(root);
-    setValue(cs.getPropertyValue(cssName));
-  }, []);
+  // useEffect(() => {
+  //   const root = document.documentElement;
+  //   const cs = getComputedStyle(root);
+  //   setValue(cs.getPropertyValue(cssName));
+  // }, []);
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
-      const root = document.documentElement;
-      const target = e.target as HTMLInputElement;
-      root.style.setProperty(cssName, target.value);
-      setValue(target.value);
-      console.log("css name", cssName);
-      console.log("root style property:", root.style.getPropertyValue(cssName));
+      changePropertyValue(cssName, (e.target as HTMLInputElement).value);
     }
   }
 
@@ -45,22 +46,20 @@ export const PropertyEditor: React.FC<Props> = ({ name, cssName }) => {
     setConfig(config);
   }
 
+  useEffect(() => {
+    setValue(config);
+  }, [config]);
+
   return (
     <div className={styles.propertyBox}>
-      <div className={styles.name}>{name}</div>
+      <div className={styles.name}>{ThemeCssVariableToName[cssName]}</div>
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         className={styles.field}
       />
-      <input
-        type={"color"}
-        value={value}
-        onInput={handleColorInput}
-        id={`${name}-input`}
-        className={styles.colorInput}
-      />
+      <input type={"color"} value={value} onInput={handleColorInput} className={styles.colorInput} />
     </div>
   );
 };

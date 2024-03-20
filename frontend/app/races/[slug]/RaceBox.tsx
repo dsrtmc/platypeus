@@ -29,6 +29,7 @@ import { WordProgress } from "@/components/test/WordProgress";
 import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
 import { assertIsNode } from "@/utils/assertIsNode";
 import { Countdown } from "@/app/races/[slug]/Countdown";
+import { HiArrowsPointingIn } from "react-icons/hi2";
 
 interface Props {
   race: NonNullable<RacePage_GetRaceQuery["race"]>;
@@ -71,6 +72,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const initialCountdown = race.started
     ? Math.round(new Date(race.startTime).getTime() / 1000 + COUNTDOWN_TIME - new Date().getTime() / 1000)
     : COUNTDOWN_TIME;
+  console.log("INitial countdown:", initialCountdown);
   const [countdown, setCountdown] = useState(initialCountdown);
 
   // TODO: make it nicer, right now it returns true when we should prevent user input
@@ -241,6 +243,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   if (error) return <p>error: {JSON.stringify(error)}</p>;
   // if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>; // why did i do if (!meData?.me)?
   if (!data?.onRaceEvent) return <p>no data</p>;
+  // TODO: wouldn't it be a better idea to just have separate layouts for different states altogether? idk bro this is confusing
   return (
     <div className={styles.box}>
       <div className={styles.top}>
@@ -249,7 +252,9 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         ) : (
           <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
         )}
-        {data.onRaceEvent.started && !data.onRaceEvent.running && <Countdown countdown={countdown} />}
+        {data.onRaceEvent.started && !data.onRaceEvent.running && !data.onRaceEvent.finished && (
+          <Countdown countdown={countdown} />
+        )}
       </div>
       <div className={styles.middle} ref={ref}>
         <Test
@@ -268,6 +273,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           handleChangeWpm={handleChangeWpm}
           handleSaveScore={handleSaveScore}
           setWordCount={setWordCount}
+          showCaret={true}
           initialContent={data.onRaceEvent.content.split(" ").slice(0, LOADED_WORDS_COUNT)}
         />
       </div>
@@ -281,6 +287,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           ) : (
             <LeaveRaceButton handleLeaveRace={handleLeaveRace} />
           ))}
+        <div className={styles.spacer} />
         {data?.onRaceEvent.host.id === meData?.me?.id && (
           <StartRaceButton
             disabled={

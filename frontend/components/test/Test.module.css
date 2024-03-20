@@ -136,7 +136,7 @@
     border-radius: 2px;
     width: 3px;
     height: calc(var(--font-size) * var(--test-font-size-multiplier) * 1.25);
-    transition: all ease var(--caret-speed);
+    transition: all ease-in-out var(--caret-speed);
 }
 
 .blinking {
@@ -148,14 +148,14 @@
 }
 
 @keyframes blink {
-    20% {
-        opacity: 100%;
-    }
-    50% {
+    0% {
         opacity: 0;
     }
-    80% {
+    50% {
         opacity: 100%;
+    }
+    100% {
+        opacity: 0;
     }
 }
 

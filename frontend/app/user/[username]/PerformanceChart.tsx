@@ -23,7 +23,7 @@ import {
 } from "chart.js";
 import { PerformanceChartFallback } from "@/app/user/[username]/PerformanceChartFallback";
 import { CSSTransition } from "react-transition-group";
-import { ConfigCssVariables, ThemeCssVariables } from "@/shared/types/configTypes";
+import { ConfigCssVariable, ThemeCssVariable } from "@/shared/types/configTypes";
 
 interface Props {
   scores: UserPage_GetUserMonthlyScoreSummariesQuery["userMonthlyScoreSummaries"];
@@ -171,10 +171,10 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
   // TODO: use global variables as an enum?
   useEffect(() => {
     let style = getComputedStyle(document.body);
-    setFontFamily(style.getPropertyValue(ConfigCssVariables.FontFamily));
-    setMainColor(style.getPropertyValue(ThemeCssVariables.MainColor));
-    setSubColor(style.getPropertyValue(ThemeCssVariables.SubColor));
-    setSubAltColor(style.getPropertyValue(ThemeCssVariables.SubAltColor));
+    setFontFamily(style.getPropertyValue(ConfigCssVariable.FontFamily));
+    setMainColor(style.getPropertyValue(ThemeCssVariable.MainColor));
+    setSubColor(style.getPropertyValue(ThemeCssVariable.SubColor));
+    setSubAltColor(style.getPropertyValue(ThemeCssVariable.SubAltColor));
     setVisible(true);
   }, []);
 

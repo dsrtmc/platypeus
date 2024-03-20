@@ -4,8 +4,6 @@ import React, { PropsWithChildren, Ref } from "react";
 import styles from "@/components/test/Test.module.css";
 import { Transition } from "react-transition-group";
 
-interface Props {}
-
 const duration = 300;
 
 const style = {
@@ -20,6 +18,8 @@ const transitionStyles = {
   exited: { opacity: 0 },
   unmounted: { opacity: 0 }, // don't know the reason for it, it just fixes the types
 };
+
+interface Props {}
 
 export default function Template({ children }: PropsWithChildren<Props>) {
   return (
