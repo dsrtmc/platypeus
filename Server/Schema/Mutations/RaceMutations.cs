@@ -8,6 +8,7 @@ using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Services;
 using Server.Utilities;
+using StackExchange.Redis;
 
 namespace Server.Schema.Mutations;
 
@@ -160,7 +161,15 @@ public static class RaceMutations
         await db.SaveChangesAsync(cancellationToken);
         
         var message = new RacePropertyUpdate { Racers = race.Racers };
-        await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
+        try
+        {
+            // TODO: Doesn't work if using Redis for some reason, causes the JsonSerializer to throw a `possible object cycle` exception.
+            await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[EXCEPTION] Message: {ex.Message}");
+        }
         
         return race;
     }
@@ -203,7 +212,7 @@ public static class RaceMutations
         return race;
     }
     
-    public static async Task<MutationResult<Race, NotAuthenticatedError>> CreateRace(
+    public static async Task<MutationResult<Race, NotAuthenticatedError, UniqueSlugNotGeneratedError>> CreateRace(
         bool unlisted, string mode, int modeSetting, string content, 
         DatabaseContext db, IHttpContextAccessor accessor)
     {
@@ -217,16 +226,14 @@ public static class RaceMutations
         if (user is null)
             return new NotAuthenticatedError();
 
-        var attemptCount = 0;
+        var attempts = 0;
         var slug = RandomGenerator.GenerateRandomString(8);
         
         while (db.Races.FirstOrDefault(r => r.Slug == slug) is not null)
         {
-            Console.WriteLine($"The slug: {slug}");
-            if (++attemptCount >= 50)
-            {
-                // TODO: return an error "too many attempts to generate a slug" idk
-            }
+            if (++attempts >= 50)
+                return new UniqueSlugNotGeneratedError();
+            
             slug = RandomGenerator.GenerateRandomString(8);
         }
         

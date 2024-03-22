@@ -48,6 +48,7 @@ type CreateRacePayload {
 
 type CreateScorePayload {
   score: Score
+  errors: [CreateScoreError!] @cost(complexity: 5)
 }
 
 type DeleteUserPayload {
@@ -101,6 +102,10 @@ type JoinRacePayload {
 type LeaveRacePayload {
   race: Race
   errors: [LeaveRaceError!] @cost(complexity: 5)
+}
+
+type ListTooLargeError implements Error {
+  message: String!
 }
 
 type LoginPayload {
@@ -355,6 +360,10 @@ type TooFewRacersError implements Error {
   message: String!
 }
 
+type UniqueSlugNotGeneratedError implements Error {
+  message: String!
+}
+
 type UpdateStatsPayload {
   racer: Racer
   errors: [UpdateStatsError!] @cost(complexity: 5)
@@ -401,7 +410,9 @@ type UsersEdge {
   node: User!
 }
 
-union CreateRaceError = NotAuthenticatedError
+union CreateRaceError = NotAuthenticatedError | UniqueSlugNotGeneratedError
+
+union CreateScoreError = ListTooLargeError
 
 union FinishRaceError = InvalidRaceError
 

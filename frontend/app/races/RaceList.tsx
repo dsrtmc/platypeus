@@ -36,6 +36,8 @@ const GetRaces = gql`
               }
             }
           }
+          mode
+          modeSetting
           host {
             username
           }
@@ -121,6 +123,9 @@ export function RaceList({}) {
             <tr className={styles.tr}>
               <th className={`${styles.left} ${styles.th}`}>
                 <p>author</p>
+              </th>
+              <th className={`${styles.right} ${styles.th}`}>
+                <p>mode</p>
               </th>
               <th className={`${styles.right} ${styles.th}`}>
                 <p>racers</p>

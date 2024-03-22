@@ -16,7 +16,8 @@ const possibleTypesIntrospectionQuery = `
   }
 `;
 
-// TODO: only in development, never do that in prod
+// TODO: only in development, don't do that in prod
+// we should move it to the build script, and in theory we only build for https, so we'll probably remove it
 const agent = new https.Agent({ rejectUnauthorized: false });
 
 fetch(process.env["NEXT_PUBLIC_API_URL"], {

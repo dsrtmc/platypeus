@@ -25,6 +25,7 @@
 
 .username {
     font-size: 3rem;
+    overflow: hidden;
 }
 
 .centerInfo {
@@ -47,6 +48,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    max-width: calc(var(--wrapper-width) / 2);
 }
 
 .groupTop {

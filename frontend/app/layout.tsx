@@ -11,6 +11,7 @@ import { NotificationProvider } from "@/app/NotificationProvider";
 import { NotificationToast } from "@/app/NotificationToast";
 import { Providers } from "@/app/Providers";
 import { Toasts } from "@/app/Toasts";
+import { Footer } from "@/components/footer/Footer";
 
 export const metadata = {
   title: "Create Next App",
@@ -30,10 +31,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Providers>
             <ContentWrapper>
               <Header />
-              <ConfigLoader />
-              {/* actually no idea why I have to specify height 100% for it to take all available space */}
-              <main style={{ height: "100%" }}>{children}</main>
               <Toasts />
+              <ConfigLoader />
+              <main>{children}</main>
+              <Footer />
             </ContentWrapper>
           </Providers>
         </ApolloWrapper>

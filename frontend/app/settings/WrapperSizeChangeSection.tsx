@@ -1,11 +1,18 @@
-import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, KeyboardEvent, useContext, useEffect, useState } from "react";
 import { DEFAULT_CONFIG, getConfig, setConfig } from "@/utils/configUtils";
 import styles from "@/app/settings/Settings.module.css";
 import { ConfigCssVariable } from "@/shared/types/configTypes";
+import { ErrorContext } from "@/app/ErrorProvider";
+import { NotificationContext } from "@/app/NotificationProvider";
+
+const MIN_WRAPPER_WIDTH = 720;
+const MAX_WRAPPER_WIDTH = 1920;
 
 interface Props {}
 
 export const WrapperSizeChangeSection: React.FC<Props> = ({}) => {
+  const { setError } = useContext(ErrorContext)!;
+  const { setNotification } = useContext(NotificationContext)!;
   const [value, setValue] = useState("");
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -24,11 +31,21 @@ export const WrapperSizeChangeSection: React.FC<Props> = ({}) => {
       console.error("`config` has not been found in the local storage.");
       return;
     }
-    config.wrapperWidth = parseFloat(value);
+    const numberValue = parseFloat(value);
+    if (numberValue < MIN_WRAPPER_WIDTH || numberValue > MAX_WRAPPER_WIDTH) {
+      setError({
+        code: "INVALID_WRAPPER_WIDTH",
+        message: `invalid wrapper width. min: ${MIN_WRAPPER_WIDTH}, max: ${MAX_WRAPPER_WIDTH}`,
+      });
+      return;
+    }
+    config.wrapperWidth = numberValue;
     setConfig(config);
 
     const root = document.documentElement;
     root.style.setProperty(ConfigCssVariable.WrapperWidth, value + "px");
+
+    setNotification({ message: "successfully changed wrapper width." });
   }
 
   function resetToDefault() {

@@ -42,7 +42,9 @@
 }
 
 .td, .th {
+    position: relative;
     padding: .25rem 1rem;
+    max-width: 8rem;
 }
 
 .tr .td:first-child {
@@ -61,6 +63,12 @@
     align-items: flex-start;
     gap: 1rem;
     height: 100%;
+}
+
+@media (max-width: 900px) {
+    .tables {
+        flex-direction: column;
+    }
 }
 
 .box {
@@ -115,6 +123,7 @@
     color: var(--text-color);
     transition: color 150ms ease;
     cursor: pointer;
+    word-wrap: break-word;
 }
 
 .user:hover {

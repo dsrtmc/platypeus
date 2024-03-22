@@ -52,6 +52,9 @@ public class User : BaseEntity
     
     public double GetAverageWpm(DatabaseContext db)
     {
+        if (this.Scores.IsNullOrEmpty())
+            return 0;
+        
         return this.Scores.Average(s => s.Wpm);
     }
 

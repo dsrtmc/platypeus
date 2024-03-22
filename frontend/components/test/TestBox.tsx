@@ -37,6 +37,7 @@ export function TestBox({ handleSaveScore }: Props) {
   const [initialContent, setInitialContent] = useState([""]);
   const [timePassed, setTimePassed] = useState(modeSetting);
   const [wpm, setWpm] = useState(0);
+  const [showCaret, setShowCaret] = useState(false);
 
   const ref = useRef<HTMLDivElement | null>(null);
   const testRef = useRef<HTMLDivElement | null>(null);
@@ -204,9 +205,6 @@ export function TestBox({ handleSaveScore }: Props) {
       }
     }
   }, [mode, modeSetting, language]);
-
-  // TODO: make sure a user cannot just sit in test for a million years and stack up an array with infinite length
-  const [showCaret, setShowCaret] = useState(false);
 
   if (!visible) return null;
   return (

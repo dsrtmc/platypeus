@@ -408,7 +408,9 @@ export const Test: FC<Props> = ({
 
     const nextWord = wordsRef.current[wordIndex + 1];
     const shouldFinish =
-      (letterIndex > currentWord.children.length - 1 && !nextWord) || (mode === "words" && wordIndex >= modeSetting);
+      (letterIndex > currentWord.children.length - 1 && !nextWord) ||
+      (mode === "words" && wordIndex >= modeSetting) ||
+      timePassed >= 60; // This part makes it "impossible" for our tests to run past 60s -> remember that for the future if we want to add more modes
 
     if (shouldFinish) {
       onFinish();

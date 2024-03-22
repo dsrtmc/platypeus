@@ -17,6 +17,11 @@ export const RaceListItem: React.FC<Props> = ({ race }) => {
         </Link>
       </td>
       <td className={`${styles.right} ${styles.td}`}>
+        <p>
+          {race.mode} {race.modeSetting}
+        </p>
+      </td>
+      <td className={`${styles.right} ${styles.td}`}>
         <p>{race.racers?.edges?.length}</p>
       </td>
       <td className={`${styles.right} ${styles.td} ${styles.date}`}>

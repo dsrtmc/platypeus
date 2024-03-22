@@ -199,7 +199,9 @@ export function Leaderboard({ mode, modeSetting }: Props) {
                 </td>
                 <td className={`${styles.right} ${styles.td}`}>
                   <p>{new Date(edge.node.createdAt).toLocaleDateString()}</p>
-                  <p className={styles.sub}>{new Date(edge.node.createdAt).toLocaleTimeString()}</p>
+                  <p className={styles.sub}>
+                    {new Date(edge.node.createdAt).toLocaleTimeString([], { hour12: false })}
+                  </p>
                 </td>
               </tr>
             ))}

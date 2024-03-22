@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Server.Models;
+using Server.Schema.Types.Errors;
 using Server.Services;
 
 namespace Server.Schema.Mutations;
@@ -25,7 +26,7 @@ public static class ScoreMutations
     /// <param name="db">The database context</param>
     /// <param name="accessor">Provides access to the current <see cref="HttpContext"/>, if one is available</param>
     /// <returns>The created score</returns>
-    public static async Task<Score> CreateScore(
+    public static async Task<MutationResult<Score, ListTooLargeError>> CreateScore(
         int wpm, int rawWpm, string mode, int modeSetting, string content,
         float accuracy, List<int> wpmStats, List<int> rawStats, string language,
         DatabaseContext db, [Service] IHttpContextAccessor accessor)
@@ -42,6 +43,10 @@ public static class ScoreMutations
             Content = content,
             Language = language,
         };
+
+        const int maxListLength = 75;
+        if (wpmStats.Count >= maxListLength || rawStats.Count >= maxListLength)
+            return new ListTooLargeError(maxListLength);
         
         var userId = accessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
         

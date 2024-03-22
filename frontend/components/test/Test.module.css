@@ -1,9 +1,10 @@
-.main {
+.mainBox {
     display: flex;
     justify-content: flex-end;
     flex-basis: 0;
     gap: 0;
     height: 100%;
+    width: 100%;
 }
 
 .top {
@@ -77,6 +78,7 @@
     /* TODO: GET CANCER HOW CAN I MAKE FLEX-WRAP LIMIT TO 3 ROWS MAN HOLY SHIT */
     height: calc(100px * calc(2 * 0.75));
     overflow: hidden;
+    width: 100%;
 }
 
 .words:active {
@@ -88,7 +90,6 @@
 }
 
 .wordsWrapper {
-    
 }
 
 .wordsEnter {

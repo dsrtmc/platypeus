@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Server.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,6 +102,7 @@ builder.Services
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>()
     .AddInMemorySubscriptions()
+    // .AddRedisSubscriptions((sp) => ConnectionMultiplexer.Connect("localhost"))
     .SetPagingOptions(new PagingOptions
     {
         RequirePagingBoundaries = true

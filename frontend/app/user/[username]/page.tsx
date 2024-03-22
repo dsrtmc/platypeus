@@ -35,9 +35,8 @@ const GetUserMonthlyScoreSummaries = gql`
   }
 `;
 
-// TODO: CONSIDER GOING FOR ROUTE-SPECIFIC QUERIES SO THAT WE AVOID OVER-FETCHING
 export default async function UserPage({ params }: { params: { username: string } }) {
-  const { data } = await getClient().query({
+  const { data, error } = await getClient().query({
     query: UserPage_GetUserDocument,
     variables: {
       where: {
@@ -51,7 +50,6 @@ export default async function UserPage({ params }: { params: { username: string 
     notFound();
   }
 
-  // TODO: cache is fkd i think idk, even if i do ctrl + f5 it still gets me stale data despite the server getting it correctly
   const { data: scoresData } = await getClient().query({
     query: UserPage_GetUserMonthlyScoreSummariesDocument,
     variables: {

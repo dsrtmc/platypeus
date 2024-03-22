@@ -70,7 +70,7 @@ export const MainBox: FC<Props> = ({}) => {
   }
 
   return (
-    <div className={styles.main}>
+    <div className={styles.mainBox}>
       {showScore ? (
         <ScoreBox scoreId={scoreId} handleStartNextTest={handleStartNextTest} />
       ) : (
