@@ -116,7 +116,7 @@ export const ScoreChart: React.FC<Props> = ({ score }) => {
       },
     ] as ChartDataset<"line">[],
   };
-  // TODO: for some incredibly funny reason, IBM Plex Mono doesn't work here lol and needs an additional re-render to work
+
   useEffect(() => {
     let style = getComputedStyle(document.body);
     setFontFamily(style.getPropertyValue("--font-family"));

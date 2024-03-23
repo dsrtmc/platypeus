@@ -77,7 +77,7 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
   };
 
   /*
-   * TODO: apparently you're not supposed to use `watch()` inside of the useEffect()'s dependency array,
+   * Apparently you're not supposed to use `watch()` inside of the useEffect()'s dependency array,
    * but the docs only mention optimization, and this is not an issue here at all.
    * also, its only purpose is to avoid discrepancy between the "selected" setting (UI) and the actually selected one.
    */
@@ -85,7 +85,6 @@ export const CreateRaceForm: React.FC<Props> = ({}) => {
     setValue("modeSetting", "5");
   }, [watch("mode")]);
 
-  // TODO: require authentication
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <h1 className={styles.header}>create a race</h1>

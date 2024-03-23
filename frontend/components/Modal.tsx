@@ -8,7 +8,6 @@ interface Props {
   handleHide: () => void;
 }
 
-// TODO: I guess move it somewhere else so it's more fitting to its reusable properties
 export const Modal: React.FC<PropsWithChildren<Props>> = ({ visible, handleHide, children }) => {
   const contentRef = useRef<HTMLDivElement | null>(null);
 

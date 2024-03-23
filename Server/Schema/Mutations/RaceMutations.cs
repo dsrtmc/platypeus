@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Security.Claims;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ public static class RaceMutations
 
         await db.SaveChangesAsync();
         
-        var message = new RacePropertyUpdate { Finished = true };
+        var message = new RaceEventMessage { Finished = true };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message);
 
         return race;
@@ -44,7 +45,6 @@ public static class RaceMutations
     public static async Task<MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError>> RunRace(
         Guid raceId, DatabaseContext db, [Service] ITopicEventSender eventSender, CancellationToken cancellationToken)
     {
-        // TODO: fix funny includes
         var race = await db.Races
             .Include(r => r.Host)
             .Include(r => r.Racers)
@@ -58,7 +58,7 @@ public static class RaceMutations
 
         await db.SaveChangesAsync(cancellationToken);
         
-        var message = new RacePropertyUpdate { Running = true };
+        var message = new RaceEventMessage { Running = true };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;
@@ -102,7 +102,7 @@ public static class RaceMutations
         
         await db.SaveChangesAsync(cancellationToken);
         
-        var message = new RacePropertyUpdate { Started = race.Started, StartTime = race.StartTime };
+        var message = new RaceEventMessage { Started = race.Started, StartTime = race.StartTime };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;
@@ -160,7 +160,7 @@ public static class RaceMutations
         
         await db.SaveChangesAsync(cancellationToken);
         
-        var message = new RacePropertyUpdate { Racers = race.Racers };
+        var message = new RaceEventMessage { Racers = race.Racers };
         try
         {
             // TODO: Doesn't work if using Redis for some reason, causes the JsonSerializer to throw a `possible object cycle` exception.
@@ -206,7 +206,7 @@ public static class RaceMutations
     
         await db.SaveChangesAsync(cancellationToken);
         
-        var message = new RacePropertyUpdate { Racers = race.Racers };
+        var message = new RaceEventMessage { Racers = race.Racers };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
     
         return race;
@@ -253,5 +253,36 @@ public static class RaceMutations
         await db.SaveChangesAsync();
         
         return race;
+    }
+
+    public static async Task<MutationResult<bool, NotAuthenticatedError, NotAuthorizedError, InvalidRaceError>> DeleteRace(
+        Guid raceId, DatabaseContext db, IHttpContextAccessor accessor,
+        CancellationToken cancellationToken)
+    {
+        var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+        if (claim is null || claim.Value.IsNullOrEmpty())
+            return new NotAuthenticatedError();
+
+        var userId = new Guid(claim.Value);
+        
+        var user = await db.Users.FindAsync(userId);
+        if (user is null)
+            return new NotAuthenticatedError();
+        
+        var race = await db.Races
+            .Include(r => r.Host)
+            .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+        
+        if (race is null)
+            return new InvalidRaceError(raceId);
+        
+        if (race.Host.Id != user.Id)
+            return new NotAuthorizedError();
+
+        db.Races.Remove(race);
+        
+        await db.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 }

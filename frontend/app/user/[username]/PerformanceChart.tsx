@@ -31,7 +31,6 @@ interface Props {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-// TODO: fix charts
 export const PerformanceChart: React.FC<Props> = ({ scores }) => {
   const [visible, setVisible] = useState(false);
 
@@ -167,8 +166,6 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
     ] as ChartDataset<"line">[],
   };
 
-  // really don't know whether I should be doing it like that, it seems very very very error-prone but oh well
-  // TODO: use global variables as an enum?
   useEffect(() => {
     let style = getComputedStyle(document.body);
     setFontFamily(style.getPropertyValue(ConfigCssVariable.FontFamily));
@@ -180,7 +177,6 @@ export const PerformanceChart: React.FC<Props> = ({ scores }) => {
 
   const ref = useRef<HTMLDivElement | null>(null);
 
-  // TODO: fix this stupid font issue where it doesn't load until a rerender
   return (
     <CSSTransition
       nodeRef={ref as Ref<HTMLDivElement | undefined>}

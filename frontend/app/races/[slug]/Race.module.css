@@ -167,7 +167,6 @@
     color: var(--sub-color);
 }
 
-/* TODO: I guess the button is ugly, it doesn't follow the textarea's resize */
 .sendButton {
     display: flex;
     justify-content: center;

@@ -28,6 +28,7 @@ const documents = {
     "\n  mutation RaceBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        wpm\n        rawWpm\n        mode\n        modeSetting\n        content\n        language\n        user {\n          username\n        }\n      }\n    }\n  }\n": types.RaceBox_CreateScoreDocument,
     "\n  mutation RaceBox_StartRace($input: StartRaceInput!) {\n    startRace(input: $input) {\n      race {\n        started\n        running\n        updatedAt\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_StartRaceDocument,
     "\n  mutation RaceBox_RunRace($input: RunRaceInput!) {\n    runRace(input: $input) {\n      race {\n        running\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_RunRaceDocument,
+    "\n  mutation RaceBox_DeleteRace($input: DeleteRaceInput!) {\n    deleteRace(input: $input) {\n      result: boolean\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_DeleteRaceDocument,
     "\n  query RacePage_GetRace($where: RaceFilterInput, $racersFirst: Int!) {\n    race(where: $where) {\n      id\n      startTime\n      createdAt\n      racers(first: $racersFirst) {\n        edges {\n          node {\n            user {\n              username\n            }\n            wpm\n          }\n        }\n      }\n      host {\n        username\n      }\n      started\n      content\n      unlisted\n      running\n      finished\n    }\n  }\n": types.RacePage_GetRaceDocument,
     "\n  query RacesPage_Me {\n    me {\n      id\n      ...UserInfo\n    }\n  }\n": types.RacesPage_MeDocument,
     "\n  query ScorePage_GetScore($where: ScoreFilterInput) {\n    score(where: $where) {\n      id\n      wpm\n      rawWpm\n    }\n  }\n": types.ScorePage_GetScoreDocument,
@@ -118,6 +119,10 @@ export function graphql(source: "\n  mutation RaceBox_StartRace($input: StartRac
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation RaceBox_RunRace($input: RunRaceInput!) {\n    runRace(input: $input) {\n      race {\n        running\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RaceBox_RunRace($input: RunRaceInput!) {\n    runRace(input: $input) {\n      race {\n        running\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RaceBox_DeleteRace($input: DeleteRaceInput!) {\n    deleteRace(input: $input) {\n      result: boolean\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RaceBox_DeleteRace($input: DeleteRaceInput!) {\n    deleteRace(input: $input) {\n      result: boolean\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

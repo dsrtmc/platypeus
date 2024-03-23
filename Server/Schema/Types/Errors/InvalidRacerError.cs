@@ -12,5 +12,10 @@ public class InvalidRacerError
         Message = $"User \"{username}\" is not a part of the race \"{raceId}\".";
     }
     
+    public InvalidRacerError(string? slug, string? username)
+    {
+        Message = $"User \"{username}\" is not a part of the race \"{slug}\".";
+    }
+    
     public string Message { get; set; }
 }

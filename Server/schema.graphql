@@ -51,6 +51,11 @@ type CreateScorePayload {
   errors: [CreateScoreError!] @cost(complexity: 5)
 }
 
+type DeleteRacePayload {
+  boolean: Boolean
+  errors: [DeleteRaceError!] @cost(complexity: 5)
+}
+
 type DeleteUserPayload {
   boolean: Boolean
 }
@@ -154,6 +159,7 @@ type Mutation {
   joinRace(input: JoinRaceInput!): JoinRacePayload! @cost(complexity: 5)
   leaveRace(input: LeaveRaceInput!): LeaveRacePayload! @cost(complexity: 5)
   createRace(input: CreateRaceInput!): CreateRacePayload! @cost(complexity: 5)
+  deleteRace(input: DeleteRaceInput!): DeleteRacePayload! @cost(complexity: 5)
   updateStats(input: UpdateStatsInput!): UpdateStatsPayload! @cost(complexity: 5)
   finishRaceForUser(input: FinishRaceForUserInput!): FinishRaceForUserPayload! @cost(complexity: 5)
   createScore(input: CreateScoreInput!): CreateScorePayload! @cost(complexity: 5)
@@ -414,6 +420,8 @@ union CreateRaceError = NotAuthenticatedError | UniqueSlugNotGeneratedError
 
 union CreateScoreError = ListTooLargeError
 
+union DeleteRaceError = NotAuthenticatedError | NotAuthorizedError | InvalidRaceError
+
 union FinishRaceError = InvalidRaceError
 
 union FinishRaceForUserError = InvalidRaceError | InvalidUserError | InvalidRacerError
@@ -488,6 +496,10 @@ input DateTimeOperationFilterInput {
   nlt: DateTime
   lte: DateTime
   nlte: DateTime
+}
+
+input DeleteRaceInput {
+  raceId: UUID!
 }
 
 input DeleteUserInput {

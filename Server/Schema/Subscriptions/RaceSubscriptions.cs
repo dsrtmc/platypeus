@@ -30,12 +30,12 @@ public class RaceSubscriptions
 
         yield return race;
         
-        var sourceStream = await eventReceiver.SubscribeAsync<RacePropertyUpdate>(Helper.EncodeOnRaceEventToken(raceId));
+        var sourceStream = await eventReceiver.SubscribeAsync<RaceEventMessage>(Helper.EncodeOnRaceEventToken(raceId));
         
         await foreach (var propertyUpdate in sourceStream.ReadEventsAsync())
         {
             var raceProperties = typeof(Race).GetProperties();
-            var properties = typeof(RacePropertyUpdate).GetProperties();
+            var properties = typeof(RaceEventMessage).GetProperties();
             foreach (var raceProperty in raceProperties)
             {
                 foreach (var property in properties)
@@ -70,11 +70,10 @@ public class RaceSubscriptions
     //     => await db.Races.Where(r => ids.Contains(r.Id)).ToDictionaryAsync(r => r.Id, cancellationToken);
 }
 
-// TODO: rename i guess
 /// <summary>
 /// Holds the properties that are to be updated in the `Race` object.
 /// </summary>
-public class RacePropertyUpdate
+public class RaceEventMessage
 {
     public List<Racer>? Racers { get; set; }
     

@@ -305,8 +305,7 @@
 
 .languageList {
     display: flex;
-    /* TODO: make it more responsive */
-    width: calc(var(--wrapper-width) * 0.75);
+    width: 100%;
     max-height: 700px;
     flex-direction: column;
     justify-content: center;

@@ -43,4 +43,6 @@
     background-color: var(--sub-alt-color);
     border-radius: var(--roundness);
     z-index: 20;
+    width: 75%;
+    max-width: calc(var(--wrapper-width) * 0.75);
 }

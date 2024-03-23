@@ -93,7 +93,7 @@ export type CreateChatboxPayload = {
   chatbox?: Maybe<Chatbox>;
 };
 
-export type CreateRaceError = NotAuthenticatedError;
+export type CreateRaceError = NotAuthenticatedError | UniqueSlugNotGeneratedError;
 
 export type CreateRaceInput = {
   content: Scalars['String']['input'];
@@ -107,6 +107,8 @@ export type CreateRacePayload = {
   errors?: Maybe<Array<CreateRaceError>>;
   race?: Maybe<Race>;
 };
+
+export type CreateScoreError = ListTooLargeError;
 
 export type CreateScoreInput = {
   accuracy: Scalars['Float']['input'];
@@ -122,6 +124,7 @@ export type CreateScoreInput = {
 
 export type CreateScorePayload = {
   __typename?: 'CreateScorePayload';
+  errors?: Maybe<Array<CreateScoreError>>;
   score?: Maybe<Score>;
 };
 
@@ -138,6 +141,18 @@ export type DateTimeOperationFilterInput = {
   nin?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
   nlt?: InputMaybe<Scalars['DateTime']['input']>;
   nlte?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type DeleteRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError;
+
+export type DeleteRaceInput = {
+  raceId: Scalars['UUID']['input'];
+};
+
+export type DeleteRacePayload = {
+  __typename?: 'DeleteRacePayload';
+  boolean?: Maybe<Scalars['Boolean']['output']>;
+  errors?: Maybe<Array<DeleteRaceError>>;
 };
 
 export type DeleteUserInput = {
@@ -303,6 +318,11 @@ export type ListIntOperationFilterInput = {
   some?: InputMaybe<IntOperationFilterInput>;
 };
 
+export type ListTooLargeError = Error & {
+  __typename?: 'ListTooLargeError';
+  message: Scalars['String']['output'];
+};
+
 export type LoginError = IncorrectCredentialsError | InvalidFieldError;
 
 export type LoginInput = {
@@ -376,6 +396,7 @@ export type Mutation = {
   createChatbox: CreateChatboxPayload;
   createRace: CreateRacePayload;
   createScore: CreateScorePayload;
+  deleteRace: DeleteRacePayload;
   deleteUser: DeleteUserPayload;
   finishRace: FinishRacePayload;
   finishRaceForUser: FinishRaceForUserPayload;
@@ -399,6 +420,11 @@ export type MutationCreateRaceArgs = {
 
 export type MutationCreateScoreArgs = {
   input: CreateScoreInput;
+};
+
+
+export type MutationDeleteRaceArgs = {
+  input: DeleteRaceInput;
 };
 
 
@@ -920,6 +946,11 @@ export type TooFewRacersError = Error & {
   message: Scalars['String']['output'];
 };
 
+export type UniqueSlugNotGeneratedError = Error & {
+  __typename?: 'UniqueSlugNotGeneratedError';
+  message: Scalars['String']['output'];
+};
+
 export type UpdateStatsError = InvalidRaceError | InvalidRacerError | InvalidUserError | NotAuthenticatedError;
 
 export type UpdateStatsInput = {
@@ -1041,7 +1072,7 @@ export type CreateRaceForm_CreateRaceMutationVariables = Exact<{
 }>;
 
 
-export type CreateRaceForm_CreateRaceMutation = { __typename?: 'Mutation', createRace: { __typename?: 'CreateRacePayload', race?: { __typename?: 'Race', id: any, unlisted: boolean, slug: string } | null, errors?: Array<{ __typename?: 'NotAuthenticatedError', message: string, code: 'NotAuthenticatedError' }> | null } };
+export type CreateRaceForm_CreateRaceMutation = { __typename?: 'Mutation', createRace: { __typename?: 'CreateRacePayload', race?: { __typename?: 'Race', id: any, unlisted: boolean, slug: string } | null, errors?: Array<{ __typename?: 'NotAuthenticatedError', message: string, code: 'NotAuthenticatedError' } | { __typename?: 'UniqueSlugNotGeneratedError', message: string, code: 'UniqueSlugNotGeneratedError' }> | null } };
 
 export type RaceList_GetRacesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
@@ -1139,6 +1170,13 @@ export type RaceBox_RunRaceMutationVariables = Exact<{
 
 
 export type RaceBox_RunRaceMutation = { __typename?: 'Mutation', runRace: { __typename?: 'RunRacePayload', race?: { __typename?: 'Race', running: boolean } | null, errors?: Array<{ __typename?: 'InvalidRaceError', message: string, code: 'InvalidRaceError' } | { __typename?: 'NotAuthenticatedError', message: string, code: 'NotAuthenticatedError' } | { __typename?: 'NotAuthorizedError', message: string, code: 'NotAuthorizedError' }> | null } };
+
+export type RaceBox_DeleteRaceMutationVariables = Exact<{
+  input: DeleteRaceInput;
+}>;
+
+
+export type RaceBox_DeleteRaceMutation = { __typename?: 'Mutation', deleteRace: { __typename?: 'DeleteRacePayload', result?: boolean | null, errors?: Array<{ __typename?: 'InvalidRaceError', message: string, code: 'InvalidRaceError' } | { __typename?: 'NotAuthenticatedError', message: string, code: 'NotAuthenticatedError' } | { __typename?: 'NotAuthorizedError', message: string, code: 'NotAuthorizedError' }> | null } };
 
 export type RacePage_GetRaceQueryVariables = Exact<{
   where?: InputMaybe<RaceFilterInput>;
@@ -1247,6 +1285,7 @@ export const RaceBox_LeaveRaceDocument = {"kind":"Document","definitions":[{"kin
 export const RaceBox_CreateScoreDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RaceBox_CreateScore"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateScoreInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createScore"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"score"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"rawWpm"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"modeSetting"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RaceBox_CreateScoreMutation, RaceBox_CreateScoreMutationVariables>;
 export const RaceBox_StartRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RaceBox_StartRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"StartRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"started"}},{"kind":"Field","name":{"kind":"Name","value":"running"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"code"},"name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RaceBox_StartRaceMutation, RaceBox_StartRaceMutationVariables>;
 export const RaceBox_RunRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RaceBox_RunRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RunRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"runRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"running"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"code"},"name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RaceBox_RunRaceMutation, RaceBox_RunRaceMutationVariables>;
+export const RaceBox_DeleteRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RaceBox_DeleteRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"boolean"}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"code"},"name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RaceBox_DeleteRaceMutation, RaceBox_DeleteRaceMutationVariables>;
 export const RacePage_GetRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RacePage_GetRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"RaceFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"racersFirst"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"racers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"racersFirst"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"started"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"unlisted"}},{"kind":"Field","name":{"kind":"Name","value":"running"}},{"kind":"Field","name":{"kind":"Name","value":"finished"}}]}}]}}]} as unknown as DocumentNode<RacePage_GetRaceQuery, RacePage_GetRaceQueryVariables>;
 export const RacesPage_MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RacesPage_Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"UserInfo"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserInfo"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]} as unknown as DocumentNode<RacesPage_MeQuery, RacesPage_MeQueryVariables>;
 export const ScorePage_GetScoreDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ScorePage_GetScore"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ScoreFilterInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"score"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"wpm"}},{"kind":"Field","name":{"kind":"Name","value":"rawWpm"}}]}}]}}]} as unknown as DocumentNode<ScorePage_GetScoreQuery, ScorePage_GetScoreQueryVariables>;

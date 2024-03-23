@@ -164,3 +164,17 @@ const RunRace = gql`
     }
   }
 `;
+
+const DeleteRace = gql`
+  mutation RaceBox_DeleteRace($input: DeleteRaceInput!) {
+    deleteRace(input: $input) {
+      result: boolean
+      errors {
+        code: __typename
+        ... on Error {
+          message
+        }
+      }
+    }
+  }
+`;

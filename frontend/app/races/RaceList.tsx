@@ -77,7 +77,7 @@ export function RaceList({}) {
         updateQuery: (previousQueryResult, { fetchMoreResult }) => {
           // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
           if (!fetchMoreResult) return previousQueryResult;
-          // if (!data?.races?.pageInfo.hasNextPage) return; // TODO: uncomment and investigate, possibly stale `data` that's why ↑
+          if (!data?.races?.pageInfo.hasNextPage) return previousQueryResult; // TODO: uncomment and investigate, possibly stale `data` that's why ↑
           const prevEdges = previousQueryResult.races!.edges ?? [];
           const nextEdges = fetchMoreResult.races!.edges ?? [];
 

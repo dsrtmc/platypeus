@@ -96,6 +96,7 @@ export const Test: FC<Props> = ({
 }) => {
   const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
+  const wordsDivRef = useRef<HTMLDivElement | null>(null);
 
   const [wordIndex, setWordIndex] = useState(-1);
   const [letterIndex, setLetterIndex] = useState(-1);
@@ -487,10 +488,6 @@ export const Test: FC<Props> = ({
       window.removeEventListener("resize", handleResize);
     };
   }, [handleKeyDown, handleResize]);
-
-  // TODO: name xd
-  // TODO: probably look at these refs here, innerRef and others.
-  const wordsDivRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <div className={styles.wordsWrapper} ref={innerRef}>

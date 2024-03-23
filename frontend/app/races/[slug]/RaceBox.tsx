@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
   CreateScoreInput as CreateScoreInputType,
   RaceBox_CreateScoreDocument,
+  RaceBox_DeleteRaceDocument,
   RaceBox_FinishRaceDocument,
   RaceBox_FinishRaceForUserDocument,
   RaceBox_JoinRaceDocument,
@@ -30,6 +31,7 @@ import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
 import { assertIsNode } from "@/utils/assertIsNode";
 import { Countdown } from "@/app/races/[slug]/Countdown";
 import { HiArrowsPointingIn } from "react-icons/hi2";
+import { ErrorContext } from "@/app/ErrorProvider";
 
 interface Props {
   race: NonNullable<RacePage_GetRaceQuery["race"]>;
@@ -40,6 +42,8 @@ const COUNTDOWN_TIME = 5;
 
 // TODO: add error handling whenever we execute a mutation (not just in this file)
 export const RaceBox: React.FC<Props> = ({ race }) => {
+  const { setError } = useContext(ErrorContext)!;
+
   const { data, loading, error } = useSubscription(RaceBox_OnRaceEventDocument, {
     variables: { raceId: race!.id, racersFirst: 10 },
   });
@@ -53,6 +57,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const [createScore, {}] = useMutation(RaceBox_CreateScoreDocument);
   const [startRace, {}] = useMutation(RaceBox_StartRaceDocument);
   const [runRace, {}] = useMutation(RaceBox_RunRaceDocument);
+  const [deleteRace, {}] = useMutation(RaceBox_DeleteRaceDocument);
 
   const ref = useRef<HTMLDivElement | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -72,13 +77,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const initialCountdown = race.started
     ? Math.round(new Date(race.startTime).getTime() / 1000 + COUNTDOWN_TIME - new Date().getTime() / 1000)
     : COUNTDOWN_TIME;
-  console.log("INitial countdown:", initialCountdown);
   const [countdown, setCountdown] = useState(initialCountdown);
 
-  // TODO: make it nicer, right now it returns true when we should prevent user input
   function handleKeyDown(e: globalThis.KeyboardEvent) {
     if (!data?.onRaceEvent.running || userHasFinished || !focused) {
-      console.log("a");
       e.stopPropagation();
     }
   }
@@ -123,7 +125,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     assertIsNode(e.target);
     if (!meData?.me || !data?.onRaceEvent) return;
     console.log(
-      data.onRaceEvent.racers?.edges!.find((edge) => edge.node.id === meData.me!.id)
+      data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id)
         ? "you are in the race"
         : "you are not in the race"
     );
@@ -151,7 +153,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   async function handleStart() {
     if (!data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
-      await startRace({ variables: { input: { raceId: race!.id } } });
+      const { data } = await startRace({ variables: { input: { raceId: race!.id } } });
+      if (data?.startRace?.errors?.length) {
+        setError({ code: data?.startRace.errors?.[0].code ?? "", message: data?.startRace.errors?.[0].message ?? "" });
+      }
     }
   }
 
@@ -225,13 +230,21 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     }
   }, [data]);
 
-  // TODO: think about deleting the race when the host leaves? hmm
+  async function handleBeforeUnload(e: BeforeUnloadEvent) {
+    // I would really love to have that and call `deleteRace()` depending on what the user clicks but :(
+    // e.preventDefault();
+    await deleteRace({ variables: { input: { raceId: race.id } } });
+  }
+
   useEffect(() => {
     document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, [data?.onRaceEvent.finished, data?.onRaceEvent.racers]);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      document.removeEventListener("click", handleClick);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [data?.onRaceEvent.finished, data?.onRaceEvent.racers, handleClick, handleBeforeUnload]);
 
-  // TODO: the cache update is fucked whenever you do a `joinRace` so idk bro fix it i guess lol // I GUESS IT GOT FIXED? LOL
   // TODO: would probably make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
   // TODO: maybe figure out a better error page? right now it shows an ugly "theres a funny error: {}" which is not too user-friendly in case-
   // ^^^^^-some shit actually goes down
@@ -243,7 +256,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   if (error) return <p>error: {JSON.stringify(error)}</p>;
   // if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>; // why did i do if (!meData?.me)?
   if (!data?.onRaceEvent) return <p>no data</p>;
-  // TODO: wouldn't it be a better idea to just have separate layouts for different states altogether? idk bro this is confusing
   return (
     <div className={styles.box}>
       <div className={styles.top}>
