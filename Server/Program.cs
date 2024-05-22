@@ -75,6 +75,8 @@ builder.Services
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddHostedService<RaceManagementService>();
+
 // GraphQL setup
 // TODO: read on max byte size for documents?
 builder.Services

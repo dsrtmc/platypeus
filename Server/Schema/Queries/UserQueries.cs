@@ -46,8 +46,7 @@ public static class UserQueries
         if (user is null)
             return new List<UserMonthlySummary>();
 
-        // TODO: it doesn't account for the year, would probably be a good idea to change that :)
-        return db.Scores.AsEnumerable().Where(s => s.UserId == user.Id).GroupBy(s => s.CreatedAt.Month).Select(
+        return db.Scores.AsEnumerable().Where(s => s.UserId == user.Id).GroupBy(s => new { s.CreatedAt.Year, s.CreatedAt.Month }).Select(
             group => new UserMonthlySummary
             {
                 Wpm = Convert.ToInt32(group.Average(g => g.Wpm)),

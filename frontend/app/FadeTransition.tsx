@@ -27,12 +27,12 @@ export const FadeTransition: React.FC<PropsWithChildren<Props>> = ({ children })
   const ref = useRef<HTMLDivElement | null>(null);
   return (
     <Transition nodeRef={ref} in={true} appear={true} timeout={duration}>
-      {/* TODO: would highly appreciate getting rid of this wrapper div for it ruins my styling */}
       {(state) => (
         <div
           style={{
             ...style,
             ...transitionStyles[state],
+            all: "inherit",
           }}
           ref={ref}
         >

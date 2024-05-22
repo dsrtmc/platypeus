@@ -191,7 +191,6 @@ export function TestBox({ handleSaveScore }: Props) {
 
   useEffect(() => {
     if (!finished) {
-      // TODO: a hack, which will probably stay here forever :)
       /*
        * NOTE: this only runs if the initial loading of settings actually changes one of those dependencies.
        * it means that if those values in the config are equal to the initial values in this component, we will not call it.

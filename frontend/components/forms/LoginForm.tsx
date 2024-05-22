@@ -1,7 +1,7 @@
 "use client";
 
 import { gql, useMutation } from "@apollo/client";
-import { LoginForm_LoginDocument } from "@/graphql/generated/graphql";
+import { Login_MeDocument, Login_MeQuery, LoginForm_LoginDocument } from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
 import { useEffect } from "react";
 import Link from "next/link";
@@ -47,26 +47,22 @@ export default function LoginForm() {
     },
   });
 
-  // TODO: Figure out why response doesn't have error messages
   const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
     const response = await login({
       variables: { input: { username: data.username, password: data.password } },
       update: (cache, { data }) => {
-        if (!data) {
-          return null;
-        }
-        // TODO: fix i guess xd idk graphql fragment or some shit idk
-        // cache.writeQuery<MeQuery>({
-        //   query: MeDocument,
-        //   data: {
-        //     me: data.login.user,
-        //   },
-        // });
+        if (!data) return;
+        // TODO: erm it actually doesn't work because if we navigate somewhere else that requires auth, it doesn't update it
+        // my guess is it's because our `MeDocument` is not global and Apollo separates them
+        cache.writeQuery<Login_MeQuery>({
+          query: Login_MeDocument,
+          data: {
+            me: data.login.user,
+          },
+        });
       },
     });
-    console.log("Response:", response);
-    // TODO: redirect home
     if (response.data?.login.user) {
       router.push("/");
     }

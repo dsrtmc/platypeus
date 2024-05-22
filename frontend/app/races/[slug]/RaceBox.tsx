@@ -161,10 +161,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   }
 
   async function handleFinish() {
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-    }
-    await finishRace({ variables: { input: { raceId: race!.id } } });
+    // if (countdownIntervalRef.current) {
+    //   clearInterval(countdownIntervalRef.current);
+    // }
+    // await finishRace({ variables: { input: { raceId: race!.id } } });
   }
 
   // TODO: very likely this shit is causing race conditions; need to investigate how to avoid sending the entire race as the event
@@ -224,6 +224,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     if (!data) return;
     if (!content) setContent(data.onRaceEvent.content.split(" "));
     if (data.onRaceEvent.running && !data.onRaceEvent.finished) {
+      console.log("we should be finishing the race XX?DX?D?DX??D");
       if (data.onRaceEvent.racers?.edges!.every((edge) => edge.node.finished)) {
         (async () => await handleFinish())();
       }
@@ -319,9 +320,9 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         modeSetting={data.onRaceEvent.modeSetting}
       />
       {/* dev */}
-      {/*<h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>*/}
-      {/*<h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.started ? "true" : "false"}</h1>*/}
-      {/*<h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>*/}
+      <h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>
+      <h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.started ? "true" : "false"}</h1>
+      <h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>
       {/* dev */}
       <div className={styles.hr} />
       <Chatbox chatboxId={data.onRaceEvent.chatboxId} me={meData?.me} />

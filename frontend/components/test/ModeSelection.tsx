@@ -16,7 +16,7 @@ export const ModeSelection: React.FC<Props> = ({ selectedMode, handleSelectMode 
   return (
     <div className={styles.modeSelection}>
       {selection.map((mode) => (
-        <ModeButton mode={mode} selected={mode === selectedMode} onSelect={onSelectMode} />
+        <ModeButton mode={mode} selected={mode === selectedMode} onSelect={onSelectMode} key={mode} />
       ))}
     </div>
   );
