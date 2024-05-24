@@ -18,12 +18,6 @@ public class Race : BaseEntity
     
     public string Content { get; init; } = null!;
     
-    // TODO: i think remove, i don't think we need this
-    /// <summary>
-    /// Specifies whether the race has started, which initiates the countdown before the race is running.
-    /// </summary>
-    public bool Started { get; set; }
-    
     /// <summary>
     /// Specifies whether the race is running, which means the racers can type.
     /// </summary>

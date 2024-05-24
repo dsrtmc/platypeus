@@ -28,7 +28,6 @@ const GetRace = gql`
       host {
         username
       }
-      started
       content
       unlisted
       running

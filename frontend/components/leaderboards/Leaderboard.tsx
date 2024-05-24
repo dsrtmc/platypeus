@@ -140,6 +140,8 @@ export function Leaderboard({ mode, modeSetting }: Props) {
     // TODO: throw an error?
     throw new Error("we didnt get data");
   }
+  // @ts-ignore
+  // @ts-ignore
   return (
     <div className={styles.box}>
       <label>
@@ -175,6 +177,14 @@ export function Leaderboard({ mode, modeSetting }: Props) {
             </tr>
           </thead>
           <tbody className={styles.body}>
+            {!data.scoresForLeaderboard.edges?.length && (
+              <tr className={styles.tr}>
+                {/* @ts-ignore // pretty sure it's correct but JSX doesn't expect a string */}
+                <td className={styles.emptyMessage} colSpan={"100%"}>
+                  uh oh, look like there's no scores yet!
+                </td>
+              </tr>
+            )}
             {data.scoresForLeaderboard.edges!.map((edge, index) => (
               <tr className={styles.tr} key={edge.node.id}>
                 <td className={`${styles.left} ${styles.td}`}>

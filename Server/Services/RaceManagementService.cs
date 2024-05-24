@@ -31,10 +31,11 @@ public class RaceManagementService : BackgroundService
 
         var now = DateTimeOffset.UtcNow;
         
+        // removes time-based races after they've ended or any other races after 5 minutes
         var racesToFinish = await db.Races
-            .Where(r => !r.Finished && r.Mode == "time" &&
-                        r.StartTime.HasValue &&
-                        r.StartTime.Value.AddSeconds(r.ModeSetting) <= now)
+            .Where(r => !r.Finished && r.StartTime.HasValue && (
+                r.Mode == "time" && r.StartTime.Value.AddSeconds(r.ModeSetting) <= now ||
+                r.Mode != "time" && r.StartTime.Value.AddMinutes(5) <= now))
             .ToListAsync(stoppingToken);
         
         Console.WriteLine($"The races to finish count: {racesToFinish.Count}");

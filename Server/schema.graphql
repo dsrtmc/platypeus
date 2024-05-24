@@ -216,7 +216,6 @@ type Race {
   mode: String!
   modeSetting: Int!
   content: String!
-  started: Boolean!
   running: Boolean!
   finished: Boolean!
   unlisted: Boolean!
@@ -619,7 +618,6 @@ input RaceFilterInput {
   mode: StringOperationFilterInput
   modeSetting: IntOperationFilterInput
   content: StringOperationFilterInput
-  started: BooleanOperationFilterInput
   running: BooleanOperationFilterInput
   finished: BooleanOperationFilterInput
   unlisted: BooleanOperationFilterInput
@@ -637,7 +635,6 @@ input RaceSortInput {
   mode: SortEnumType
   modeSetting: SortEnumType
   content: SortEnumType
-  started: SortEnumType
   running: SortEnumType
   finished: SortEnumType
   unlisted: SortEnumType
@@ -714,6 +711,7 @@ input SendMessageInput {
 
 input StartRaceInput {
   raceId: UUID!
+  countdownTime: Int!
 }
 
 input StringOperationFilterInput {

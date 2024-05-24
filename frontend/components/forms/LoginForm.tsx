@@ -40,6 +40,7 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setFocus,
+    setError,
   } = useForm<FormValues>({
     defaultValues: {
       username: "",
@@ -65,6 +66,9 @@ export default function LoginForm() {
     });
     if (response.data?.login.user) {
       router.push("/");
+    } else if (response.data?.login.errors) {
+      // I guess we shouldn't set the error on the `password` field. Too bad!
+      setError("password", { type: "custom", message: response.data.login.errors[0].message });
     }
   };
 

@@ -33,7 +33,6 @@ const OnRaceEvent = gql`
         id
         username
       }
-      started
       running
       finished
       content
@@ -135,7 +134,6 @@ const StartRace = gql`
   mutation RaceBox_StartRace($input: StartRaceInput!) {
     startRace(input: $input) {
       race {
-        started
         running
         updatedAt
       }

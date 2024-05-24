@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
   CreateScoreInput as CreateScoreInputType,
@@ -32,6 +32,8 @@ import { assertIsNode } from "@/utils/assertIsNode";
 import { Countdown } from "@/app/races/[slug]/Countdown";
 import { HiArrowsPointingIn } from "react-icons/hi2";
 import { ErrorContext } from "@/app/ErrorProvider";
+import { COUNT } from "arg";
+import { isSetIterator } from "util/types";
 
 interface Props {
   race: NonNullable<RacePage_GetRaceQuery["race"]>;
@@ -70,12 +72,13 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const [wordCount, setWordCount] = useState(0);
 
   const initialTimePassed = Math.round(
-    race.started ? (new Date().getTime() - new Date(race.startTime).getTime()) / 1000 : 0
+    race.startTime ? (new Date().getTime() - new Date(race.startTime).getTime()) / 1000 : 0
   );
   const [timePassed, setTimePassed] = useState(initialTimePassed);
 
-  const initialCountdown = race.started
-    ? Math.round(new Date(race.startTime).getTime() / 1000 + COUNTDOWN_TIME - new Date().getTime() / 1000)
+  // ...now....startTime...
+  const initialCountdown = race.startTime
+    ? Math.round((new Date(race.startTime).getTime() - new Date().getTime()) / 1000)
     : COUNTDOWN_TIME;
   const [countdown, setCountdown] = useState(initialCountdown);
 
@@ -153,12 +156,50 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   async function handleStart() {
     if (!data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
-      const { data } = await startRace({ variables: { input: { raceId: race!.id } } });
-      if (data?.startRace?.errors?.length) {
-        setError({ code: data?.startRace.errors?.[0].code ?? "", message: data?.startRace.errors?.[0].message ?? "" });
-      }
+      await startRace({ variables: { input: { raceId: race.id, countdownTime: COUNTDOWN_TIME } } });
+      startCountdown();
+      // setTimeout(async () => {
+      //   const { data } = await startRace({ variables: { input: { raceId: race!.id } } });
+      //   if (data?.startRace?.errors?.length) {
+      //     setError({
+      //       code: data?.startRace.errors?.[0].code ?? "",
+      //       message: data?.startRace.errors?.[0].message ?? "",
+      //     });
+      //   }
+      // }, 5000);
     }
   }
+
+  /*
+   * TODO: simplify the shit out of this system. there is no way React makes it so complicated, it has to be me.
+   * simply put:
+   * 1. click start race
+   *    - the `startRace` function has an argument `countdownTime`, so `startRace(5)` will initiate the countdown
+   * 2. since `race.startTime` is not `null` anymore, <Countdown /> can see that:
+   *    - if (race.startTime is not null) -> display countdown
+   * 3. once countdown (in other words, time left 'till start) reaches 0, the users are able to race
+   *    - I don't think there's need to validate the countdown; if someone can bypass the countdown, too bad!
+   * 4. once the timer reaches 0, the server should finish the race; once the race is `finished` for users, they can't type
+   */
+  const startCountdown = useCallback(() => {
+    if (data) {
+      countdownIntervalRef.current = setInterval(() => {
+        console.log("The fucking start time:", data.onRaceEvent.startTime);
+        const timeLeftToBegin = Math.round(
+          (new Date(data.onRaceEvent.startTime).getTime() - new Date().getTime()) / 1000
+        );
+        setCountdown(timeLeftToBegin);
+      }, 1000);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data && data.onRaceEvent.startTime) {
+      console.log("The start time in use effect:", data.onRaceEvent.startTime);
+      startCountdown();
+    }
+    return () => clearInterval(countdownIntervalRef.current);
+  }, [data?.onRaceEvent.startTime]); // perhaps it's just better to do `[data]` at this point
 
   async function handleFinish() {
     // if (countdownIntervalRef.current) {
@@ -183,24 +224,25 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     await leaveRace({ variables: { input: { raceId: race.id } } });
   }
 
-  useEffect(() => {
-    if (data && data.onRaceEvent.started) {
-      countdownIntervalRef.current = setInterval(() => {
-        const timeLeftToBegin = Math.round(
-          (new Date(data.onRaceEvent.startTime).getTime() + COUNTDOWN_TIME * 1000 - new Date().getTime()) / 1000
-        );
-        console.log("we call it here like retards?:", timeLeftToBegin);
-        setCountdown(timeLeftToBegin);
-      }, 1000);
-    }
-    return () => clearInterval(countdownIntervalRef.current);
-  }, [data?.onRaceEvent.started]);
+  // useEffect(() => {
+  // if (data && data.onRaceEvent.startTime) {
+  //   countdownIntervalRef.current = setInterval(() => {
+  //     const timeLeftToBegin = Math.round(
+  //       (new Date(data.onRaceEvent.startTime).getTime() + COUNTDOWN_TIME * 1000 - new Date().getTime()) / 1000
+  //     );
+  //     console.log("we call it here like retards?:", timeLeftToBegin);
+  //     setCountdown(timeLeftToBegin);
+  //   }, 1000);
+  // }
+  //   return () => clearInterval(countdownIntervalRef.current);
+  // }, [data?.onRaceEvent.startTime]);
 
   useEffect(() => {
     if (!data) return;
     if (countdown <= 0) {
-      clearInterval(countdownIntervalRef.current);
-      (async () => await runRace({ variables: { input: { raceId: race.id } } }))();
+      // clearInterval(countdownIntervalRef.current);
+      console.log("WE JUST STARTED THE RACE :d");
+      // (async () => await runRace({ variables: { input: { raceId: race.id } } }))();
     }
   }, [countdown]);
 
@@ -265,7 +307,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         ) : (
           <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
         )}
-        {data.onRaceEvent.started && !data.onRaceEvent.running && !data.onRaceEvent.finished && (
+        {data.onRaceEvent.startTime && !data.onRaceEvent.running && !data.onRaceEvent.finished && (
           <Countdown countdown={countdown} />
         )}
       </div>
@@ -293,7 +335,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
       <div className={styles.bottom}>
         {meData &&
           meData.me &&
-          !data.onRaceEvent.started &&
+          !data.onRaceEvent.startTime &&
           !data.onRaceEvent.running &&
           (!data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id) ? (
             <JoinRaceButton handleJoinRace={handleJoinRace} />
@@ -306,7 +348,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
             disabled={
               data.onRaceEvent.finished ||
               data.onRaceEvent.running ||
-              data.onRaceEvent.started ||
+              data.onRaceEvent.startTime ||
               !data.onRaceEvent.racers?.edges ||
               data.onRaceEvent.racers!.edges!.length <= 0 // TODO: set to 1 before deploy
             }
@@ -320,8 +362,9 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         modeSetting={data.onRaceEvent.modeSetting}
       />
       {/* dev */}
+      <h1 style={{ fontSize: "1.5rem" }}>the start time: {data.onRaceEvent.startTime}</h1>
       <h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.started ? "true" : "false"}</h1>
+      <h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.startTime ? "true" : "false"}</h1>
       <h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>
       {/* dev */}
       <div className={styles.hr} />

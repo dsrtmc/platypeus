@@ -77,8 +77,6 @@ public class RaceEventMessage
 {
     public List<Racer>? Racers { get; set; }
     
-    public bool? Started { get; set; }
-    
     public bool? Running { get; set; }
     
     public bool? Finished { get; set; }

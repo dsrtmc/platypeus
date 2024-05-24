@@ -134,3 +134,9 @@
     transition: filter 150ms ease;
     filter: opacity(0.8);
 }
+
+.emptyMessage {
+    color: var(--sub-color);
+    text-align: center;
+    padding: 2rem;
+}

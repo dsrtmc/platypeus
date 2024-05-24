@@ -64,10 +64,20 @@ public static class RaceMutations
         return race;
     }
 
+    /// <summary>
+    /// Starts the race delayed by the given countdown time.
+    /// </summary>
+    /// <param name="raceId">The ID of the race.</param>
+    /// <param name="countdownTime">In seconds, the time it takes after submit for the race to start.</param>
+    /// <param name="db"></param>
+    /// <param name="eventSender"></param>
+    /// <param name="accessor"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public static async Task<
         MutationResult<Race, InvalidRaceError, NotAuthenticatedError, NotAuthorizedError, RaceAlreadyRunningError, TooFewRacersError>
     > StartRace(
-        Guid raceId, DatabaseContext db,
+        Guid raceId, int countdownTime, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
         IHttpContextAccessor accessor,
         CancellationToken cancellationToken)
@@ -87,7 +97,7 @@ public static class RaceMutations
         if (race is null)
             return new InvalidRaceError(raceId);
 
-        if (race.Finished || race.Started || race.Running)
+        if (race.Finished || race.Running)
             return new RaceAlreadyRunningError(raceId);
         
         // TODO: uncomment that in prod
@@ -97,12 +107,11 @@ public static class RaceMutations
         if (race.Host.Id != user.Id)
             return new NotAuthorizedError();
 
-        race.Started = true;
-        race.StartTime = DateTimeOffset.UtcNow;
+        race.StartTime = DateTimeOffset.UtcNow.AddSeconds(countdownTime);
         
         await db.SaveChangesAsync(cancellationToken);
         
-        var message = new RaceEventMessage { Started = race.Started, StartTime = race.StartTime };
+        var message = new RaceEventMessage { StartTime = race.StartTime };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;
@@ -195,7 +204,7 @@ public static class RaceMutations
         if (race is null)
             return new InvalidRaceError(raceId);
 
-        if (race.Started || race.Running)
+        if (race.Running)
             return new RaceIsRunningError();
 
         var racer = race.Racers.FirstOrDefault(r => r.User.Id == userId);
