@@ -2,11 +2,16 @@
 
 import styles from "./Test.module.css";
 import { Ref, useEffect, useRef, useState } from "react";
-import { Test } from "@/components/test/Test";
+import { Test, TestScoreType } from "@/components/test/Test";
 import { Timer } from "@/components/test/Timer";
 import { Counter } from "@/components/test/Counter";
 import { RestartButton } from "@/components/test/RestartButton";
-import { CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
+import {
+  CreateScoreInput,
+  CreateScoreInput as CreateScoreInputType,
+  MainBox_CreateScoreDocument,
+  MainBox_CreateScoreMutation,
+} from "@/graphql/generated/graphql";
 import { generateWord } from "@/utils/generateWords";
 import { generateRandomWords } from "@/utils/generateRandomWords";
 import { WordProgress } from "@/components/test/WordProgress";
@@ -16,13 +21,15 @@ import { CSSTransition } from "react-transition-group";
 import { getConfig, setConfig } from "@/utils/configUtils";
 import { TestLanguage, TestMode, ConfigType } from "@/shared/types/configTypes";
 import { assertIsNode } from "@/utils/assertIsNode";
-import { oneOf } from "prop-types";
+import { FetchResult, useMutation } from "@apollo/client";
 
 interface Props {
-  handleSaveScore: (score: CreateScoreInputType) => void;
+  onSaveScore: (score: FetchResult<MainBox_CreateScoreMutation>) => void;
 }
 
-export function TestBox({ handleSaveScore }: Props) {
+export function TestBox({ onSaveScore }: Props) {
+  const [createScore] = useMutation(MainBox_CreateScoreDocument);
+
   const [mounted, setMounted] = useState(true); // Used for triggering the animation on test reset
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(true);
@@ -141,6 +148,26 @@ export function TestBox({ handleSaveScore }: Props) {
     }
     setRunning(false);
     setFinished(true);
+  }
+
+  async function handleSaveScore(score: TestScoreType) {
+    const scoreInput: CreateScoreInputType = {
+      wpm: Math.round(score.wpm), // since there's no way to enforce an `int`, we round here just to be sure
+      rawWpm: Math.round(score.rawWpm),
+      accuracy: score.accuracy,
+      wpmStats: score.wpmStats,
+      rawStats: score.rawStats,
+      mode,
+      modeSetting,
+      content: score.content,
+      language,
+    };
+    const result = await createScore({
+      variables: {
+        input: scoreInput,
+      },
+    });
+    onSaveScore(result);
   }
 
   // TODO: sit down one day and think about those useEffect()s, some of them here and in `Test.tsx` are likely to be unnecessary.
@@ -262,10 +289,14 @@ export function TestBox({ handleSaveScore }: Props) {
               running={running}
               finished={finished}
               timePassed={timePassed}
-              modeSetting={modeSetting}
+              // modeSetting={modeSetting}
               startTime={testStartTime}
-              mode={mode}
-              language={language}
+              finishConditions={{
+                maxDuration: mode === "time" ? modeSetting : undefined,
+                maxWordCount: mode === "words" ? modeSetting : undefined,
+              }}
+              // mode={mode}
+              // language={language}
               onKeyDown={handleKeyDown}
               preventInput={finished || !focused}
               onPoolUpdate={onPoolUpdate}

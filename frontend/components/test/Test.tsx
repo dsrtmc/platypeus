@@ -1,7 +1,7 @@
 "use client";
 
 import { Word } from "@/components/test/Word";
-import { CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
+import { CreateScoreInput, CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
 import {
   createElement,
   FC,
@@ -20,24 +20,33 @@ import { generateRandomString } from "@/utils/generateRandomString";
 
 const MAX_TEST_TIME = 60;
 
+export type FinishConditionsType = {
+  maxWordCount?: number;
+  maxDuration?: number;
+};
+
+export type TestScoreType = Omit<CreateScoreInputType, "mode" | "modeSetting" | "language">;
+
 interface Props {
   focused: boolean;
   running: boolean;
   finished: boolean;
 
   timePassed: number;
-  modeSetting: number;
+  // modeSetting: number;
   startTime: number;
 
-  mode: string;
-  language: string;
+  finishConditions: FinishConditionsType;
+
+  // mode: string;
+  // language: string;
 
   onKeyDown: (e: globalThis.KeyboardEvent) => void;
   preventInput: boolean;
   onPoolUpdate: (count: number) => string[];
   handleFinish: () => void;
   handleChangeWpm: (wpm: number) => void;
-  handleSaveScore: (score: CreateScoreInputType) => void;
+  handleSaveScore: (score: TestScoreType) => void;
   setWordCount: (value: ((prevState: number) => number) | number) => void;
   showCaret: boolean;
 
@@ -79,10 +88,11 @@ export const Test: FC<Props> = ({
   running,
   finished,
   timePassed,
-  modeSetting,
+  // modeSetting,
   startTime,
-  mode,
-  language,
+  // mode,
+  // language,
+  finishConditions,
   onKeyDown,
   preventInput,
   onPoolUpdate,
@@ -372,7 +382,7 @@ export const Test: FC<Props> = ({
       if (e.key === " ") e.preventDefault();
       if (preventInput) return;
       onKeyDown(e);
-      // TODO: maybe name it better xd
+      // TODO: maybe name it better xd (name what? xd)
       if (e.key.length === 1) {
         if (e.ctrlKey && e.key !== "a") return;
         e.preventDefault();
@@ -396,7 +406,7 @@ export const Test: FC<Props> = ({
         }
       }
     },
-    [wordIndex, letterIndex, focused, running, finished]
+    [wordIndex, letterIndex, focused, running, finished, preventInput]
   );
 
   useEffect(() => {
@@ -408,10 +418,11 @@ export const Test: FC<Props> = ({
     if (!currentWord) return;
 
     const nextWord = wordsRef.current[wordIndex + 1];
-    const shouldFinish =
-      (letterIndex > currentWord.children.length - 1 && !nextWord) ||
-      (mode === "words" && wordIndex >= modeSetting) ||
-      timePassed >= 60; // This part makes it "impossible" for our tests to run past 60s -> remember that for the future if we want to add more modes
+
+    let shouldFinish = false;
+    shouldFinish ||= letterIndex > currentWord.children.length - 1 && !nextWord;
+    if (finishConditions.maxWordCount) shouldFinish ||= wordIndex >= finishConditions.maxWordCount;
+    if (finishConditions.maxDuration) shouldFinish ||= timePassed >= finishConditions.maxDuration;
 
     if (shouldFinish) {
       onFinish();
@@ -440,8 +451,8 @@ export const Test: FC<Props> = ({
     const newCorrectCount = correctCharacters + correctCount;
     const newNonEmptyCount = nonEmptyCharacters + nonEmptyCount;
 
-    const testDuration = (new Date().getTime() - startTime) / 1000;
-    console.log("Test duration at the end:", testDuration);
+    const testDuration = (new Date().getTime() - new Date(startTime).getTime()) / 1000;
+
     const wpm = calculateWpm(newCorrectCount, testDuration);
     const rawWpm = calculateWpm(newNonEmptyCount, testDuration);
 
@@ -449,18 +460,13 @@ export const Test: FC<Props> = ({
     let acc = newCorrectCount / newNonEmptyCount;
     if (!Number.isFinite(acc)) acc = 0;
 
-    // TODO: we only pass language here for creating the score, I'm not sure if that makes sense -> surely we can just pass the partial
-    // and update the mode/modeSetting/language from the parent box? (well we need mode and modeSetting here)
-    const score: CreateScoreInputType = {
+    const score: TestScoreType = {
       wpm,
       rawWpm,
-      mode,
-      modeSetting,
       accuracy: acc,
       wpmStats: [...wpmStats, wpm],
       rawStats: [...rawStats, rawWpm],
       content: content.join(" "),
-      language,
     };
     handleSaveScore(score);
   }
@@ -469,9 +475,10 @@ export const Test: FC<Props> = ({
     if (running && !finished) {
       updateStats(timePassed);
 
-      if (timePassed >= MAX_TEST_TIME || (mode === "time" && timePassed >= modeSetting)) {
-        onFinish();
-      }
+      // if (timePassed >= MAX_TEST_TIME || (mode === "time" && timePassed >= modeSetting)) {
+      if (finishConditions.maxDuration && timePassed >= finishConditions.maxDuration) onFinish();
+      // TODO: Word
+      // }
     }
   }, [timePassed]);
 

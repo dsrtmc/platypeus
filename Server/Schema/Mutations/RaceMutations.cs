@@ -108,10 +108,11 @@ public static class RaceMutations
             return new NotAuthorizedError();
 
         race.StartTime = DateTimeOffset.UtcNow.AddSeconds(countdownTime);
+        race.Running = true;
         
         await db.SaveChangesAsync(cancellationToken);
         
-        var message = new RaceEventMessage { StartTime = race.StartTime };
+        var message = new RaceEventMessage { Running = race.Running, StartTime = race.StartTime };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return race;

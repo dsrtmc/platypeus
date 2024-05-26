@@ -59,7 +59,6 @@ type FormValues = {
 };
 
 export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
-  console.log("logs every chatbox rerender?");
   const { data, loading, error } = useSubscription(Chatbox_OnChatboxEventDocument, {
     variables: {
       chatboxId,

@@ -1,6 +1,7 @@
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
+using Server.Schema.Mutations;
 using Server.Schema.Subscriptions;
 
 namespace Server.Services;
@@ -36,6 +37,8 @@ public class RaceManagementService : BackgroundService
             .Where(r => !r.Finished && r.StartTime.HasValue && (
                 r.Mode == "time" && r.StartTime.Value.AddSeconds(r.ModeSetting) <= now ||
                 r.Mode != "time" && r.StartTime.Value.AddMinutes(5) <= now))
+            .Include(r => r.Racers)
+                .ThenInclude(rr => rr.User)
             .ToListAsync(stoppingToken);
         
         Console.WriteLine($"The races to finish count: {racesToFinish.Count}");
@@ -51,9 +54,13 @@ public class RaceManagementService : BackgroundService
         foreach (var race in racesToFinish)
         {
             race.Finished = true;
-            // use the event sender here
-            var message = new RaceEventMessage { Finished = true };
+            
+            foreach (var racer in race.Racers)
+                racer.Finished = true;
+            
+            var message = new RaceEventMessage { Finished = true, Racers = race.Racers };
             await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(race.Id), message, stoppingToken);
+            
             Console.WriteLine($"We just finished the race with id: {race.Id}");
         }
 

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node ./scripts/generatePossibleTypes.js && next dev --turbo",
-    "build": "node ./scripts/generatePossibleTypes.js && next build",
-    "start": "node ./scripts/generatePossibleTypes.js && next start",
+    "dev": "node ./scripts/generatePossibleTypes.js; next dev --turbo",
+    "build": "node ./scripts/generatePossibleTypes.js; next build",
+    "start": "node ./scripts/generatePossibleTypes.js; next start",
     "lint": "next lint",
     "gen": "graphql-codegen --config codegen.ts"
   },

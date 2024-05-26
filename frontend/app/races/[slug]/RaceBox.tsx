@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import {
   CreateScoreInput as CreateScoreInputType,
@@ -16,11 +16,10 @@ import {
   RaceBox_StartRaceDocument,
   RaceBox_UpdateStatsDocument,
   RacePage_GetRaceQuery,
-  Score as ScoreType,
 } from "@/graphql/generated/graphql";
 import { Chatbox } from "@/app/races/[slug]/Chatbox";
 import styles from "./Race.module.css";
-import { Test } from "@/components/test/Test";
+import { Test, TestScoreType } from "@/components/test/Test";
 import { LOADED_WORDS_COUNT } from "@/shared/constants/testConfig";
 import { StartRaceButton } from "@/app/races/[slug]/StartRaceButton";
 import { JoinRaceButton } from "@/app/races/[slug]/JoinRaceButton";
@@ -30,10 +29,7 @@ import { WordProgress } from "@/components/test/WordProgress";
 import { RaceScoreboard } from "@/app/races/[slug]/RaceScoreboard";
 import { assertIsNode } from "@/utils/assertIsNode";
 import { Countdown } from "@/app/races/[slug]/Countdown";
-import { HiArrowsPointingIn } from "react-icons/hi2";
 import { ErrorContext } from "@/app/ErrorProvider";
-import { COUNT } from "arg";
-import { isSetIterator } from "util/types";
 
 interface Props {
   race: NonNullable<RacePage_GetRaceQuery["race"]>;
@@ -66,7 +62,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   const [focused, setFocused] = useState(false);
-  const [testStartTime, setTestStartTime] = useState(0);
   const [userHasFinished, setUserHasFinished] = useState(false);
   const [content, setContent] = useState<Array<string> | null>(race.content.split(" "));
   const [wordCount, setWordCount] = useState(0);
@@ -97,10 +92,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     });
   }
 
-  async function handleSaveScore(score: CreateScoreInputType) {
+  async function handleSaveScore(score: TestScoreType) {
     // Prevents multiple saving of the same score (as well as attempting to save on re-entering, which would crash out)
-    if (userHasFinished) return;
-    await handleChangeWpm(score.wpm!);
+    if (!data || userHasFinished) return; // xD
+    await handleChangeWpm(score.wpm ?? 0);
     await createScore({
       variables: {
         input: {
@@ -109,10 +104,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           accuracy: score.accuracy,
           wpmStats: score.wpmStats,
           rawStats: score.rawStats,
-          mode: score.mode,
-          modeSetting: score.modeSetting,
+          mode: data.onRaceEvent.mode,
+          modeSetting: data.onRaceEvent.modeSetting,
           content: score.content,
-          language: score.language,
+          language: "english", // TODO: make it modular by allowing choosing languages for races
         },
       },
     });
@@ -127,11 +122,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   function handleClick(e: globalThis.MouseEvent) {
     assertIsNode(e.target);
     if (!meData?.me || !data?.onRaceEvent) return;
-    console.log(
-      data.onRaceEvent.racers?.edges!.find((edge) => edge.node.user.id === meData.me!.id)
-        ? "you are in the race"
-        : "you are not in the race"
-    );
+    console.log(viewerIsInTheRace() ? "you are in the race" : "you are not in the race");
     if (ref && ref.current && viewerIsInTheRace()) {
       setFocused(!data.onRaceEvent.finished && ref.current!.contains(e.target as Node));
     }
@@ -157,55 +148,15 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   async function handleStart() {
     if (!data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
       await startRace({ variables: { input: { raceId: race.id, countdownTime: COUNTDOWN_TIME } } });
-      startCountdown();
-      // setTimeout(async () => {
-      //   const { data } = await startRace({ variables: { input: { raceId: race!.id } } });
-      //   if (data?.startRace?.errors?.length) {
-      //     setError({
-      //       code: data?.startRace.errors?.[0].code ?? "",
-      //       message: data?.startRace.errors?.[0].message ?? "",
-      //     });
-      //   }
-      // }, 5000);
     }
   }
-
-  /*
-   * TODO: simplify the shit out of this system. there is no way React makes it so complicated, it has to be me.
-   * simply put:
-   * 1. click start race
-   *    - the `startRace` function has an argument `countdownTime`, so `startRace(5)` will initiate the countdown
-   * 2. since `race.startTime` is not `null` anymore, <Countdown /> can see that:
-   *    - if (race.startTime is not null) -> display countdown
-   * 3. once countdown (in other words, time left 'till start) reaches 0, the users are able to race
-   *    - I don't think there's need to validate the countdown; if someone can bypass the countdown, too bad!
-   * 4. once the timer reaches 0, the server should finish the race; once the race is `finished` for users, they can't type
-   */
-  const startCountdown = useCallback(() => {
-    if (data) {
-      countdownIntervalRef.current = setInterval(() => {
-        console.log("The fucking start time:", data.onRaceEvent.startTime);
-        const timeLeftToBegin = Math.round(
-          (new Date(data.onRaceEvent.startTime).getTime() - new Date().getTime()) / 1000
-        );
-        setCountdown(timeLeftToBegin);
-      }, 1000);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (data && data.onRaceEvent.startTime) {
-      console.log("The start time in use effect:", data.onRaceEvent.startTime);
-      startCountdown();
-    }
-    return () => clearInterval(countdownIntervalRef.current);
-  }, [data?.onRaceEvent.startTime]); // perhaps it's just better to do `[data]` at this point
 
   async function handleFinish() {
     // if (countdownIntervalRef.current) {
     //   clearInterval(countdownIntervalRef.current);
     // }
     // await finishRace({ variables: { input: { raceId: race!.id } } });
+    setUserHasFinished(true);
   }
 
   // TODO: very likely this shit is causing race conditions; need to investigate how to avoid sending the entire race as the event
@@ -224,54 +175,41 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     await leaveRace({ variables: { input: { raceId: race.id } } });
   }
 
-  // useEffect(() => {
-  // if (data && data.onRaceEvent.startTime) {
-  //   countdownIntervalRef.current = setInterval(() => {
-  //     const timeLeftToBegin = Math.round(
-  //       (new Date(data.onRaceEvent.startTime).getTime() + COUNTDOWN_TIME * 1000 - new Date().getTime()) / 1000
-  //     );
-  //     console.log("we call it here like retards?:", timeLeftToBegin);
-  //     setCountdown(timeLeftToBegin);
-  //   }, 1000);
-  // }
-  //   return () => clearInterval(countdownIntervalRef.current);
-  // }, [data?.onRaceEvent.startTime]);
-
+  // Countdown logic
   useEffect(() => {
-    if (!data) return;
-    if (countdown <= 0) {
-      // clearInterval(countdownIntervalRef.current);
-      console.log("WE JUST STARTED THE RACE :d");
-      // (async () => await runRace({ variables: { input: { raceId: race.id } } }))();
-    }
-  }, [countdown]);
-
-  useEffect(() => {
-    if (data?.onRaceEvent.running) {
-      // clearInterval(countdownIntervalRef.current);
+    if (!data || !data.onRaceEvent.startTime) return;
+    countdownIntervalRef.current = setInterval(() => {
       const startTime = new Date(data.onRaceEvent.startTime).getTime();
-      setTestStartTime(startTime + COUNTDOWN_TIME * 1000);
+      const nowTime = new Date().getTime();
+      const timeLeftToBegin = Math.max(Math.round((startTime - nowTime) / 1000), 0);
+      setCountdown(timeLeftToBegin);
+    }, 1000);
+    return () => {
+      clearInterval(countdownIntervalRef.current);
+    };
+  }, [data?.onRaceEvent.startTime]);
 
+  // Timer logic
+  useEffect(() => {
+    if (!data || !data.onRaceEvent.startTime) return;
+    const startTime = new Date(data.onRaceEvent.startTime).getTime();
+    const nowTime = new Date().getTime();
+    const timeLeftToBegin = Math.max(Math.round((startTime - nowTime) / 1000), 0);
+    if (timeLeftToBegin <= 0) {
       timerIntervalRef.current = setInterval(async () => {
-        const nowTime = new Date().getTime();
-
-        const testDuration = Math.round(Math.abs(startTime + COUNTDOWN_TIME * 1000 - nowTime) / 1000);
+        const now = new Date().getTime();
+        const testDuration = Math.round(Math.abs(startTime - now) / 1000);
         setTimePassed(testDuration);
       }, 1000);
     }
     return () => clearInterval(timerIntervalRef.current);
-  }, [data?.onRaceEvent.running]); // perhaps it's just better to do `[data]` at this point
+  }, [data?.onRaceEvent.startTime, countdown]);
 
   useEffect(() => {
-    if (!data) return;
-    if (!content) setContent(data.onRaceEvent.content.split(" "));
-    if (data.onRaceEvent.running && !data.onRaceEvent.finished) {
-      console.log("we should be finishing the race XX?DX?D?DX??D");
-      if (data.onRaceEvent.racers?.edges!.every((edge) => edge.node.finished)) {
-        (async () => await handleFinish())();
-      }
+    if (data?.onRaceEvent.finished) {
+      (async () => await handleFinish())();
     }
-  }, [data]);
+  }, [data?.onRaceEvent.finished]);
 
   async function handleBeforeUnload(e: BeforeUnloadEvent) {
     // I would really love to have that and call `deleteRace()` depending on what the user clicks but :(
@@ -289,7 +227,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   }, [data?.onRaceEvent.finished, data?.onRaceEvent.racers, handleClick, handleBeforeUnload]);
 
   // TODO: would probably make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
-  // TODO: maybe figure out a better error page? right now it shows an ugly "theres a funny error: {}" which is not too user-friendly in case-
   // ^^^^^-some shit actually goes down
   // ↓ dont read this
   // NOTE: if you try to join the race twice from the same account on two different clients, funny shit happens and it throws you an error
@@ -307,9 +244,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         ) : (
           <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
         )}
-        {data.onRaceEvent.startTime && !data.onRaceEvent.running && !data.onRaceEvent.finished && (
-          <Countdown countdown={countdown} />
-        )}
+        {data.onRaceEvent.startTime && !data.onRaceEvent.finished && <Countdown countdown={countdown} />}
       </div>
       <div className={styles.middle} ref={ref}>
         <Test
@@ -317,12 +252,18 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           running={data.onRaceEvent.running}
           finished={data.onRaceEvent.finished ?? userHasFinished}
           timePassed={timePassed}
-          modeSetting={data.onRaceEvent.modeSetting}
-          startTime={testStartTime}
-          mode={data.onRaceEvent.mode}
-          language={"english"}
+          // modeSetting={data.onRaceEvent.modeSetting}
+          startTime={data.onRaceEvent.startTime}
+          // mode={data.onRaceEvent.mode}
+          // language={"english"}
+          finishConditions={{ maxDuration: 5 }}
           onKeyDown={handleKeyDown}
-          preventInput={!data?.onRaceEvent.running || userHasFinished || !focused}
+          preventInput={
+            !data?.onRaceEvent.startTime ||
+            new Date(data.onRaceEvent.startTime).getTime() > new Date().getTime() ||
+            userHasFinished ||
+            !focused
+          }
           onPoolUpdate={onPoolUpdate}
           handleFinish={handleFinishForUser}
           handleChangeWpm={handleChangeWpm}
