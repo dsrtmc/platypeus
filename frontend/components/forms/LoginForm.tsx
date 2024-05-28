@@ -1,7 +1,13 @@
 "use client";
 
 import { gql, useMutation } from "@apollo/client";
-import { Login_MeDocument, Login_MeQuery, LoginForm_LoginDocument } from "@/graphql/generated/graphql";
+import {
+  Login_MeDocument,
+  Login_MeQuery,
+  LoginForm_LoginDocument,
+  MeDocument,
+  MeQuery,
+} from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
 import { useEffect } from "react";
 import Link from "next/link";
@@ -54,10 +60,8 @@ export default function LoginForm() {
       variables: { input: { username: data.username, password: data.password } },
       update: (cache, { data }) => {
         if (!data) return;
-        // TODO: erm it actually doesn't work because if we navigate somewhere else that requires auth, it doesn't update it
-        // my guess is it's because our `MeDocument` is not global and Apollo separates them
-        cache.writeQuery<Login_MeQuery>({
-          query: Login_MeDocument,
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
           data: {
             me: data.login.user,
           },

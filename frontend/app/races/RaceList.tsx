@@ -1,6 +1,6 @@
 "use client";
 
-import React, { startTransition, useCallback } from "react";
+import React, { startTransition, useCallback, useEffect, useState } from "react";
 import { RaceList_GetRacesDocument, RaceList_GetRacesQueryVariables, RaceSortInput } from "@/graphql/generated/graphql";
 import styles from "./Races.module.css";
 import { gql, useSuspenseQuery } from "@apollo/client";

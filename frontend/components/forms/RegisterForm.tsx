@@ -1,7 +1,7 @@
 "use client";
 
 import { gql, useMutation } from "@apollo/client";
-import { RegisterForm_RegisterDocument } from "@/graphql/generated/graphql";
+import { MeDocument, MeQuery, RegisterForm_RegisterDocument } from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
 import { useEffect } from "react";
 import Link from "next/link";
@@ -18,6 +18,7 @@ const RegisterMutation = gql`
   mutation RegisterForm_Register($input: RegisterInput!) {
     register(input: $input) {
       user {
+        id
         ...UserInfo
       }
       errors {
@@ -51,15 +52,13 @@ export default function RegisterForm() {
     const response = await registerUser({
       variables: { input: { username: data.username, email: data.email, password: data.password } },
       update: (cache, { data }) => {
-        if (!data) {
-          return null;
-        }
-        // cache.writeQuery<MeQuery>({
-        //   query: MeDocument,
-        //   data: {
-        //     me: data.register.user,
-        //   },
-        // });
+        if (!data) return;
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            me: data.register.user,
+          },
+        });
       },
     });
     console.log("Register response:", response);

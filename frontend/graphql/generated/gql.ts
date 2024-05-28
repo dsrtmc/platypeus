@@ -34,13 +34,14 @@ const documents = {
     "\n  query UserPage_GetUser($where: UserFilterInput) {\n    user(where: $where) {\n      id\n      username\n      averageWpm\n      scoreCount\n      createdAt\n    }\n  }\n": types.UserPage_GetUserDocument,
     "\n  query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n    userMonthlyScoreSummaries(userId: $userId) {\n      wpm\n      rawWpm\n      accuracy\n      date\n    }\n  }\n": types.UserPage_GetUserMonthlyScoreSummariesDocument,
     "\n  mutation LoginForm_Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        ...UserInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.LoginForm_LoginDocument,
-    "\n  mutation RegisterForm_Register($input: RegisterInput!) {\n    register(input: $input) {\n      user {\n        ...UserInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RegisterForm_RegisterDocument,
+    "\n  mutation RegisterForm_Register($input: RegisterInput!) {\n    register(input: $input) {\n      user {\n        id\n        ...UserInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RegisterForm_RegisterDocument,
     "\n  query Leaderboard_GetScoresForLeaderboard(\n    $after: String\n    $before: String\n    $first: Int\n    $last: Int\n    $mode: String!\n    $modeSetting: Int!\n  ) {\n    scoresForLeaderboard(\n      after: $after\n      before: $before\n      first: $first\n      last: $last\n      mode: $mode\n      modeSetting: $modeSetting\n    ) {\n      edges {\n        node {\n          id\n          wpm\n          rawWpm\n          accuracy\n          user {\n            username\n          }\n          mode\n          modeSetting\n          content\n          createdAt\n        }\n        cursor\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n": types.Leaderboard_GetScoresForLeaderboardDocument,
     "\n  mutation AuthBox_Logout {\n    logout {\n      boolean\n    }\n  }\n": types.AuthBox_LogoutDocument,
     "\n  query Navbar_Me {\n    me {\n      id\n      ...UserInfo\n    }\n  }\n": types.Navbar_MeDocument,
     "\n  fragment ScoreInfo on Score {\n    wpm\n    rawWpm\n    mode\n    modeSetting\n    content\n    language\n    accuracy\n    wpmStats\n    rawStats\n    user {\n      username\n    }\n  }\n": types.ScoreInfoFragmentDoc,
     "\n  mutation MainBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        ...ScoreInfo\n      }\n    }\n  }\n": types.MainBox_CreateScoreDocument,
     "fragment UserInfo on User {\n  username\n  email\n}": types.UserInfoFragmentDoc,
+    "query Me {\n  me {\n    id\n    ...UserInfo\n  }\n}": types.MeDocument,
 };
 
 /**
@@ -144,7 +145,7 @@ export function graphql(source: "\n  mutation LoginForm_Login($input: LoginInput
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RegisterForm_Register($input: RegisterInput!) {\n    register(input: $input) {\n      user {\n        ...UserInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterForm_Register($input: RegisterInput!) {\n    register(input: $input) {\n      user {\n        ...UserInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  mutation RegisterForm_Register($input: RegisterInput!) {\n    register(input: $input) {\n      user {\n        id\n        ...UserInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterForm_Register($input: RegisterInput!) {\n    register(input: $input) {\n      user {\n        id\n        ...UserInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -169,6 +170,10 @@ export function graphql(source: "\n  mutation MainBox_CreateScore($input: Create
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "fragment UserInfo on User {\n  username\n  email\n}"): (typeof documents)["fragment UserInfo on User {\n  username\n  email\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query Me {\n  me {\n    id\n    ...UserInfo\n  }\n}"): (typeof documents)["query Me {\n  me {\n    id\n    ...UserInfo\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

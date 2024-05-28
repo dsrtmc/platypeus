@@ -5,7 +5,7 @@ import styles from "./Races.module.css";
 import { getClient } from "@/lib/client";
 import { LoginRequiredMessage } from "@/app/races/LoginRequiredMessage";
 import { gql } from "@apollo/client";
-import { RacesPage_MeDocument } from "@/graphql/generated/graphql";
+import { MeDocument, RacesPage_MeDocument } from "@/graphql/generated/graphql";
 
 interface Props {}
 
@@ -19,7 +19,7 @@ const Me = gql`
 `;
 
 export default async function RacesPage() {
-  const { data } = await getClient().query({ query: RacesPage_MeDocument });
+  const { data } = await getClient().query({ query: MeDocument });
   return (
     <div className={styles.main}>
       {data?.me ? <CreateRaceForm /> : <LoginRequiredMessage />}

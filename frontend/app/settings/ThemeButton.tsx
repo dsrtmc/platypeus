@@ -10,7 +10,6 @@ interface Props {
 }
 
 export const ThemeButton: React.FC<Props> = ({ theme, selected, handleThemeUpdate }) => {
-  // TODO: make selected actually usable
   const [themeName, themeConfig] = theme;
   function handleSelect() {
     handleThemeUpdate(themeConfig, themeName);

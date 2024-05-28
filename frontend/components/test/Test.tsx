@@ -2,7 +2,7 @@
 
 import { Word } from "@/components/test/Word";
 import { CreateScoreInput, CreateScoreInput as CreateScoreInputType } from "@/graphql/generated/graphql";
-import {
+import React, {
   createElement,
   FC,
   FunctionComponentElement,
@@ -18,7 +18,7 @@ import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
 import { generateRandomString } from "@/utils/generateRandomString";
 
-const MAX_TEST_TIME = 60;
+const MAX_TEST_DURATION = 60;
 
 export type FinishConditionsType = {
   maxWordCount?: number;
@@ -114,6 +114,7 @@ export const Test: FC<Props> = ({
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [wordPool, setWordPool] = useState<Array<FunctionComponentElement<typeof Word>>>([]);
   const [caretPosition, setCaretPosition] = useState({ x: 500, y: 500 });
+  const [lastLayoutShiftTime, setLastLayoutShiftTime] = useState(0);
 
   // funniest type ever, gives a squiggly but passes the build stage? xD whereas if there's no squiggly, the build breaks? XD
   const [{ correctCharacters, nonEmptyCharacters, allWordsLength, accuracy, content, wpmStats, rawStats }, dispatch] =
@@ -377,37 +378,35 @@ export const Test: FC<Props> = ({
   }
 
   // Not sure if this is better than keeping the dependencies in useEffect(), I'll keep it for now
-  const handleKeyDown = useCallback(
-    (e: globalThis.KeyboardEvent) => {
-      if (e.key === " ") e.preventDefault();
-      if (preventInput) return;
-      onKeyDown(e);
-      // TODO: maybe name it better xd (name what? xd)
-      if (e.key.length === 1) {
-        if (e.ctrlKey && e.key !== "a") return;
-        e.preventDefault();
-        if (e.key === " ") {
-          if (letterIndex) {
-            moveForwardOneWord();
-          }
-          handleLineChange();
-        } else {
-          moveForwardOneLetter(e.key);
+  /* prettier-ignore */
+  const handleKeyDown = useCallback((e: globalThis.KeyboardEvent) => {
+    if (e.key === " ") e.preventDefault();
+    if (preventInput) return;
+    onKeyDown(e);
+    // TODO: maybe name it better xd (name what? xd)
+    if (e.key.length === 1) {
+      if (e.ctrlKey && e.key !== "a") return;
+      e.preventDefault();
+      if (e.key === " ") {
+        if (letterIndex) {
+          moveForwardOneWord();
         }
+        handleLineChange();
       } else {
-        if (e.key === "Backspace") {
-          if (e.ctrlKey) {
-            deletePreviousWord();
-          } else if (!letterIndex) {
-            moveBackOneWord();
-          } else {
-            moveBackOneLetter();
-          }
+        moveForwardOneLetter(e.key);
+      }
+    } else {
+      if (e.key === "Backspace") {
+        if (e.ctrlKey) {
+          deletePreviousWord();
+        } else if (!letterIndex) {
+          moveBackOneWord();
+        } else {
+          moveBackOneLetter();
         }
       }
-    },
-    [wordIndex, letterIndex, focused, running, finished, preventInput]
-  );
+    }
+  }, [wordIndex, letterIndex, focused, running, finished, preventInput]);
 
   useEffect(() => {
     reset();
@@ -417,17 +416,11 @@ export const Test: FC<Props> = ({
     const currentWord = wordsRef.current[wordIndex];
     if (!currentWord) return;
 
-    const nextWord = wordsRef.current[wordIndex + 1];
-
-    let shouldFinish = false;
-    shouldFinish ||= letterIndex > currentWord.children.length - 1 && !nextWord;
-    if (finishConditions.maxWordCount) shouldFinish ||= wordIndex >= finishConditions.maxWordCount;
-    if (finishConditions.maxDuration) shouldFinish ||= timePassed >= finishConditions.maxDuration;
-
-    if (shouldFinish) {
+    if (shouldFinish()) {
       onFinish();
     }
 
+    // Caret movement
     const currentLetter = currentWord.children[letterIndex];
     if (currentLetter) {
       const { left, top } = currentLetter.getBoundingClientRect();
@@ -438,7 +431,7 @@ export const Test: FC<Props> = ({
       const { right, top } = previousLetter.getBoundingClientRect();
       moveCaret(right, top);
     }
-  }, [wordIndex, letterIndex, windowSize, wordPool]);
+  }, [wordIndex, letterIndex, wordPool, windowSize, lastLayoutShiftTime]);
 
   function onFinish() {
     handleFinish();
@@ -471,18 +464,29 @@ export const Test: FC<Props> = ({
     handleSaveScore(score);
   }
 
+  function shouldFinish(): boolean {
+    const currentWord = wordsRef.current[wordIndex];
+    if (!currentWord) return true;
+
+    const nextWord = wordsRef.current[wordIndex + 1];
+    let result = false;
+    result ||= letterIndex > currentWord.children.length - 1 && !nextWord;
+    if (finishConditions.maxWordCount) result ||= wordIndex >= finishConditions.maxWordCount;
+    if (finishConditions.maxDuration) {
+      result ||= timePassed >= finishConditions.maxDuration;
+    }
+    result ||= timePassed >= MAX_TEST_DURATION;
+    return result;
+  }
+
   useEffect(() => {
     if (running && !finished) {
       updateStats(timePassed);
 
-      // if (timePassed >= MAX_TEST_TIME || (mode === "time" && timePassed >= modeSetting)) {
-      if (finishConditions.maxDuration && timePassed >= finishConditions.maxDuration) onFinish();
-      // TODO: Word
-      // }
+      if (shouldFinish()) onFinish();
     }
   }, [timePassed]);
 
-  // TODO: not sure if the window size here affects stuff like dev tools etc. do research
   const handleResize = useCallback(() => {
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
   }, [windowSize]);
@@ -495,6 +499,21 @@ export const Test: FC<Props> = ({
       window.removeEventListener("resize", handleResize);
     };
   }, [handleKeyDown, handleResize]);
+
+  // Makes sure the caret will follow the text on the event of layout shifts
+  const observer = new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+      if (entry.entryType === "layout-shift") {
+        // @ts-ignore // `.lastInputTime` exists on entry if `.entryType === "layout-shift"`
+        setLastLayoutShiftTime(entry.lastInputTime);
+      }
+    }
+  });
+
+  useEffect(() => {
+    observer.observe({ type: "layout-shift", buffered: true });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className={styles.wordsWrapper} ref={innerRef}>

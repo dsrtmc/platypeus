@@ -131,17 +131,13 @@ export function Leaderboard({ mode, modeSetting }: Props) {
 
       observer.observe(node);
 
-      return () => {
-        observer.unobserve(node);
-      };
+      return () => observer.unobserve(node);
     }, [handleFetchMore]);
 
   if (!data?.scoresForLeaderboard) {
     // TODO: throw an error?
     throw new Error("we didnt get data");
   }
-  // @ts-ignore
-  // @ts-ignore
   return (
     <div className={styles.box}>
       <label>
