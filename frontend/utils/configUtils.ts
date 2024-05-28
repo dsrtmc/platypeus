@@ -21,6 +21,11 @@ export function makeConfig(): ConfigType {
   return DEFAULT_CONFIG;
 }
 
+/**
+ * Returns the user's config. Creates a new one if one is not found.
+ * `null` ONLY if the function is invoked on the server.
+ * @returns {ConfigType | null}
+ */
 export function getConfig(): ConfigType | null {
   if (typeof window === "undefined") return null;
   let config: ConfigType | null = null;

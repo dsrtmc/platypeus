@@ -6,13 +6,11 @@ import {
   CreateScoreInput as CreateScoreInputType,
   RaceBox_CreateScoreDocument,
   RaceBox_DeleteRaceDocument,
-  RaceBox_FinishRaceDocument,
   RaceBox_FinishRaceForUserDocument,
   RaceBox_JoinRaceDocument,
   RaceBox_LeaveRaceDocument,
   RaceBox_MeDocument,
   RaceBox_OnRaceEventDocument,
-  RaceBox_RunRaceDocument,
   RaceBox_StartRaceDocument,
   RaceBox_UpdateStatsDocument,
   RacePage_GetRaceQuery,
@@ -105,7 +103,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           mode: data.onRaceEvent.mode,
           modeSetting: data.onRaceEvent.modeSetting,
           content: score.content,
-          language: "english", // TODO: make it modular by allowing choosing languages for races
+          language: "english", // TODO: make it modular by allowing choosing languages for races (no priority)
         },
       },
     });
@@ -150,10 +148,6 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   }
 
   async function handleFinish() {
-    // if (countdownIntervalRef.current) {
-    //   clearInterval(countdownIntervalRef.current);
-    // }
-    // await finishRace({ variables: { input: { raceId: race!.id } } });
     setUserHasFinished(true);
   }
 
