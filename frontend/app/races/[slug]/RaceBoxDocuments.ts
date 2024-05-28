@@ -75,22 +75,6 @@ const UpdateStats = gql`
   }
 `;
 
-const FinishRace = gql`
-  mutation RaceBox_FinishRace($input: FinishRaceInput!) {
-    finishRace(input: $input) {
-      race {
-        id
-      }
-      errors {
-        code: __typename
-        ... on Error {
-          message
-        }
-      }
-    }
-  }
-`;
-
 const JoinRace = gql`
   mutation RaceBox_JoinRace($input: JoinRaceInput!) {
     joinRace(input: $input) {
@@ -136,22 +120,6 @@ const StartRace = gql`
       race {
         running
         updatedAt
-      }
-      errors {
-        code: __typename
-        ... on Error {
-          message
-        }
-      }
-    }
-  }
-`;
-
-const RunRace = gql`
-  mutation RaceBox_RunRace($input: RunRaceInput!) {
-    runRace(input: $input) {
-      race {
-        running
       }
       errors {
         code: __typename

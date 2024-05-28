@@ -44,6 +44,7 @@ public static class RacerMutations
         return racer;
     }
     
+    // lol should it really be here? took me a while to find it xD
     public static async Task<MutationResult<Racer, InvalidRaceError, InvalidUserError, InvalidRacerError>> FinishRaceForUser(
         Guid userId, Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
@@ -63,9 +64,12 @@ public static class RacerMutations
 
         racer.Finished = true;
 
+        if (race.Racers.All(rr => rr.Finished))
+            race.Finished = true;
+
         await db.SaveChangesAsync(cancellationToken);
         
-        var message = new RaceEventMessage { Racers = race.Racers };
+        var message = new RaceEventMessage { Finished = race.Finished, Racers = race.Racers };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
 
         return racer;

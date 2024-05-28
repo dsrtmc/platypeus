@@ -22,12 +22,10 @@ const documents = {
     "\n  subscription RaceBox_OnRaceEvent($raceId: UUID!, $racersFirst: Int) {\n    onRaceEvent(raceId: $raceId) {\n      id\n      mode\n      modeSetting\n      racers(first: $racersFirst) {\n        edges {\n          node {\n            id\n            user {\n              id\n              username\n            }\n            finished\n            wpm\n            wordsTyped\n          }\n        }\n      }\n      host {\n        id\n        username\n      }\n      running\n      finished\n      content\n      chatboxId\n      startTime\n    }\n  }\n": types.RaceBox_OnRaceEventDocument,
     "\n  mutation RaceBox_FinishRaceForUser($input: FinishRaceForUserInput!) {\n    finishRaceForUser(input: $input) {\n      racer {\n        id\n        finished\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_FinishRaceForUserDocument,
     "\n  mutation RaceBox_UpdateStats($input: UpdateStatsInput!) {\n    updateStats(input: $input) {\n      racer {\n        id\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_UpdateStatsDocument,
-    "\n  mutation RaceBox_FinishRace($input: FinishRaceInput!) {\n    finishRace(input: $input) {\n      race {\n        id\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_FinishRaceDocument,
     "\n  mutation RaceBox_JoinRace($input: JoinRaceInput!) {\n    joinRace(input: $input) {\n      race {\n        id\n      }\n    }\n  }\n": types.RaceBox_JoinRaceDocument,
     "\n  mutation RaceBox_LeaveRace($input: LeaveRaceInput!) {\n    leaveRace(input: $input) {\n      race {\n        id\n      }\n    }\n  }\n": types.RaceBox_LeaveRaceDocument,
     "\n  mutation RaceBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        wpm\n        rawWpm\n        mode\n        modeSetting\n        content\n        language\n        user {\n          username\n        }\n      }\n    }\n  }\n": types.RaceBox_CreateScoreDocument,
     "\n  mutation RaceBox_StartRace($input: StartRaceInput!) {\n    startRace(input: $input) {\n      race {\n        running\n        updatedAt\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_StartRaceDocument,
-    "\n  mutation RaceBox_RunRace($input: RunRaceInput!) {\n    runRace(input: $input) {\n      race {\n        running\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_RunRaceDocument,
     "\n  mutation RaceBox_DeleteRace($input: DeleteRaceInput!) {\n    deleteRace(input: $input) {\n      result: boolean\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_DeleteRaceDocument,
     "\n  query RacePage_GetRace($where: RaceFilterInput, $racersFirst: Int!) {\n    race(where: $where) {\n      id\n      startTime\n      createdAt\n      racers(first: $racersFirst) {\n        edges {\n          node {\n            user {\n              username\n            }\n            wpm\n          }\n        }\n      }\n      host {\n        username\n      }\n      content\n      unlisted\n      running\n      finished\n    }\n  }\n": types.RacePage_GetRaceDocument,
     "\n  query RacesPage_Me {\n    me {\n      id\n      ...UserInfo\n    }\n  }\n": types.RacesPage_MeDocument,
@@ -98,10 +96,6 @@ export function graphql(source: "\n  mutation RaceBox_UpdateStats($input: Update
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RaceBox_FinishRace($input: FinishRaceInput!) {\n    finishRace(input: $input) {\n      race {\n        id\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RaceBox_FinishRace($input: FinishRaceInput!) {\n    finishRace(input: $input) {\n      race {\n        id\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "\n  mutation RaceBox_JoinRace($input: JoinRaceInput!) {\n    joinRace(input: $input) {\n      race {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RaceBox_JoinRace($input: JoinRaceInput!) {\n    joinRace(input: $input) {\n      race {\n        id\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -115,10 +109,6 @@ export function graphql(source: "\n  mutation RaceBox_CreateScore($input: Create
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation RaceBox_StartRace($input: StartRaceInput!) {\n    startRace(input: $input) {\n      race {\n        running\n        updatedAt\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RaceBox_StartRace($input: StartRaceInput!) {\n    startRace(input: $input) {\n      race {\n        running\n        updatedAt\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  mutation RaceBox_RunRace($input: RunRaceInput!) {\n    runRace(input: $input) {\n      race {\n        running\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RaceBox_RunRace($input: RunRaceInput!) {\n    runRace(input: $input) {\n      race {\n        running\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

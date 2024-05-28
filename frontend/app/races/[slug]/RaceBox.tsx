@@ -49,12 +49,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   const [finishRaceForUser, {}] = useMutation(RaceBox_FinishRaceForUserDocument);
   const [updateStats, {}] = useMutation(RaceBox_UpdateStatsDocument);
-  const [finishRace, {}] = useMutation(RaceBox_FinishRaceDocument);
   const [joinRace, {}] = useMutation(RaceBox_JoinRaceDocument);
   const [leaveRace, {}] = useMutation(RaceBox_LeaveRaceDocument);
   const [createScore, {}] = useMutation(RaceBox_CreateScoreDocument);
   const [startRace, {}] = useMutation(RaceBox_StartRaceDocument);
-  const [runRace, {}] = useMutation(RaceBox_RunRaceDocument);
   const [deleteRace, {}] = useMutation(RaceBox_DeleteRaceDocument);
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -159,11 +157,13 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     setUserHasFinished(true);
   }
 
-  // TODO: very likely this shit is causing race conditions; need to investigate how to avoid sending the entire race as the event
   async function handleFinishForUser() {
-    if (!meData || !meData.me) return;
-    const response = await finishRaceForUser({ variables: { input: { raceId: race!.id, userId: meData?.me!.id } } });
-    setUserHasFinished(!!response.data?.finishRaceForUser.racer?.finished);
+    // if the test is time-based then our server should finish the race for everyone at the same time.
+    if (data?.onRaceEvent.mode === "words") {
+      if (!meData || !meData.me) return;
+      const response = await finishRaceForUser({ variables: { input: { raceId: race!.id, userId: meData?.me!.id } } });
+      setUserHasFinished(!!response.data?.finishRaceForUser.racer?.finished);
+    }
   }
 
   async function handleJoinRace() {
@@ -244,7 +244,9 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         ) : (
           <WordProgress count={wordCount} setting={data.onRaceEvent.modeSetting} />
         )}
-        {data.onRaceEvent.startTime && !data.onRaceEvent.finished && <Countdown countdown={countdown} />}
+        {countdown !== 0 && data.onRaceEvent.startTime && !data.onRaceEvent.finished && (
+          <Countdown countdown={countdown} />
+        )}
       </div>
       <div className={styles.middle} ref={ref}>
         <Test
@@ -252,11 +254,11 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
           running={data.onRaceEvent.running}
           finished={data.onRaceEvent.finished ?? userHasFinished}
           timePassed={timePassed}
-          // modeSetting={data.onRaceEvent.modeSetting}
           startTime={data.onRaceEvent.startTime}
-          // mode={data.onRaceEvent.mode}
-          // language={"english"}
-          finishConditions={{ maxDuration: 5 }}
+          finishConditions={{
+            maxDuration: data.onRaceEvent.mode === "time" ? 5 : undefined,
+            maxWordCount: data.onRaceEvent.mode === "words" ? data.onRaceEvent.modeSetting : undefined,
+          }}
           onKeyDown={handleKeyDown}
           preventInput={
             !data?.onRaceEvent.startTime ||
