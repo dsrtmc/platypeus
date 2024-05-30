@@ -379,7 +379,10 @@ export const Test: FC<Props> = ({
   /* prettier-ignore */
   const handleKeyDown = useCallback((e: globalThis.KeyboardEvent) => {
     if (e.key === " ") e.preventDefault();
-    if (preventInput) return;
+    if (preventInput) {
+      console.log("We just prevented input!");
+      return;
+    };
     onKeyDown(e);
     // TODO: maybe name it better xd (name what? xd)
     if (e.key.length === 1) {

@@ -273,6 +273,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
             !data?.onRaceEvent.startTime ||
             new Date(data.onRaceEvent.startTime).getTime() > new Date().getTime() ||
             userHasFinished ||
+            data.onRaceEvent.finished ||
             !focused
           }
           onPoolUpdate={onPoolUpdate}
