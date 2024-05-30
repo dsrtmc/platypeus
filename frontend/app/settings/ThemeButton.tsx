@@ -14,12 +14,14 @@ export const ThemeButton: React.FC<Props> = ({ theme, selected, handleThemeUpdat
   function handleSelect() {
     handleThemeUpdate(themeConfig, themeName);
     let config = getConfig();
+
+    if (!config) {
+      console.error("`config` has not been found in the local storage.");
+      return;
+    }
+
     for (const [property, value] of Object.entries(themeConfig)) {
       document.documentElement.style.setProperty(property, value);
-      if (!config) {
-        console.error("`config` has not been found in the local storage.");
-        return;
-      }
       config.themeName = themeName;
       config.themeConfig = { ...config.themeConfig, [property]: value };
     }

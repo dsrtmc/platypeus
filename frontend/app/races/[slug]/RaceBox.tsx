@@ -89,9 +89,9 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   }
 
   async function handleSaveScore(score: TestScoreType) {
-    // Prevents multiple saving of the same score (as well as attempting to save on re-entering, which would crash out)
-    if (!data || userHasFinished) return; // xD
+    if (!data) return; // xD
     await handleChangeWpm(score.wpm ?? 0);
+    console.log("We just called handle save score");
     await createScore({
       variables: {
         input: {
@@ -153,11 +153,11 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   async function handleFinishForUser() {
     // if the test is time-based then our server should finish the race for everyone at the same time.
-    if (data?.onRaceEvent.mode === "words") {
-      if (!meData || !meData.me) return;
-      const response = await finishRaceForUser({ variables: { input: { raceId: race!.id, userId: meData?.me!.id } } });
-      setUserHasFinished(!!response.data?.finishRaceForUser.racer?.finished);
-    }
+    if (data?.onRaceEvent.finished) return;
+    if (!meData || !meData.me) return;
+
+    const response = await finishRaceForUser({ variables: { input: { raceId: race!.id, userId: meData?.me!.id } } });
+    setUserHasFinished(!!response.data?.finishRaceForUser.racer?.finished);
   }
 
   async function handleJoinRace() {
@@ -199,11 +199,25 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     return () => clearInterval(timerIntervalRef.current);
   }, [data?.onRaceEvent.startTime, countdown]);
 
-  useEffect(() => {
-    if (data?.onRaceEvent.finished) {
-      (async () => await handleFinish())();
-    }
-  }, [data?.onRaceEvent.finished]);
+  // server finishes race for every user      (e.g. time test)
+  //    - race.finished = true
+  //    - test.tsx effect on finished: save score and shit
+  // user can finish his own race prematurely (e.g. words test)
+  //    - race.finished is false
+  //    - test.tsx effect on finished: save score and shit
+
+  // useEffect(() => {
+  //   if (!data?.onRaceEvent.finished) return;
+  //   if (userHasFinished) return;
+  // }, [data?.onRaceEvent.finished]);
+
+  // useEffect(() => {
+  //   if (!userHasFinished) return;
+  //
+  //   if (!data?.onRaceEvent.finished) {
+  //     (async () => await handleFinishForUser())();
+  //   }
+  // }, [userHasFinished]);
 
   async function handleBeforeUnload(e: BeforeUnloadEvent) {
     // I would really love to have that and call `deleteRace()` depending on what the user clicks but :(
@@ -220,12 +234,13 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     };
   }, [data?.onRaceEvent.finished, data?.onRaceEvent.racers, handleClick, handleBeforeUnload]);
 
+  // TODO: fix this function the name is retarded and stuff but it does what i needed to accomplish.
+  // what it helps me do is modify the `finished` flag from inside of <Test />
+  function setFinished() {
+    setUserHasFinished(true);
+  }
+
   // TODO: would probably make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
-  // ^^^^^-some shit actually goes down
-  // ↓ dont read this
-  // NOTE: if you try to join the race twice from the same account on two different clients, funny shit happens and it throws you an error
-  // which i guess is good? idk probably
-  // ↑ dont read this
   if (loading) return <p>loading race data...</p>;
   if (error) return <p>error: {JSON.stringify(error)}</p>;
   // if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>; // why did i do if (!meData?.me)?
@@ -246,11 +261,11 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         <Test
           focused={focused}
           running={data.onRaceEvent.running}
-          finished={data.onRaceEvent.finished ?? userHasFinished}
+          finished={data.onRaceEvent.finished || userHasFinished}
+          setFinished={setFinished}
           timePassed={timePassed}
           startTime={data.onRaceEvent.startTime}
           finishConditions={{
-            maxDuration: data.onRaceEvent.mode === "time" ? 5 : undefined,
             maxWordCount: data.onRaceEvent.mode === "words" ? data.onRaceEvent.modeSetting : undefined,
           }}
           onKeyDown={handleKeyDown}

@@ -120,19 +120,19 @@ export function Leaderboard({ mode, modeSetting }: Props) {
 
   /* prettier-ignore */
   const observerRef = useCallback((node: HTMLDivElement | null) => {
-      if (!node) return;
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(async (entry) => {
-          if (entry.isIntersecting) {
-            await handleFetchMore();
-          }
-        });
+    if (!node) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(async (entry) => {
+        if (entry.isIntersecting) {
+          await handleFetchMore();
+        }
       });
+    });
 
-      observer.observe(node);
+    observer.observe(node);
 
-      return () => observer.unobserve(node);
-    }, [handleFetchMore]);
+    return () => observer.unobserve(node);
+  }, [handleFetchMore]);
 
   if (!data?.scoresForLeaderboard) {
     // TODO: throw an error?

@@ -23,7 +23,6 @@ const transitionStyles = {
 
 export const FadeTransition: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   // TODO: throws a warning that ref isn't added even though it is?
-  // TODO: use a HOC to avoid having to use a wrapping <div>?
   const ref = useRef<HTMLDivElement | null>(null);
   return (
     <Transition nodeRef={ref} in={true} appear={true} timeout={duration}>

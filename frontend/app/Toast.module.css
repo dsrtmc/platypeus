@@ -10,7 +10,6 @@
     gap: 1rem;
 }
 
-/* TODO: better toast styling */
 .toast {
     display: flex;
     flex-direction: column;

@@ -1,5 +1,5 @@
 import styles from "./Test.module.css";
-import React, { forwardRef } from "react";
+import React, { FC, forwardRef, useRef } from "react";
 import { Transition } from "react-transition-group";
 
 const duration = 300;
@@ -24,23 +24,24 @@ interface Props {
   hidden: boolean;
 }
 
-export const Caret = forwardRef<HTMLDivElement, Props>(({ x, y, blinking, hidden }, ref) => {
+export const Caret: FC<Props> = ({ x, y, blinking, hidden }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
   return (
-    <Transition in={true} appear={true} timeout={duration}>
+    <Transition nodeRef={ref} in={true} appear={true} timeout={duration}>
       {(state) => (
         <div
           style={{
             ...style,
             ...transitionStyles[state],
           }}
+          ref={ref}
         >
           <div
             className={`${styles.caret} ${!blinking && styles.blinking} ${!hidden && styles.hidden}`}
             style={{ left: x, top: y }}
-            ref={ref}
           />
         </div>
       )}
     </Transition>
   );
-});
+};

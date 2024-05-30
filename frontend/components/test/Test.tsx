@@ -31,6 +31,7 @@ interface Props {
   focused: boolean;
   running: boolean;
   finished: boolean;
+  setFinished: () => void;
 
   timePassed: number;
   // modeSetting: number;
@@ -55,9 +56,9 @@ interface Props {
   initialContent: string[];
 }
 
-export interface TestMethods {
+export type TestMethods = {
   reset: () => void;
-}
+};
 
 type State = {
   correctCharacters: number;
@@ -88,11 +89,9 @@ export const Test: FC<Props> = ({
   running,
   finished,
   timePassed,
-  // modeSetting,
   startTime,
-  // mode,
-  // language,
   finishConditions,
+  setFinished,
   onKeyDown,
   preventInput,
   onPoolUpdate,
@@ -104,7 +103,6 @@ export const Test: FC<Props> = ({
   innerRef,
   initialContent,
 }) => {
-  const caretRef = useRef<HTMLDivElement | null>(null);
   const wordsRef = useRef<Array<HTMLDivElement>>([]);
   const wordsDivRef = useRef<HTMLDivElement | null>(null);
 
@@ -412,26 +410,22 @@ export const Test: FC<Props> = ({
     reset();
   }, []);
 
-  useEffect(() => {
+  function shouldFinish(): boolean {
+    if (finished) return false;
+
     const currentWord = wordsRef.current[wordIndex];
-    if (!currentWord) return;
+    if (!currentWord) return true;
 
-    if (shouldFinish()) {
-      onFinish();
+    const nextWord = wordsRef.current[wordIndex + 1];
+    let result = false;
+    result ||= letterIndex > currentWord.children.length - 1 && !nextWord;
+    if (finishConditions.maxWordCount) result ||= wordIndex >= finishConditions.maxWordCount;
+    if (finishConditions.maxDuration) {
+      result ||= timePassed >= finishConditions.maxDuration;
     }
-
-    // Caret movement
-    const currentLetter = currentWord.children[letterIndex];
-    if (currentLetter) {
-      const { left, top } = currentLetter.getBoundingClientRect();
-      moveCaret(left, top);
-    } else {
-      const previousLetter = currentWord.children[letterIndex - 1];
-      if (!previousLetter) return;
-      const { right, top } = previousLetter.getBoundingClientRect();
-      moveCaret(right, top);
-    }
-  }, [wordIndex, letterIndex, wordPool, windowSize, lastLayoutShiftTime]);
+    result ||= timePassed >= MAX_TEST_DURATION;
+    return result;
+  }
 
   function onFinish() {
     handleFinish();
@@ -461,31 +455,46 @@ export const Test: FC<Props> = ({
       rawStats: [...rawStats, rawWpm],
       content: content.join(" "),
     };
+    console.log("WE just called onfinish");
     handleSaveScore(score);
   }
 
-  function shouldFinish(): boolean {
+  useEffect(() => {
     const currentWord = wordsRef.current[wordIndex];
-    if (!currentWord) return true;
+    if (!currentWord) return;
 
-    const nextWord = wordsRef.current[wordIndex + 1];
-    let result = false;
-    result ||= letterIndex > currentWord.children.length - 1 && !nextWord;
-    if (finishConditions.maxWordCount) result ||= wordIndex >= finishConditions.maxWordCount;
-    if (finishConditions.maxDuration) {
-      result ||= timePassed >= finishConditions.maxDuration;
+    if (shouldFinish()) {
+      setFinished();
     }
-    result ||= timePassed >= MAX_TEST_DURATION;
-    return result;
-  }
+
+    // Caret movement
+    const currentLetter = currentWord.children[letterIndex];
+    if (currentLetter) {
+      const { left, top } = currentLetter.getBoundingClientRect();
+      moveCaret(left, top);
+    } else {
+      const previousLetter = currentWord.children[letterIndex - 1];
+      if (!previousLetter) return;
+      const { right, top } = previousLetter.getBoundingClientRect();
+      moveCaret(right, top);
+    }
+  }, [wordIndex, letterIndex, wordPool, windowSize, lastLayoutShiftTime]);
 
   useEffect(() => {
     if (running && !finished) {
       updateStats(timePassed);
 
-      if (shouldFinish()) onFinish();
+      if (shouldFinish()) {
+        setFinished();
+      }
     }
   }, [timePassed]);
+
+  useEffect(() => {
+    if (finished) {
+      onFinish();
+    }
+  }, [finished]);
 
   const handleResize = useCallback(() => {
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
@@ -520,7 +529,7 @@ export const Test: FC<Props> = ({
       <div className={styles.words} ref={wordsDivRef} tabIndex={-1}>
         {wordPool.map((word) => word)}
       </div>
-      <Caret x={caretPosition.x} y={caretPosition.y} blinking={running} hidden={showCaret && focused} ref={caretRef} />
+      <Caret x={caretPosition.x} y={caretPosition.y} blinking={running} hidden={showCaret && focused} />
     </div>
   );
 };

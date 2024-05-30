@@ -288,6 +288,7 @@ export function TestBox({ onSaveScore }: Props) {
               focused={focused}
               running={running}
               finished={finished}
+              setFinished={() => setFinished(true)}
               timePassed={timePassed}
               // modeSetting={modeSetting}
               startTime={testStartTime}

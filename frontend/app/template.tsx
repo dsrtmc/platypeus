@@ -1,6 +1,6 @@
 "use client";
 
-import React, { PropsWithChildren, Ref } from "react";
+import React, { PropsWithChildren, Ref, useRef } from "react";
 import styles from "@/components/test/Test.module.css";
 import { Transition } from "react-transition-group";
 
@@ -22,14 +22,16 @@ const transitionStyles = {
 interface Props {}
 
 export default function Template({ children }: PropsWithChildren<Props>) {
+  const ref = useRef<HTMLDivElement | null>(null);
   return (
-    <Transition in={true} appear={true} timeout={duration}>
+    <Transition nodeRef={ref} in={true} appear={true} timeout={duration}>
       {(state) => (
         <div
           style={{
             ...style,
             ...transitionStyles[state],
           }}
+          ref={ref}
         >
           {children}
         </div>

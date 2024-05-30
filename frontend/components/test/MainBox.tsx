@@ -45,8 +45,6 @@ export const MainBox: FC<Props> = ({}) => {
   const [scoreId, setScoreId] = useState("");
   const [showScore, setShowScore] = useState(false);
 
-  const [createScore] = useMutation(MainBox_CreateScoreDocument);
-
   async function onSaveScore(result: FetchResult<MainBox_CreateScoreMutation>) {
     // TODO: some validation of course, anti-cheat (LONG SHOT)
     if (!result.data?.createScore.score) return; // TODO: better error handling here
