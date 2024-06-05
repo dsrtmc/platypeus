@@ -56,8 +56,6 @@ interface Props {
   modeSetting: number;
 }
 
-// TODO: Lmao for some reason i got this hydration error
-// Warning: Text content did not match. Server: "24:52:19" Client: "00:52:19"
 export function Leaderboard({ mode, modeSetting }: Props) {
   const variables: Leaderboard_GetScoresForLeaderboardQueryVariables = {
     first: 25,

@@ -214,6 +214,11 @@ input[type="checkbox"]:checked:after {
     transition: background-color 150ms ease;
 }
 
+/* a very ugly hack to avoid the :-internal-autofill-selected selector breaking the styling */
+input:-webkit-autofill {
+    transition: background-color 0s 600000s, color 0s 600000s !important;
+}
+
 #contentWrapper {
     align-items: center;
     display: grid;

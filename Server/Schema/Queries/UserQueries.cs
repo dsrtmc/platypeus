@@ -60,7 +60,6 @@ public static class UserQueries
     // [UseProjection]
     [UseFiltering]
     [UseSorting]
-    // Not including messages because it would definitely be too heavy at one point, and there's no need to see someone's messages for now.
     public static IQueryable<User> GetUsers(DatabaseContext db) => db.Users.Include(s => s.Scores);
 
     [UseFirstOrDefault]

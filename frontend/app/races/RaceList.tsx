@@ -101,7 +101,6 @@ export function RaceList({}) {
       entries.forEach(async (entry) => {
         if (entry.isIntersecting) {
           // uncomment for infinite scroll
-          // DO NOT uncomment because everything breaks. TODO :)
           await handleFetchMore();
         }
       });

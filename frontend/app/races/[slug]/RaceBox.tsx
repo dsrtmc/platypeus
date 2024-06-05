@@ -36,7 +36,6 @@ interface Props {
 // The length of race start countdown in seconds
 const COUNTDOWN_TIME = 5;
 
-// TODO: add error handling whenever we execute a mutation (not just in this file)
 export const RaceBox: React.FC<Props> = ({ race }) => {
   const { setError } = useContext(ErrorContext)!;
 
@@ -143,7 +142,14 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   async function handleStart() {
     if (!data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
-      await startRace({ variables: { input: { raceId: race.id, countdownTime: COUNTDOWN_TIME } } });
+      const response = await startRace({ variables: { input: { raceId: race.id, countdownTime: COUNTDOWN_TIME } } });
+      if (response.data?.startRace.errors?.length) {
+        setError({
+          code: "ERROR_STARTING_RACE",
+          message: "We were unable to start the race. See the console for more details.",
+        });
+        console.error("Errors:", response.data.startRace.errors);
+      }
     }
   }
 
@@ -234,7 +240,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
     };
   }, [data?.onRaceEvent.finished, data?.onRaceEvent.racers, handleClick, handleBeforeUnload]);
 
-  // TODO: fix this function the name is retarded and stuff but it does what i needed to accomplish.
+  // fix this function the name is retarded but it does what i needed to accomplish.
   // what it helps me do is modify the `finished` flag from inside of <Test />
   function setFinished() {
     setUserHasFinished(true);

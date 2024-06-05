@@ -39,7 +39,7 @@ const documents = {
     "\n  mutation AuthBox_Logout {\n    logout {\n      boolean\n    }\n  }\n": types.AuthBox_LogoutDocument,
     "\n  query Navbar_Me {\n    me {\n      id\n      ...UserInfo\n    }\n  }\n": types.Navbar_MeDocument,
     "\n  fragment ScoreInfo on Score {\n    wpm\n    rawWpm\n    mode\n    modeSetting\n    content\n    language\n    accuracy\n    wpmStats\n    rawStats\n    user {\n      username\n    }\n  }\n": types.ScoreInfoFragmentDoc,
-    "\n  mutation MainBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        ...ScoreInfo\n      }\n    }\n  }\n": types.MainBox_CreateScoreDocument,
+    "\n  mutation MainBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        ...ScoreInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.MainBox_CreateScoreDocument,
     "fragment UserInfo on User {\n  username\n  email\n}": types.UserInfoFragmentDoc,
     "query Me {\n  me {\n    id\n    ...UserInfo\n  }\n}": types.MeDocument,
 };
@@ -165,7 +165,7 @@ export function graphql(source: "\n  fragment ScoreInfo on Score {\n    wpm\n   
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation MainBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        ...ScoreInfo\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation MainBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        ...ScoreInfo\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  mutation MainBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        ...ScoreInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation MainBox_CreateScore($input: CreateScoreInput!) {\n    createScore(input: $input) {\n      score {\n        id\n        ...ScoreInfo\n      }\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

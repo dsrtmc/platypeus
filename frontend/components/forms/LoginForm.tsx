@@ -80,8 +80,6 @@ export default function LoginForm() {
     setFocus("username");
   }, [setFocus]);
 
-  // Ignore squiggly lines, explicit type declaration fixes it despite being the same type; `react-hook-form` doing the funny
-  // TODO: i don't rly like that it suggests ur previous passwords - disable it and read on accessibility whether it fucks it up
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <span>Sign in</span>

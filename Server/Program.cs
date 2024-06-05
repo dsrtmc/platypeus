@@ -2,25 +2,28 @@ using System.Threading.RateLimiting;
 using DotNetEnv;
 using HotChocolate.Execution;
 using HotChocolate.Types.Pagination;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Server.Services;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
 
+var environment = builder.Configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
+var __dev__ = environment == "Development";
+
 // Database setup
 builder.Services.AddDbContextPool<DatabaseContext>(o =>
 {
     o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
-    o.EnableSensitiveDataLogging(); // TODO: DEV only?
+    o.EnableSensitiveDataLogging(__dev__);
 });
 
+IdentityModelEventSource.ShowPII = __dev__;
+
 // CORS setup
-builder.Services.AddCors((o) =>
+builder.Services.AddCors(o =>
 {
     o.AddPolicy("default", pb =>
     {
@@ -31,35 +34,25 @@ builder.Services.AddCors((o) =>
     });
 });
 
-// TODO: read up on advanced operation complexity HotChocolate
-// TODO: rename
-// TODO: see if there's an easy way to return an errors "sorry you're rate limited" rather than just making the user wait
-// TODO: change values in prod and idk before deployment and stuff
-// Rate limiting
-var rateLimiterOptions = new TokenBucketRateLimiterOptions
+
+builder.Services.AddRateLimiter(options =>
 {
-    AutoReplenishment = true,
-    QueueLimit = 1,
-    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-    ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-    TokenLimit = 1000,
-    TokensPerPeriod = 100
-};
-
-const string tokenPolicy = "token";
-
-builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(rateLimiterOptions);
-
-builder.Services.AddRateLimiter(_ => _
-    .AddTokenBucketLimiter(policyName: tokenPolicy, options =>
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
     {
-        options.TokenLimit = rateLimiterOptions.TokenLimit;
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = rateLimiterOptions.QueueLimit;
-        options.ReplenishmentPeriod = rateLimiterOptions.ReplenishmentPeriod;
-        options.TokensPerPeriod = rateLimiterOptions.TokensPerPeriod;
-        options.AutoReplenishment = rateLimiterOptions.AutoReplenishment;
-    }));
+        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetTokenBucketLimiter(ipAddress, _ => new TokenBucketRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            QueueLimit = 1,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+            TokenLimit = 100,
+            TokensPerPeriod = 10
+        });
+    });
+    
+    options.RejectionStatusCode = 429;
+});
 
 // Cookies setup
 builder.Services
@@ -77,14 +70,14 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHostedService<RaceManagementService>();
 
-// GraphQL setup
 // TODO: read on max byte size for documents?
+// TODO: consider persistent queries
+// TODO: read up on advanced operation complexity HotChocolate
+// GraphQL setup
 builder.Services
     .AddGraphQLServer()
-    // TODO: read what this one does, what kind of validation it refers to
     .SetMaxAllowedValidationErrors(10)
-    // TODO: I guess disable introspection, we don't need it, even role-based
-    .AllowIntrospection(true) // !__prod__?
+    .AllowIntrospection(__dev__)
     .AddMaxExecutionDepthRule(10, skipIntrospectionFields: true)
     .ModifyRequestOptions(o =>
     {
@@ -92,11 +85,8 @@ builder.Services
         o.Complexity.DefaultComplexity = 1;
         o.Complexity.DefaultResolverComplexity = 5;
         o.Complexity.MaximumAllowed = 10000;
-        // TODO: consider persistent queries
-        // TODO: maybe make it dev only? ↓
-        o.IncludeExceptionDetails = true;
-        // TODO: Configure the execution timeout for production
-        o.ExecutionTimeout = TimeSpan.FromSeconds(30);
+        o.IncludeExceptionDetails = __dev__;
+        o.ExecutionTimeout = TimeSpan.FromSeconds(5);
     })
     .AddTypes()
     .AddAuthorization()
@@ -122,56 +112,15 @@ app.UseCors("default");
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
-    IdentityModelEventSource.ShowPII = true;
-
 // Write the GraphQL schema to a file
 var executor = await app.Services.GetRequestExecutorAsync();
 await File.WriteAllTextAsync("schema.graphql", executor.Schema.ToString());
 
 app.UseRateLimiter();
 
-// REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE
-app.MapGet("/", () => "><((((*>");
 app.MapGet("/secret", () => $"top secret");
 
 app.UseWebSockets();
-app.MapGraphQL().RequireRateLimiting(tokenPolicy);
+app.MapGraphQL();
 
 app.Run();
-
-// JWT setup // LEGACY
-// builder.Services.AddAuthentication(o =>
-// {
-//     o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-//     o.RequireAuthenticatedSignIn = false;
-// }).AddJwtBearer(o =>
-// {
-//     o.TokenValidationParameters = new TokenValidationParameters
-//     {
-//         // should add issuer/audience
-//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!)),
-//         ValidateIssuerSigningKey = true,
-//         ValidateIssuer = false, // probably true
-//         ValidateAudience = false, // probably true
-//         ClockSkew = TimeSpan.Zero
-//     };
-// });
-
-// TODO: Move it somewhere
-public class MyRateLimitOptions
-{
-    public const string MyRateLimit = "MyRateLimit";
-    public int PermitLimit { get; set; } = 100;
-    public int Window { get; set; } = 10;
-    public int ReplenishmentPeriod { get; set; } = 2;
-    public int QueueLimit { get; set; } = 2;
-    public int SegmentsPerWindow { get; set; } = 8;
-    public int TokenLimit { get; set; } = 10;
-    public int TokenLimit2 { get; set; } = 20;
-    public int TokensPerPeriod { get; set; } = 4;
-    public bool AutoReplenishment { get; set; } = false;
-};

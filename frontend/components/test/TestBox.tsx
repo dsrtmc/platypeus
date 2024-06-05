@@ -216,6 +216,7 @@ export function TestBox({ onSaveScore }: Props) {
     return () => clearInterval(intervalRef.current);
   }, [running]);
 
+  // Useful for animations. No idea what's happening here.
   useEffect(() => {
     if (!finished) {
       /*
