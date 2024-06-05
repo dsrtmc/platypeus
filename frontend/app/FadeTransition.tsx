@@ -22,7 +22,6 @@ const transitionStyles = {
 };
 
 export const FadeTransition: React.FC<PropsWithChildren<Props>> = ({ children }) => {
-  // TODO: throws a warning that ref isn't added even though it is?
   const ref = useRef<HTMLDivElement | null>(null);
   return (
     <Transition nodeRef={ref} in={true} appear={true} timeout={duration}>

@@ -1,13 +1,12 @@
 "use client";
 
-import React, { startTransition, useCallback, useEffect, useState } from "react";
-import { RaceList_GetRacesDocument, RaceList_GetRacesQueryVariables, RaceSortInput } from "@/graphql/generated/graphql";
+import React, { startTransition, useCallback } from "react";
+import { RaceList_GetRacesDocument, RaceList_GetRacesQueryVariables, SortEnumType } from "@/graphql/generated/graphql";
 import styles from "./Races.module.css";
 import { gql, useSuspenseQuery } from "@apollo/client";
 import { RaceListItem } from "@/app/races/RaceListItem";
 import { RaceListRefreshButton } from "@/app/races/RaceListRefreshButton";
 import { RaceListEmptyMessage } from "@/app/races/RaceListEmptyMessage";
-import { start } from "repl";
 
 interface Props {}
 
@@ -57,10 +56,11 @@ const GetRaces = gql`
 export function RaceList({}) {
   const variables: RaceList_GetRacesQueryVariables = {
     where: { and: [{ running: { eq: false } }, { finished: { eq: false } }, { unlisted: { eq: false } }] },
-    order: [{ createdAt: "DESC" }] as RaceSortInput,
+    order: { createdAt: SortEnumType.Desc, id: SortEnumType.Desc },
     racesFirst: 10,
     racersFirst: 10,
   };
+
   const { data, error, refetch, fetchMore } = useSuspenseQuery(RaceList_GetRacesDocument, {
     variables,
   });
@@ -71,13 +71,14 @@ export function RaceList({}) {
   }
 
   async function handleFetchMore() {
+    if (!data.races?.pageInfo.hasNextPage) return;
+
     startTransition(() => {
       fetchMore({
         variables: { ...variables, after: data?.races?.pageInfo.endCursor } as RaceList_GetRacesQueryVariables,
         updateQuery: (previousQueryResult, { fetchMoreResult }) => {
-          // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
           if (!fetchMoreResult) return previousQueryResult;
-          if (!data?.races?.pageInfo.hasNextPage) return previousQueryResult; // TODO: uncomment and investigate, possibly stale `data` that's why ↑
+
           const prevEdges = previousQueryResult.races!.edges ?? [];
           const nextEdges = fetchMoreResult.races!.edges ?? [];
 
@@ -101,7 +102,7 @@ export function RaceList({}) {
         if (entry.isIntersecting) {
           // uncomment for infinite scroll
           // DO NOT uncomment because everything breaks. TODO :)
-          // await handleFetchMore();
+          await handleFetchMore();
         }
       });
     });

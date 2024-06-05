@@ -7,7 +7,7 @@ import { generateRandomString } from "@/utils/generateRandomString";
 
 interface Props {
   word: string;
-  wordIndex: number; // used for generating nice, unique keys
+  wordIndex: number; // UNUSED RN used for generating nice, unique keys
 }
 
 export const Word = forwardRef<HTMLDivElement, Props>(({ word, wordIndex }, ref) => {

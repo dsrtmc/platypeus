@@ -4,6 +4,7 @@ import React, { startTransition, useCallback } from "react";
 import {
   Leaderboard_GetScoresForLeaderboardDocument,
   Leaderboard_GetScoresForLeaderboardQueryVariables,
+  SortEnumType,
 } from "@/graphql/generated/graphql";
 import { gql, useSuspenseQuery } from "@apollo/client";
 import styles from "@/components/leaderboards/Leaderboards.module.css";
@@ -55,67 +56,42 @@ interface Props {
   modeSetting: number;
 }
 
+// TODO: Lmao for some reason i got this hydration error
+// Warning: Text content did not match. Server: "24:52:19" Client: "00:52:19"
 export function Leaderboard({ mode, modeSetting }: Props) {
-  const { data, error, fetchMore } = useSuspenseQuery(Leaderboard_GetScoresForLeaderboardDocument, {
-    variables: {
-      first: 25,
-      mode,
-      modeSetting,
-    },
-  });
-  // TODO: we get an error in console when we run this, cache update funny shit
-  function handleFetchMore() {
-    console.log("The next cursor:", data?.scoresForLeaderboard?.pageInfo?.endCursor);
-    if (data?.scoresForLeaderboard?.pageInfo?.hasNextPage) {
-      const variables: Leaderboard_GetScoresForLeaderboardQueryVariables = {
-        first: 10,
-        after: data?.scoresForLeaderboard?.pageInfo?.endCursor,
-        mode,
-        modeSetting,
-      };
-      startTransition(() => {
-        fetchMore({
-          variables,
-          updateQuery: (previousQueryResult, { fetchMoreResult }) => {
-            // TODO: i'm still getting duplicates and i crash despite that lol investigate xdd
-            if (!fetchMoreResult) return previousQueryResult;
-            // if (!data?.races?.pageInfo.hasNextPage) return; // TODO: uncomment and investigate, possibly stale `data` that's why ↑
-            const prevEdges = previousQueryResult.scoresForLeaderboard!.edges ?? [];
-            const nextEdges = fetchMoreResult.scoresForLeaderboard!.edges ?? [];
+  const variables: Leaderboard_GetScoresForLeaderboardQueryVariables = {
+    first: 25,
+    mode,
+    modeSetting,
+  };
 
-            return {
-              scoresForLeaderboard: {
-                ...previousQueryResult.scoresForLeaderboard,
-                edges: [...prevEdges, ...nextEdges],
-                pageInfo: fetchMoreResult.scoresForLeaderboard!.pageInfo,
-              },
-            };
-          },
-          // TODO
-          // updateQuery: (previousQueryResult, { fetchMoreResult }) => {
-          //   if (!data?.scoresForLeaderboard?.pageInfo.hasNextPage) return;
-          //
-          //   if (!fetchMoreResult?.scoresForLeaderboard || !previousQueryResult?.scoresForLeaderboard) {
-          //     return {
-          //       scores: {
-          //         pageInfo: { hasNextPage: false },
-          //         edges: [],
-          //       },
-          //     };
-          //   }
-          //   return {
-          //     scoresForLeaderboard: {
-          //       pageInfo: fetchMoreResult.scoresForLeaderboard.pageInfo,
-          //       edges: [
-          //         ...previousQueryResult.scoresForLeaderboard.edges,
-          //         ...fetchMoreResult.scoresForLeaderboard.edges,
-          //       ],
-          //     },
-          //   };
-          // },
-        });
+  const { data, error, fetchMore } = useSuspenseQuery(Leaderboard_GetScoresForLeaderboardDocument, {
+    variables,
+  });
+
+  function handleFetchMore() {
+    if (!data.scoresForLeaderboard?.pageInfo.hasNextPage) return;
+
+    startTransition(() => {
+      // why squiggly?
+      fetchMore({
+        variables: { ...variables, after: data.scoresForLeaderboard?.pageInfo.endCursor },
+        updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) return previousQueryResult;
+
+          const prevEdges = previousQueryResult.scoresForLeaderboard!.edges ?? [];
+          const nextEdges = fetchMoreResult.scoresForLeaderboard!.edges ?? [];
+
+          return {
+            scoresForLeaderboard: {
+              ...previousQueryResult.scoresForLeaderboard,
+              edges: [...prevEdges, ...nextEdges],
+              pageInfo: fetchMoreResult.scoresForLeaderboard!.pageInfo,
+            },
+          };
+        },
       });
-    }
+    });
   }
 
   /* prettier-ignore */
@@ -206,7 +182,7 @@ export function Leaderboard({ mode, modeSetting }: Props) {
                 <td className={`${styles.right} ${styles.td}`}>
                   <p>{new Date(edge.node.createdAt).toLocaleDateString()}</p>
                   <p className={styles.sub}>
-                    {new Date(edge.node.createdAt).toLocaleTimeString([], { hour12: false })}
+                    {new Date(edge.node.createdAt).toLocaleTimeString([], { hourCycle: "h23" })}
                   </p>
                 </td>
               </tr>

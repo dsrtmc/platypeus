@@ -35,10 +35,8 @@ public static class ScoreQueries
     [UsePaging]
     public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db, string mode, int modeSetting)
     {
-        // return db.Scores.FromSql(
-        //         $"SELECT DISTINCT ON (s.\"UserId\") s.* FROM \"Scores\" s WHERE s.\"Mode\" = {mode} AND s.\"ModeSetting\" = {modeSetting} ORDER BY s.\"UserId\", s.\"Wpm\" DESC"
-        //     ).Include(s => s.User);
-        return db.Scores.Where(s => s.Mode == mode && s.ModeSetting == modeSetting)
-            .OrderByDescending(s => s.Wpm).Include(s => s.User);
+        return db.Scores.FromSql(
+                $"SELECT DISTINCT ON (s.\"UserId\") s.* FROM \"Scores\" s WHERE s.\"Mode\" = {mode} AND s.\"ModeSetting\" = {modeSetting} ORDER BY s.\"UserId\", s.\"Wpm\" DESC"
+            ).Include(s => s.User);
     }
 }
