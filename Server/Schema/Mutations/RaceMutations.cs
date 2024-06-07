@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Security.Claims;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,6 @@ using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Services;
 using Server.Utilities;
-using StackExchange.Redis;
 
 namespace Server.Schema.Mutations;
 
@@ -118,7 +116,6 @@ public static class RaceMutations
         return race;
     }
     
-    // TODO: investigate the generated SQL because holy chungus is it horrifying
     public static async Task<
         MutationResult<Race, NotAuthenticatedError, InvalidRaceError, RaceAlreadyRunningError, AlreadyJoinedRaceError>
     > JoinRace(
@@ -164,22 +161,24 @@ public static class RaceMutations
         };
 
         if (race.Racers.FirstOrDefault(r => r.User.Id == user.Id) is not null)
-            return new AlreadyJoinedRaceError(raceId, user.Username);
+            return new AlreadyJoinedRaceError(race.Slug, user.Username);
             
         race.Racers.Add(racer);
         
         await db.SaveChangesAsync(cancellationToken);
         
         var message = new RaceEventMessage { Racers = race.Racers };
-        try
-        {
-            // TODO: Doesn't work if using Redis for some reason, causes the JsonSerializer to throw a `possible object cycle` exception.
             await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[EXCEPTION] Message: {ex.Message}");
-        }
+        Console.WriteLine("? we just sent the message");
+        // try
+        // {
+        //     // TODO: Doesn't work if using Redis for some reason, causes the JsonSerializer to throw a `possible object cycle` exception.
+        //     await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
+        // }
+        // catch (Exception ex)
+        // {
+        //     Console.WriteLine($"[EXCEPTION] Message: {ex.Message}");
+        // }
         
         return race;
     }
@@ -215,7 +214,7 @@ public static class RaceMutations
         db.Racers.Remove(racer);
     
         await db.SaveChangesAsync(cancellationToken);
-        
+
         var message = new RaceEventMessage { Racers = race.Racers };
         await eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceId), message, cancellationToken);
     

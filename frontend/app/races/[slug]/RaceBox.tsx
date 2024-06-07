@@ -167,7 +167,15 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   }
 
   async function handleJoinRace() {
-    await joinRace({ variables: { input: { raceId: race.id } } });
+    const response = await joinRace({ variables: { input: { raceId: race.id } } });
+    const firstError = response.data?.joinRace.errors?.[0];
+    if (firstError) {
+      setError({
+        code: firstError.code,
+        message: firstError.message,
+      });
+      console.error("Errors:", response.data?.joinRace.errors);
+    }
   }
 
   async function handleLeaveRace() {
@@ -248,7 +256,9 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
 
   // TODO: would probably make sense to kick someone out of the race once they leave/F5 during the race (or not but i dont care, could be cool)
   if (loading) return <p>loading race data...</p>;
-  if (error) return <p>error: {JSON.stringify(error)}</p>;
+  if (error) {
+    throw new Error(JSON.stringify(error));
+  }
   // if (!data?.onRaceEvent || !meData?.me) return <p>no data</p>; // why did i do if (!meData?.me)?
   if (!data?.onRaceEvent) return <p>no data</p>;
   return (

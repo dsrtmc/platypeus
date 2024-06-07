@@ -81,6 +81,12 @@ const JoinRace = gql`
       race {
         id
       }
+      errors {
+        code: __typename
+        ... on Error {
+          message
+        }
+      }
     }
   }
 `;

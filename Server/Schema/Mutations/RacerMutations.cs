@@ -44,7 +44,7 @@ public static class RacerMutations
         return racer;
     }
     
-    // lol should it really be here? took me a while to find it xD
+    // should probably move it
     public static async Task<MutationResult<Racer, InvalidRaceError, InvalidUserError, InvalidRacerError>> FinishRaceForUser(
         Guid userId, Guid raceId, DatabaseContext db,
         [Service] ITopicEventSender eventSender,

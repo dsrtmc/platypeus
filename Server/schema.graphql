@@ -237,7 +237,9 @@ type RaceIsRunningError implements Error {
 }
 
 type Racer {
+  raceId: UUID!
   race: Race!
+  userId: UUID!
   user: User!
   wpm: Int!
   wordsTyped: Int!
@@ -650,7 +652,9 @@ input RaceSortInput {
 input RacerFilterInput {
   and: [RacerFilterInput!]
   or: [RacerFilterInput!]
+  raceId: UuidOperationFilterInput
   race: RaceFilterInput
+  userId: UuidOperationFilterInput
   user: UserFilterInput
   wpm: IntOperationFilterInput
   wordsTyped: IntOperationFilterInput

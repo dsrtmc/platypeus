@@ -13,6 +13,7 @@ namespace Server.Schema.Mutations;
 public static class MessageMutations
 {
     // TODO: Figure out rate-limiting on specific mutations; if not possible, then just resort to writing a limiter only on the client-side.
+    // TODO: Validate chat messages
     public static async Task<MutationResult<Message, NotAuthenticatedError, InvalidChatboxError>> SendMessage(
         Guid chatboxId, string content, DatabaseContext db,
         IHttpContextAccessor accessor, [Service] ITopicEventSender eventSender)
@@ -42,9 +43,9 @@ public static class MessageMutations
             Chatbox = chatbox
         };
         
-        await eventSender.SendAsync(Helper.EncodeOnChatboxEventToken(chatboxId), chatbox);
-        
         chatbox.Messages.Add(message);
+        
+        await eventSender.SendAsync(Helper.EncodeOnChatboxEventToken(chatboxId), chatbox);
         
         await db.SaveChangesAsync();
         

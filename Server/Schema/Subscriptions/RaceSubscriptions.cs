@@ -32,24 +32,24 @@ public class RaceSubscriptions
         
         var sourceStream = await eventReceiver.SubscribeAsync<RaceEventMessage>(Helper.EncodeOnRaceEventToken(raceId));
         
-        await foreach (var propertyUpdate in sourceStream.ReadEventsAsync())
+        await foreach (var eventMessage in sourceStream.ReadEventsAsync())
         {
             var raceProperties = typeof(Race).GetProperties();
-            var properties = typeof(RaceEventMessage).GetProperties();
+            var messageProperties = typeof(RaceEventMessage).GetProperties();
             foreach (var raceProperty in raceProperties)
             {
-                foreach (var property in properties)
+                foreach (var messageProperty in messageProperties)
                 {
                     /*
                      * We're only checking the name of the property, which could potentially be dangerous, since
                      * it only relies on a correct implementation of the update class. I didn't know how to
                      * account for type mismatch caused by nullability, so I opted for this solution for now.
                      */
-                    if (raceProperty.Name != property.Name) continue;
+                    if (raceProperty.Name != messageProperty.Name) continue;
                     
-                    var value = property.GetValue(propertyUpdate);
+                    var value = messageProperty.GetValue(eventMessage);
                     if (value is null) continue;
-                        
+
                     raceProperty.SetValue(race, value);
                 }
             }

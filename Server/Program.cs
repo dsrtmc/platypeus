@@ -1,10 +1,14 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using DotNetEnv;
 using HotChocolate.Execution;
+using HotChocolate.Subscriptions;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Server.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +24,20 @@ builder.Services.AddDbContextPool<DatabaseContext>(o =>
     o.EnableSensitiveDataLogging(__dev__);
 });
 
-IdentityModelEventSource.ShowPII = __dev__;
+IdentityModelEventSource.ShowPII = __dev__; 
+
+// Register the custom JSON serializer options
+builder.Services.AddSingleton(new JsonSerializerOptions
+{
+    PropertyNameCaseInsensitive = true,
+    ReferenceHandler = ReferenceHandler.Preserve
+});
+
+// Register the custom message serializer
+builder.Services.AddSingleton<IMessageSerializer, CustomMessageSerializer>();
+
+// probably stupid :p
+builder.Services.AddHostedService<RaceManagementService>();
 
 // CORS setup
 builder.Services.AddCors(o =>
@@ -33,7 +50,6 @@ builder.Services.AddCors(o =>
             .AllowCredentials();
     });
 });
-
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -68,8 +84,6 @@ builder.Services
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHostedService<RaceManagementService>();
-
 // TODO: read on max byte size for documents?
 // TODO: consider persistent queries
 // TODO: read up on advanced operation complexity HotChocolate
@@ -93,8 +107,15 @@ builder.Services
     .AddMutationConventions()
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>()
-    .AddInMemorySubscriptions()
-    // .AddRedisSubscriptions((sp) => ConnectionMultiplexer.Connect("localhost"))
+    .AddRedisSubscriptions(_ =>
+    {
+        var options = new ConfigurationOptions
+        {
+            AbortOnConnectFail = !__dev__,
+            EndPoints = { { "localhost" } }
+        };
+        return ConnectionMultiplexer.Connect(options);
+    })
     .SetPagingOptions(new PagingOptions
     {
         RequirePagingBoundaries = true
