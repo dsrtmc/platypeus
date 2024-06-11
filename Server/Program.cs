@@ -7,7 +7,9 @@ using HotChocolate.Subscriptions;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
+using Server.Helpers;
 using Server.Services;
+using Server.Services.Email;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,12 +19,21 @@ Env.Load();
 var environment = builder.Configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
 var __dev__ = environment == "Development";
 
+Helper.ValidateEnvironmentVariables();
+
 // Database setup
 builder.Services.AddDbContextPool<DatabaseContext>(o =>
 {
     o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
     o.EnableSensitiveDataLogging(__dev__);
 });
+
+// Mailer setup
+builder.Services.AddTransient<IEmailService, EmailService>(_ => new EmailService
+(
+    Environment.GetEnvironmentVariable("GMAIL_USERNAME")!,
+    Environment.GetEnvironmentVariable("GMAIL_PASSWORD")!
+));
 
 IdentityModelEventSource.ShowPII = __dev__; 
 
@@ -62,8 +73,8 @@ builder.Services.AddRateLimiter(options =>
             QueueLimit = 1,
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-            TokenLimit = 100,
-            TokensPerPeriod = 10
+            TokenLimit = 300,
+            TokensPerPeriod = 30
         });
     });
     
@@ -107,6 +118,7 @@ builder.Services
     .AddMutationConventions()
     .RegisterDbContext<DatabaseContext>()
     .RegisterService<IHttpContextAccessor>()
+    .RegisterService<IEmailService>()
     .AddRedisSubscriptions(_ =>
     {
         var options = new ConfigurationOptions

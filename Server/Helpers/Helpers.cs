@@ -1,5 +1,6 @@
 #region
 
+using Microsoft.IdentityModel.Tokens;
 using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Schema.Types.Mutations;
@@ -49,6 +50,25 @@ public static class Helper
             errors.Add(new InvalidFieldError("password", input.Password));
 
         return errors;
+    }
+    
+    public static void ValidateEnvironmentVariables()
+    {
+        var gmailUsername = Environment.GetEnvironmentVariable("GMAIL_USERNAME");
+        if (gmailUsername.IsNullOrEmpty())
+            throw new InvalidOperationException("Environment variable GMAIL_USERNAME must be set.");
+        
+        var gmailPassword = Environment.GetEnvironmentVariable("GMAIL_PASSWORD");
+        if (gmailPassword.IsNullOrEmpty())
+            throw new InvalidOperationException("Environment variable GMAIL_PASSWORD must be set.");
+        
+        var databaseConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
+        if (databaseConnectionString.IsNullOrEmpty())
+            throw new InvalidOperationException("Environment variable DATABASE_CONNECTION_STRING must be set.");
+
+        var authenticationCookieName = Environment.GetEnvironmentVariable("AUTHENTICATION_COOKIE_NAME");
+        if (authenticationCookieName.IsNullOrEmpty())
+            throw new InvalidOperationException("Environment variable AUTHENTICATION_COOKIE_NAME must be set.");
     }
     
     public static string EncodeOnRaceEventToken(Guid? raceId) => $"{nameof(RaceSubscriptions.OnRaceEvent)}_{raceId}";

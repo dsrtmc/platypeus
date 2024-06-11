@@ -82,9 +82,17 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   async function handleChangeWpm(wpm: number) {
     if (!meData?.me) return;
     if (userHasFinished) return;
-    await updateStats({
+    const response = await updateStats({
       variables: { input: { raceId: race!.id, wpm, wordsTyped: wordCount } },
     });
+    const firstError = response.data?.updateStats.errors?.[0];
+    if (firstError) {
+      setError({
+        code: firstError.code,
+        message: firstError.message,
+      });
+      console.error("Errors:", response.data?.updateStats.errors);
+    }
   }
 
   async function handleSaveScore(score: TestScoreType) {
@@ -143,12 +151,13 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
   async function handleStart() {
     if (!data?.onRaceEvent.running && !data?.onRaceEvent.finished) {
       const response = await startRace({ variables: { input: { raceId: race.id, countdownTime: COUNTDOWN_TIME } } });
-      if (response.data?.startRace.errors?.length) {
+      const firstError = response.data?.startRace.errors?.[0];
+      if (firstError) {
         setError({
-          code: "ERROR_STARTING_RACE",
-          message: "We were unable to start the race. See the console for more details.",
+          code: firstError.code,
+          message: firstError.message,
         });
-        console.error("Errors:", response.data.startRace.errors);
+        console.error("Errors:", response.data?.startRace.errors);
       }
     }
   }

@@ -57,6 +57,8 @@ public class User : BaseEntity
         
         return this.Scores.Average(s => s.Wpm);
     }
+    
+    public bool Verified { get; set; }
 
     [GraphQLIgnore]
     public string Password { get; set; }

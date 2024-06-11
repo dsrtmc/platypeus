@@ -6,6 +6,7 @@ using Server.Models;
 using Server.Schema.Types.Errors;
 using Server.Schema.Types.Mutations;
 using Server.Services;
+using Server.Services.Email;
 using Server.Utilities;
 
 namespace Server.Schema.Mutations;
@@ -90,6 +91,21 @@ public static class UserMutations
             return false;
         
         await accessor.HttpContext!.SignOutAsync();
+        return true;
+    }
+    
+    public static bool SendHelloEmail(string email, string name, IEmailService emailService)
+    {
+        var data = new EmailData
+        {
+            Body = "hello, this is a test email :)",
+            Subject = "test email from platypeus :)",
+            RecipientEmail = email,
+            RecipientName = name,
+        };
+        
+        emailService.SendEmail(data);
+        
         return true;
     }
 }

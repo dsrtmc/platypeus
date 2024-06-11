@@ -263,6 +263,10 @@
 }
 
 .user {
+    color: var(--sub-color);
+}
+
+.isMe {
     color: var(--text-color);
 }
 

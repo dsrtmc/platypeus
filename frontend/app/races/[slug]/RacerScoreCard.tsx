@@ -2,13 +2,16 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styles from "./Race.module.css";
 import { RaceBox_OnRaceEventSubscription } from "@/graphql/generated/graphql";
 import { FaCheck } from "react-icons/fa";
+import { FaUser } from "react-icons/fa6";
+import { IconBase } from "react-icons";
 
 interface Props {
   racer: NonNullable<NonNullable<RaceBox_OnRaceEventSubscription["onRaceEvent"]["racers"]>["edges"]>[number]["node"];
   progress: number;
+  isMe: boolean;
 }
 
-export const RacerScoreCard: React.FC<Props> = ({ racer, progress }) => {
+export const RacerScoreCard: React.FC<Props> = ({ racer, progress, isMe }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [offset, setOffset] = useState(0);
   useLayoutEffect(() => {
@@ -19,7 +22,10 @@ export const RacerScoreCard: React.FC<Props> = ({ racer, progress }) => {
   return (
     <div key={racer.user.username} className={styles.racerCard} ref={ref}>
       <div className={styles.left}>
-        <div style={{ position: "absolute", left: `${offset}px`, top: -0.5 + "rem" }} className={styles.user}>
+        <div
+          style={{ position: "absolute", left: `${offset}px`, top: -0.5 + "rem" }}
+          className={`${styles.user} ${isMe && styles.isMe}`}
+        >
           {racer.user.username}
         </div>
         <div className={styles.progressBar} />

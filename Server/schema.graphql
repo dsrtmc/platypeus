@@ -167,6 +167,7 @@ type Mutation {
   register(input: RegisterInput!): RegisterPayload! @cost(complexity: 5)
   login(input: LoginInput!): LoginPayload! @cost(complexity: 5)
   logout: LogoutPayload! @cost(complexity: 5)
+  sendHelloEmail(input: SendHelloEmailInput!): SendHelloEmailPayload!
 }
 
 type NotAuthenticatedError implements Error {
@@ -348,6 +349,10 @@ type ScoresForLeaderboardEdge {
   node: Score!
 }
 
+type SendHelloEmailPayload {
+  boolean: Boolean
+}
+
 type SendMessagePayload {
   message: Message
   errors: [SendMessageError!] @cost(complexity: 5)
@@ -381,6 +386,7 @@ type User {
   scoreCount: Int!
   averageWpm: Float!
   username: String!
+  verified: Boolean!
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   messages("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): MessagesConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   id: UUID!
@@ -708,6 +714,11 @@ input ScoreSortInput {
   updatedAt: SortEnumType
 }
 
+input SendHelloEmailInput {
+  email: String!
+  name: String!
+}
+
 input SendMessageInput {
   chatboxId: UUID!
   content: String!
@@ -744,6 +755,7 @@ input UserFilterInput {
   or: [UserFilterInput!]
   username: StringOperationFilterInput
   email: StringOperationFilterInput
+  verified: BooleanOperationFilterInput
   scores: ListFilterInputTypeOfScoreFilterInput
   messages: ListFilterInputTypeOfMessageFilterInput
   id: UuidOperationFilterInput
@@ -754,6 +766,7 @@ input UserFilterInput {
 input UserSortInput {
   username: SortEnumType
   email: SortEnumType
+  verified: SortEnumType
   id: SortEnumType
   createdAt: SortEnumType
   updatedAt: SortEnumType
