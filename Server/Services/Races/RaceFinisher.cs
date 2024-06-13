@@ -1,4 +1,3 @@
-using Microsoft.IdentityModel.Tokens;
 using Server.Models;
 
 namespace Server.Services.Races;
@@ -14,11 +13,11 @@ public class RaceFinisher : IRaceFinisher
 
     public Race? PeekQueue()
     {
-        if (_races.IsNullOrEmpty())
+        if (_races.Count == 0)
             return null;
         
         return _races.Peek();   
     }
 
-    public bool IsQueueEmpty() => _races.IsNullOrEmpty();
+    public bool IsQueueEmpty() => _races.Count == 0;
 }

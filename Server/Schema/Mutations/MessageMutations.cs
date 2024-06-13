@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
 using Server.Models;
 using Server.Schema.Types.Errors;
@@ -19,7 +18,7 @@ public static class MessageMutations
         IHttpContextAccessor accessor, [Service] ITopicEventSender eventSender)
     {
         var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-        if (claim is null || claim.Value.IsNullOrEmpty())
+        if (claim is null)
             return new NotAuthenticatedError();
 
         var userId = new Guid(claim.Value);

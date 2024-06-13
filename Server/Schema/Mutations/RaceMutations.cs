@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
 using Server.Models;
 using Server.Schema.Subscriptions;
@@ -233,7 +232,7 @@ public static class RaceMutations
         DatabaseContext db, IHttpContextAccessor accessor)
     {
         var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-        if (claim is null || claim.Value.IsNullOrEmpty())
+        if (claim is null)
             return new NotAuthenticatedError();
 
         var userId = new Guid(claim.Value);
@@ -271,13 +270,12 @@ public static class RaceMutations
         return race;
     }
 
-    // TODO: MAKE SURE TO REMOVE IT FROM THE RACE FINISHER QUEUE AS WELL
     public static async Task<MutationResult<bool, NotAuthenticatedError, NotAuthorizedError, InvalidRaceError>> DeleteRace(
         Guid raceId, DatabaseContext db, IHttpContextAccessor accessor,
         CancellationToken cancellationToken)
     {
         var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-        if (claim is null || claim.Value.IsNullOrEmpty())
+        if (claim is null)
             return new NotAuthenticatedError();
 
         var userId = new Guid(claim.Value);

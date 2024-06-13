@@ -5,8 +5,8 @@ using DotNetEnv;
 using HotChocolate.Execution;
 using HotChocolate.Subscriptions;
 using HotChocolate.Types.Pagination;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Logging;
 using Server.Helpers;
 using Server.Services;
 using Server.Services.Email;
@@ -36,8 +36,6 @@ builder.Services.AddTransient<IEmailService, EmailService>(_ => new EmailService
     Environment.GetEnvironmentVariable("GMAIL_PASSWORD")!
 ));
 
-IdentityModelEventSource.ShowPII = __dev__; 
-
 // Register the custom JSON serializer options
 builder.Services.AddSingleton(new JsonSerializerOptions
 {
@@ -52,6 +50,8 @@ builder.Services.AddHostedService<RaceManagementService>();
 
 // probably stupid :p
 builder.Services.AddSingleton<IRaceFinisher, RaceFinisher>();
+
+builder.Services.AddHttpLogging(_ => {});
 
 // CORS setup
 builder.Services.AddCors(o =>
@@ -76,8 +76,8 @@ builder.Services.AddRateLimiter(options =>
             QueueLimit = 1,
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-            TokenLimit = 300,
-            TokensPerPeriod = 30
+            TokenLimit = 200,
+            TokensPerPeriod = 60
         });
     });
     

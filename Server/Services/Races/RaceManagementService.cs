@@ -1,5 +1,4 @@
 using HotChocolate.Subscriptions;
-using Microsoft.IdentityModel.Tokens;
 using Server.Helpers;
 using Server.Schema.Subscriptions;
 

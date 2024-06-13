@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using HotChocolate.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Server.Models;
 using Server.Services;
 
@@ -18,7 +17,7 @@ public static class UserQueries
     {
         var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
 
-        if (claim is null || claim.Value.IsNullOrEmpty())
+        if (claim is null)
             return null;
 
         var userId = new Guid(claim.Value);

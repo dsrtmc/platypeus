@@ -1,15 +1,15 @@
-# Build stage
-# TODO: terrible, it is windows, we do not want windows, we want linux :)
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /source
-COPY . .
-RUN dotnet restore "./Server.csproj" --disable-parallel
-RUN dotnet public "./Server.csproj" -c release -o /app --no-restore
+FROM fedora:latest
 
-# Serve stage
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS build
+RUN dnf -y update && dnf -y install dotnet-sdk-7.0
+
 WORKDIR /app
-COPY --from=build /app ./
+
+ARG BUILD_CONFIGURATION=Release
+
+COPY . .
+
+RUN dotnet restore "./Server.csproj" --disable-parallel
+RUN dotnet public "./Server.csproj" -c $BUILD_CONFIGURATION -o /app --no-restore
 
 EXPOSE 5000
 

@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Server.Services;
 
 namespace Server.Models;
@@ -30,7 +29,7 @@ public class User : BaseEntity
     public string GetEmail(IHttpContextAccessor accessor)
     {
         var claim = accessor.HttpContext!.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-        if (claim is null || claim.Value.IsNullOrEmpty())
+        if (claim is null)
             return "";
 
         var userId = new Guid(claim.Value);
@@ -52,7 +51,7 @@ public class User : BaseEntity
     
     public double GetAverageWpm(DatabaseContext db)
     {
-        if (this.Scores.IsNullOrEmpty())
+        if (this.Scores.Count == 0)
             return 0;
         
         return this.Scores.Average(s => s.Wpm);
