@@ -31,7 +31,7 @@ public static class PasswordHasher
     {
         public HashOptions() {}
 
-        /// <summary>The length of the produces unencoded hash.</summary>
+        /// <summary>The length of the produced unencoded hash.</summary>
         public int HashLength { get; init; } = 32;
         
         /// <summary>The salt to protect the data against rainbow table attacks.</summary>
@@ -40,16 +40,16 @@ public static class PasswordHasher
         
         /// <summary>The length (in bytes) of the salt.</summary>
         public int SaltLength { get; init; } = 16;
-        
-        /// <summary>The amount of memory to be used by the hash function.</summary>
-        public int MemorySize { get; init; } = 1024 * 1024;
+
+        /// <summary>The amount of memory in kB to be used by the hash function.</summary>
+        public int MemorySize { get; init; } = 1 << 16; // 65536 kB
         
         /// <summary>The amount of CPU threads to be used by the hash function.</summary>
         /// <remarks>Changing the setting affects the resulting hash</remarks>
-        public int Parallelism { get; init; } = 12;
+        public int Parallelism { get; init; } = 4;
         
         /// <summary>The amount of iterations used by the hash function.</summary>
-        public int Iterations { get; init; } = 2;
+        public int Iterations { get; init; } = 10;
 
         public override string ToString() => JsonSerializer.Serialize(this);
     }
