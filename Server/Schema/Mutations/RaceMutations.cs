@@ -7,6 +7,7 @@ using Server.Models;
 using Server.Schema.Subscriptions;
 using Server.Schema.Types.Errors;
 using Server.Services;
+using Server.Services.Races;
 using Server.Utilities;
 
 namespace Server.Schema.Mutations;
@@ -69,6 +70,7 @@ public static class RaceMutations
     /// <param name="countdownTime">In seconds, the time it takes after submit for the race to start.</param>
     /// <param name="db"></param>
     /// <param name="eventSender"></param>
+    /// <param name="raceFinisher"></param>
     /// <param name="accessor"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
@@ -77,6 +79,7 @@ public static class RaceMutations
     > StartRace(
         Guid raceId, int countdownTime, DatabaseContext db,
         [Service] ITopicEventSender eventSender,
+        [Service] IRaceFinisher raceFinisher,
         IHttpContextAccessor accessor,
         CancellationToken cancellationToken)
     {
@@ -107,6 +110,10 @@ public static class RaceMutations
 
         race.StartTime = DateTimeOffset.UtcNow.AddSeconds(countdownTime);
         race.Running = true;
+
+        // var endTime = countdownTime + race.Mode == "time" ? race.ModeSetting : 60;
+        raceFinisher.Enqueue(race);
+        Console.WriteLine("WE JSUT ENQUEUED RACE LMAOOOOOOOOOOOOOOOOOOOOOO");
         
         await db.SaveChangesAsync(cancellationToken);
         
@@ -264,6 +271,7 @@ public static class RaceMutations
         return race;
     }
 
+    // TODO: MAKE SURE TO REMOVE IT FROM THE RACE FINISHER QUEUE AS WELL
     public static async Task<MutationResult<bool, NotAuthenticatedError, NotAuthorizedError, InvalidRaceError>> DeleteRace(
         Guid raceId, DatabaseContext db, IHttpContextAccessor accessor,
         CancellationToken cancellationToken)

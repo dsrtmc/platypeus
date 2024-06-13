@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Logging;
 using Server.Helpers;
 using Server.Services;
 using Server.Services.Email;
+using Server.Services.Races;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,8 +48,10 @@ builder.Services.AddSingleton(new JsonSerializerOptions
 // Register the custom message serializer
 builder.Services.AddSingleton<IMessageSerializer, CustomMessageSerializer>();
 
-// probably stupid :p
 builder.Services.AddHostedService<RaceManagementService>();
+
+// probably stupid :p
+builder.Services.AddSingleton<IRaceFinisher, RaceFinisher>();
 
 // CORS setup
 builder.Services.AddCors(o =>

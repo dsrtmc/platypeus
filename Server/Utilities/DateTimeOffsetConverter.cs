@@ -9,9 +9,5 @@ namespace Server.Utilities;
 public class DateTimeOffsetConverter : ValueConverter<DateTimeOffset, DateTimeOffset>
 {
     public DateTimeOffsetConverter()
-        : base(
-            d => d.ToUniversalTime(),
-            d => d.ToUniversalTime())
-    {
-    }
+        : base(d => d.ToUniversalTime(), d => d.ToUniversalTime()) {}
 }
