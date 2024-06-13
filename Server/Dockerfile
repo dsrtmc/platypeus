@@ -1,6 +1,6 @@
 FROM fedora:latest
 
-RUN dnf -y update && dnf -y install dotnet-sdk-7.0
+RUN dnf -y update && dnf -y install dotnet-sdk-8.0
 
 WORKDIR /app
 
