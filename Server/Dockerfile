@@ -1,16 +1,22 @@
 FROM fedora:latest
 
+ARG BUILD_CONFIGURATION=Release
+
 RUN dnf -y update && dnf -y install dotnet-sdk-8.0
+RUN dnf -y install redis
 
 WORKDIR /app
-
-ARG BUILD_CONFIGURATION=Release
 
 COPY . .
 
 RUN dotnet restore "./Server.csproj" --disable-parallel
-RUN dotnet public "./Server.csproj" -c $BUILD_CONFIGURATION -o /app --no-restore
+RUN dotnet publish "./Server.csproj" -c $BUILD_CONFIGURATION -o /app --no-restore
 
-EXPOSE 5000
+COPY . .
 
-ENTRYPOINT ["dotnet", "Server.dll"]
+ENV ASPNETCORE_URLS=http://+:8080
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD redis-server --daemonize yes; dotnet Server.dll
