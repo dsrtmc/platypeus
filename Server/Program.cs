@@ -6,6 +6,7 @@ using HotChocolate.Execution;
 using HotChocolate.Subscriptions;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
 using Server.Services;
@@ -22,10 +23,15 @@ var __dev__ = environment == "Development";
 
 Helper.ValidateEnvironmentVariables();
 
+Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111");
+Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111");
+Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111");
+Console.WriteLine(Environment.GetEnvironmentVariable("DATABASE_URL")!.Trim('\''));
+
 // Database setup
 builder.Services.AddDbContextPool<DatabaseContext>(o =>
 {
-    o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"));
+    o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL")!.Trim('\''));
     o.EnableSensitiveDataLogging(__dev__);
 });
 
@@ -58,13 +64,30 @@ builder.Services.AddCors(o =>
 {
     o.AddPolicy("default", pb =>
     {
-        pb.WithOrigins("http://localhost:3000") // TODO: .env variable
+        pb.WithOrigins(Environment.GetEnvironmentVariable("CORS_ORIGIN")!) // TODO: .env variable
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
     });
 });
 
+// Cookies setup
+builder.Services
+    .AddAuthentication("default")
+    .AddCookie("default", options => {
+        options.Cookie.Name = Environment.GetEnvironmentVariable("AUTHENTICATION_COOKIE_NAME");
+        options.Cookie.SecurePolicy = __dev__ ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
+        options.Cookie.SameSite = __dev__ ? SameSiteMode.Lax : SameSiteMode.Strict;
+        options.Cookie.HttpOnly = !__dev__;
+    });
+
+// Forwarded headers setup
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
+// Rate limiter setup
 builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
@@ -83,17 +106,6 @@ builder.Services.AddRateLimiter(options =>
     
     options.RejectionStatusCode = 429;
 });
-
-// Cookies setup
-builder.Services
-    .AddAuthentication("default")
-    .AddCookie("default", options => {
-        options.Cookie.Name = Environment.GetEnvironmentVariable("AUTHENTICATION_COOKIE_NAME");
-        // Only in development, change in prod; TODO: debug/prod .env variables
-        options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-        // Apparently Chrome does not allow SameSite: None unless you're using the Secure flag with it
-        options.Cookie.SameSite = SameSiteMode.Lax;
-    });
 
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
@@ -144,6 +156,7 @@ var app = builder.Build();
 app.UseHttpLogging();
 
 app.UseCors("default");
+app.UseForwardedHeaders();
 
 app.UseAuthentication();
 app.UseAuthorization();

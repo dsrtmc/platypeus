@@ -7,9 +7,13 @@ RUN dnf -y install redis
 
 WORKDIR /app
 
-COPY . .
+COPY Server.csproj . 
 
 RUN dotnet restore "./Server.csproj" --disable-parallel
+
+COPY . .
+# COPY .env.production .env ???????????
+
 RUN dotnet publish "./Server.csproj" -c $BUILD_CONFIGURATION -o /app --no-restore
 
 COPY . .
@@ -19,4 +23,4 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-CMD redis-server --daemonize yes; dotnet Server.dll
+CMD dotnet Server.dll
