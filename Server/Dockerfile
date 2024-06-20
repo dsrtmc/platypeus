@@ -12,7 +12,6 @@ COPY Server.csproj .
 RUN dotnet restore "./Server.csproj" --disable-parallel
 
 COPY . .
-# COPY .env.production .env ???????????
 
 RUN dotnet publish "./Server.csproj" -c $BUILD_CONFIGURATION -o /app --no-restore
 

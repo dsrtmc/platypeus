@@ -5,7 +5,6 @@ using DotNetEnv;
 using HotChocolate.Execution;
 using HotChocolate.Subscriptions;
 using HotChocolate.Types.Pagination;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
@@ -24,10 +23,7 @@ var __dev__ = environment == "Development";
 Helper.ValidateEnvironmentVariables();
 
 Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111");
-Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111");
-Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111");
-Console.WriteLine(Environment.GetEnvironmentVariable("DATABASE_URL")!.Trim('\''));
-
+Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111"); Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111"); Console.WriteLine(Environment.GetEnvironmentVariable("DATABASE_URL")!.Trim('\'')); 
 // Database setup
 builder.Services.AddDbContextPool<DatabaseContext>(o =>
 {
@@ -136,12 +132,14 @@ builder.Services
     .RegisterService<IEmailService>()
     .AddRedisSubscriptions(_ =>
     {
-        var options = new ConfigurationOptions
-        {
-            AbortOnConnectFail = !__dev__,
-            EndPoints = { { "localhost" } }
-        };
-        return ConnectionMultiplexer.Connect(options);
+        var redisUrl = Environment.GetEnvironmentVariable("REDIS_URL")!;
+        var uri = new Uri(redisUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        var password = userInfo[1];
+        var host = uri.Host;
+        var port = uri.Port;
+        var configuration = $"{host}:{port},password={password}";
+        return ConnectionMultiplexer.Connect(configuration);
     })
     .SetPagingOptions(new PagingOptions
     {
