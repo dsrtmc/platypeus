@@ -5,6 +5,7 @@ using DotNetEnv;
 using HotChocolate.Execution;
 using HotChocolate.Subscriptions;
 using HotChocolate.Types.Pagination;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
@@ -83,7 +84,7 @@ builder.Services
     .AddCookie("default", options => {
         options.Cookie.Name = Environment.GetEnvironmentVariable("AUTHENTICATION_COOKIE_NAME");
         options.Cookie.SecurePolicy = __dev__ ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
-        options.Cookie.SameSite = __dev__ ? SameSiteMode.Lax : SameSiteMode.Strict;
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.HttpOnly = !__dev__;
     });
 
