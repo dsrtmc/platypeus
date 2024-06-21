@@ -1,3 +1,5 @@
+"use client";
+
 import React, { ChangeEvent, KeyboardEvent, useContext, useEffect, useState } from "react";
 import { DEFAULT_CONFIG, getConfig, setConfig } from "@/utils/configUtils";
 import styles from "@/app/settings/Settings.module.css";

@@ -1,6 +1,10 @@
 import styles from "@/components/leaderboards/Leaderboards.module.css";
 import { Leaderboard } from "@/components/leaderboards/Leaderboard";
 
+export const metadata = {
+  title: "Leaderboards",
+};
+
 /*
  * might not be the worst idea to just have a query here that will fetch both.
  * or, instead of that, I just make a separate spinner for every leaderboard, because right now I'm

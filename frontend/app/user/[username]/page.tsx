@@ -11,6 +11,11 @@ import { BestUserScoresBox } from "@/app/user/[username]/BestUserScoresBox";
 import { notFound } from "next/navigation";
 import React from "react";
 import { gql } from "@apollo/client";
+import { Metadata } from "next";
+
+type Props = {
+  params: { username: string };
+};
 
 const GetUser = gql`
   query UserPage_GetUser($where: UserFilterInput) {
@@ -35,7 +40,13 @@ const GetUserMonthlyScoreSummaries = gql`
   }
 `;
 
-export default async function UserPage({ params }: { params: { username: string } }) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  return {
+    title: `${params.username}'s profile`,
+  };
+}
+
+export default async function UserPage({ params }: Props) {
   const { data, error } = await getClient().query({
     query: UserPage_GetUserDocument,
     variables: {

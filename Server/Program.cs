@@ -19,15 +19,25 @@ Env.Load();
 
 var environment = builder.Configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
 var __dev__ = environment == "Development";
+Console.WriteLine($"The environment we are in: {environment}");
 
 Helper.ValidateEnvironmentVariables();
 
-Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111");
-Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111"); Console.WriteLine("THIS IS THE POSTGRES DTAABASE STRING!!!!!!!!!!1111"); Console.WriteLine(Environment.GetEnvironmentVariable("DATABASE_URL")!.Trim('\'')); 
 // Database setup
 builder.Services.AddDbContextPool<DatabaseContext>(o =>
 {
-    o.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL")!.Trim('\''));
+    var postgresUrl = Environment.GetEnvironmentVariable("DATABASE_URL")!.Trim('\'');
+    var uri = new Uri(postgresUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    var userId = userInfo[0];
+    var password = userInfo[1];
+    var host = uri.Host;
+    var port = uri.Port;
+    var database = uri.PathAndQuery.Trim('/');
+    var configuration = $"Server={host};Port={port};Password='{password}';Username='{userId}';Database={database}";
+        
+    Console.WriteLine($"POSTGRES CONFIGURATION STRING: {configuration}");
+    o.UseNpgsql(configuration);
     o.EnableSensitiveDataLogging(__dev__);
 });
 
@@ -60,7 +70,7 @@ builder.Services.AddCors(o =>
 {
     o.AddPolicy("default", pb =>
     {
-        pb.WithOrigins(Environment.GetEnvironmentVariable("CORS_ORIGIN")!) // TODO: .env variable
+        pb.WithOrigins(Environment.GetEnvironmentVariable("CORS_ORIGIN")!)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -107,7 +117,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 // TODO: read on max byte size for documents?
-// TODO: consider persistent queries
 // TODO: read up on advanced operation complexity HotChocolate
 // GraphQL setup
 builder.Services
@@ -132,14 +141,27 @@ builder.Services
     .RegisterService<IEmailService>()
     .AddRedisSubscriptions(_ =>
     {
-        var redisUrl = Environment.GetEnvironmentVariable("REDIS_URL")!;
+        var redisUrl = Environment.GetEnvironmentVariable("REDIS_URL")!.Trim('\'');
         var uri = new Uri(redisUrl);
         var userInfo = uri.UserInfo.Split(':');
         var password = userInfo[1];
         var host = uri.Host;
         var port = uri.Port;
         var configuration = $"{host}:{port},password={password}";
-        return ConnectionMultiplexer.Connect(configuration);
+
+        var options = ConfigurationOptions.Parse(configuration);
+        
+        Console.WriteLine($"REDIS CONFIGURATION STRING: {configuration}");
+        try
+        {
+            return ConnectionMultiplexer.Connect(options);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ConnectionMultiplexer.Connect threw an exception: {ex.Message}");
+        }
+
+        return ConnectionMultiplexer.Connect(options);
     })
     .SetPagingOptions(new PagingOptions
     {

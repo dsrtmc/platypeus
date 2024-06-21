@@ -6,8 +6,11 @@ import { notFound } from "next/navigation";
 import { ApolloError, gql } from "@apollo/client";
 import styles from "./Race.module.css";
 import { FadeTransition } from "@/app/FadeTransition";
+import { Metadata } from "next";
 
-interface Props {}
+interface Props {
+  params: { slug: string };
+}
 
 const GetRace = gql`
   query RacePage_GetRace($where: RaceFilterInput, $racersFirst: Int!) {
@@ -36,7 +39,13 @@ const GetRace = gql`
   }
 `;
 
-export default async function RacePage({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  return {
+    title: `Race "${params.slug}"`,
+  };
+}
+
+export default async function RacePage({ params }: Props) {
   const { data, error } = await getClient().query({
     query: RacePage_GetRaceDocument,
     variables: {

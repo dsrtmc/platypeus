@@ -2,6 +2,10 @@ import styles from "./NotFound.module.css";
 import Link from "next/link";
 import { TiHome } from "react-icons/ti";
 
+export const metadata = {
+  title: "not found :(",
+};
+
 export default function NotFound() {
   return (
     <div className={styles.group}>

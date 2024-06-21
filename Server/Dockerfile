@@ -3,11 +3,13 @@ FROM fedora:latest
 ARG BUILD_CONFIGURATION=Release
 
 RUN dnf -y update && dnf -y install dotnet-sdk-8.0
-RUN dnf -y install redis
 
 WORKDIR /app
 
 COPY Server.csproj . 
+
+RUN dotnet tool install --global dotnet-ef --version 8.0.6
+ENV PATH $PATH:/root/.dotnet/tools
 
 RUN dotnet restore "./Server.csproj" --disable-parallel
 

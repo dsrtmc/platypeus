@@ -100,9 +100,8 @@ public static class RaceMutations
         if (race.Finished || race.Running)
             return new RaceAlreadyRunningError(raceId);
         
-        // TODO: uncomment that in prod
-        // if (race.Racers.Count < 2)
-        //     return new TooFewRacersError(raceId);
+        if (race.Racers.Count < 2)
+            return new TooFewRacersError(raceId);
 
         if (race.Host.Id != user.Id)
             return new NotAuthorizedError();
@@ -110,9 +109,7 @@ public static class RaceMutations
         race.StartTime = DateTimeOffset.UtcNow.AddSeconds(countdownTime);
         race.Running = true;
 
-        // var endTime = countdownTime + race.Mode == "time" ? race.ModeSetting : 60;
         raceFinisher.Enqueue(race);
-        Console.WriteLine("WE JSUT ENQUEUED RACE LMAOOOOOOOOOOOOOOOOOOOOOO");
         
         await db.SaveChangesAsync(cancellationToken);
         

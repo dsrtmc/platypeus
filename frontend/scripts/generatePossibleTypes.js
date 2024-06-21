@@ -1,6 +1,5 @@
 const fs = require("fs");
 const https = require("https");
-require("dotenv").config({ path: "./.env.local" });
 
 const possibleTypesIntrospectionQuery = `
   {
@@ -16,9 +15,9 @@ const possibleTypesIntrospectionQuery = `
   }
 `;
 
-// TODO: only in development, don't do that in prod
+// TODO: true only in development, don't do that in prod
 // we should move it to the build script, and in theory we only build for https, so we'll probably remove it
-const agent = new https.Agent({ rejectUnauthorized: false });
+const agent = new https.Agent({ rejectUnauthorized: true });
 
 fetch(process.env["NEXT_PUBLIC_API_URL"], {
   agent,

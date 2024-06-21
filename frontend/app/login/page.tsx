@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { Login_MeDocument } from "@/graphql/generated/graphql";
 import { gql, useQuery } from "@apollo/client";
 
+export const metadata = {
+  title: "Login",
+};
+
 const Me = gql`
   query Login_Me {
     me {

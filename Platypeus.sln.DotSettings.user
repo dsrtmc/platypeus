@@ -8,4 +8,5 @@
     &lt;TestId&gt;xUnit::57A300EC-CB42-4F45-AC28-F84BCBC9FF56::net7.0::Server.Tests.SampleTest.Users_ListsAllUsersFromDatabase&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=ihateregex/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=lowkey/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

@@ -9,6 +9,10 @@ import { MeDocument, RacesPage_MeDocument } from "@/graphql/generated/graphql";
 
 interface Props {}
 
+export const metadata = {
+  title: "Races",
+};
+
 const Me = gql`
   query RacesPage_Me {
     me {

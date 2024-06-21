@@ -1,11 +1,13 @@
-"use client";
-
 import styles from "./Settings.module.css";
 import { ThemeConfigSection } from "@/app/settings/ThemeConfigSection";
 import { FontConfigSection } from "@/app/settings/FontConfigSection";
 import { WrapperConfigSection } from "@/app/settings/WrapperConfigSection";
 
 interface Props {}
+
+export const metadata = {
+  title: "Settings",
+};
 
 export default function SettingsPage() {
   return (

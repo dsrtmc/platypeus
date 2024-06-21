@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import styles from "@/app/settings/Settings.module.css";
 import { WrapperSizeChangeSection } from "@/app/settings/WrapperSizeChangeSection";

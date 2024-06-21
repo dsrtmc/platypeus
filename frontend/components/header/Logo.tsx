@@ -7,7 +7,8 @@ interface Props {}
 export const Logo: React.FC<Props> = ({}) => {
   return (
     <Link href={"/"} className={styles.logo}>
-      platypeus
+      <div className={styles.big}>platypeus</div>
+      <div className={styles.sub}>also try monkeytype!</div>
     </Link>
   );
 };
