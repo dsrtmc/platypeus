@@ -97,6 +97,10 @@ public static class Helper
         var corsOrigin = Environment.GetEnvironmentVariable("CORS_ORIGIN");
         if (corsOrigin is null or "")
             throw new InvalidOperationException("Environment variable CORS_ORIGIN must be set.");
+        
+        var cookieDomain = Environment.GetEnvironmentVariable("COOKIE_DOMAIN");
+        if (cookieDomain is null or "")
+            throw new InvalidOperationException("Environment variable COOKIE_DOMAIN must be set.");
     }
     
     public static string EncodeOnRaceEventToken(Guid? raceId) => $"{nameof(RaceSubscriptions.OnRaceEvent)}_{raceId}";

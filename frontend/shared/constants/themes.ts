@@ -13,6 +13,16 @@ export enum CssThemeVariables {
 
 export const THEMES: { [name: string]: ThemeConfigType } = {
   default: {
+    "--bg-color": "#111",
+    "--main-color": "#eee",
+    "--caret-color": "#eee",
+    "--sub-color": "#444",
+    "--sub-alt-color": "#191919",
+    "--text-color": "#eee",
+    "--error-color": "#da3333",
+    "--error-extra-color": "#791717",
+  },
+  "dark navy": {
     "--bg-color": "#121520",
     "--main-color": "#fff",
     "--caret-color": "#fff",

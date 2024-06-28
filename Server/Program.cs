@@ -5,7 +5,6 @@ using DotNetEnv;
 using HotChocolate.Execution;
 using HotChocolate.Subscriptions;
 using HotChocolate.Types.Pagination;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
@@ -85,7 +84,8 @@ builder.Services
         options.Cookie.Name = Environment.GetEnvironmentVariable("AUTHENTICATION_COOKIE_NAME");
         options.Cookie.SecurePolicy = __dev__ ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.HttpOnly = !__dev__;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.Domain = Environment.GetEnvironmentVariable("COOKIE_DOMAIN");
     });
 
 // Forwarded headers setup

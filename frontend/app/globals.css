@@ -1,14 +1,14 @@
 :root {
     --nav-size: 3rem;
 
-    --bg-color: #242933;
-    --caret-color: #ec4c56;
-    --main-color: #ec4c56;
-    --sub-color: #596172;
-    --sub-alt-color: #1c222d;
-    --text-color: #f6f0e9;
-    --error-color: #ec4c56;
-    --error-extra-color: #9b333a;
+    --bg-color: #111;
+    --caret-color: #eee;
+    --main-color: #eee;
+    --sub-color: #444;
+    --sub-alt-color: #191919;
+    --text-color: #eee;
+    --error-color: #da3333;
+    --error-extra-color: #791717;
     
     /* Comes from Next.js' next/font/google (see app/layout.tsx) */
     --font-family: var(--font-itim);
