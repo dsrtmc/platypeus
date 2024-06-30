@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -8,6 +9,7 @@ using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
+using Server.Middleware;
 using Server.Services;
 using Server.Services.Email;
 using Server.Services.Races;
@@ -124,6 +126,7 @@ builder.Services
     .AddGraphQLServer()
     .SetMaxAllowedValidationErrors(10)
     .AllowIntrospection(__dev__)
+    .AddHttpRequestInterceptor<IntrospectionInterceptor>()
     .AddMaxExecutionDepthRule(10, skipIntrospectionFields: true)
     .ModifyRequestOptions(o =>
     {

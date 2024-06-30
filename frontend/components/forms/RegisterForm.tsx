@@ -3,10 +3,12 @@
 import { gql, useMutation } from "@apollo/client";
 import { MeDocument, MeQuery, RegisterForm_RegisterDocument } from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import Link from "next/link";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { AiOutlineUserAdd } from "react-icons/ai";
+import { RegisterButton } from "@/components/forms/RegisterButton";
+import { ErrorContext } from "@/app/ErrorProvider";
 
 type FormValues = {
   username: string;
@@ -33,10 +35,11 @@ const RegisterMutation = gql`
 
 export default function RegisterForm() {
   const [registerUser] = useMutation(RegisterForm_RegisterDocument);
+  const { setError } = useContext(ErrorContext)!;
 
   const {
     register,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     setFocus,
   } = useForm<FormValues>({
@@ -62,6 +65,14 @@ export default function RegisterForm() {
       },
     });
     console.log("Register response:", response);
+    const firstError = response.data?.register.errors?.[0];
+    if (firstError) {
+      setError({
+        code: firstError.code,
+        message: firstError.message,
+      });
+      console.error("Errors:", response.data?.register.errors);
+    }
   };
 
   useEffect(() => {
@@ -92,9 +103,7 @@ export default function RegisterForm() {
         aria-invalid={errors.password ? "true" : "false"}
         className={styles.field}
       />
-      <button type="submit" className={styles.button}>
-        <AiOutlineUserAdd /> register
-      </button>
+      <RegisterButton disabled={!!errors.password || !!errors.username || isSubmitting} isSubmitting={isSubmitting} />
       <Link href={"/login"} className={styles.instead}>
         Sign in instead
       </Link>

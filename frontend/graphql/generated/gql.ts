@@ -29,7 +29,6 @@ const documents = {
     "\n  mutation RaceBox_DeleteRace($input: DeleteRaceInput!) {\n    deleteRace(input: $input) {\n      result: boolean\n      errors {\n        code: __typename\n        ... on Error {\n          message\n        }\n      }\n    }\n  }\n": types.RaceBox_DeleteRaceDocument,
     "\n  query RacePage_GetRace($where: RaceFilterInput, $racersFirst: Int!) {\n    race(where: $where) {\n      id\n      startTime\n      createdAt\n      racers(first: $racersFirst) {\n        edges {\n          node {\n            user {\n              username\n            }\n            wpm\n          }\n        }\n      }\n      host {\n        username\n      }\n      content\n      unlisted\n      running\n      finished\n    }\n  }\n": types.RacePage_GetRaceDocument,
     "\n  query RacesPage_Me {\n    me {\n      id\n      ...UserInfo\n    }\n  }\n": types.RacesPage_MeDocument,
-    "\n  query ScorePage_GetScore($where: ScoreFilterInput) {\n    score(where: $where) {\n      id\n      wpm\n      rawWpm\n    }\n  }\n": types.ScorePage_GetScoreDocument,
     "\n  query UserPage_GetUsersBestScores($userId: UUID!, $mode: String!, $modeSettings: [Int!]!) {\n    usersBestScores(userId: $userId, mode: $mode, modeSettings: $modeSettings) {\n      wpm\n      rawWpm\n      mode\n      modeSetting\n      accuracy\n      createdAt\n    }\n  }\n": types.UserPage_GetUsersBestScoresDocument,
     "\n  query UserPage_GetUser($where: UserFilterInput) {\n    user(where: $where) {\n      id\n      username\n      averageWpm\n      scoreCount\n      createdAt\n    }\n  }\n": types.UserPage_GetUserDocument,
     "\n  query UserPage_GetUserMonthlyScoreSummaries($userId: UUID!) {\n    userMonthlyScoreSummaries(userId: $userId) {\n      wpm\n      rawWpm\n      accuracy\n      date\n    }\n  }\n": types.UserPage_GetUserMonthlyScoreSummariesDocument,
@@ -122,10 +121,6 @@ export function graphql(source: "\n  query RacePage_GetRace($where: RaceFilterIn
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query RacesPage_Me {\n    me {\n      id\n      ...UserInfo\n    }\n  }\n"): (typeof documents)["\n  query RacesPage_Me {\n    me {\n      id\n      ...UserInfo\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  query ScorePage_GetScore($where: ScoreFilterInput) {\n    score(where: $where) {\n      id\n      wpm\n      rawWpm\n    }\n  }\n"): (typeof documents)["\n  query ScorePage_GetScore($where: ScoreFilterInput) {\n    score(where: $where) {\n      id\n      wpm\n      rawWpm\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

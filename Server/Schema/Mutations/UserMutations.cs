@@ -33,7 +33,7 @@ public static class UserMutations
         return true;
     }
     
-    public static async Task<MutationResult<User, InvalidFieldError, UsernameTakenError>> Register(
+    public static async Task<MutationResult<User, InvalidFieldError, UsernameTakenError, EmailTakenError>> Register(
         RegisterInput input,
         DatabaseContext db,
         IHttpContextAccessor accessor)
@@ -46,6 +46,9 @@ public static class UserMutations
         if (db.Users.FirstOrDefault(u => u.Username == input.Username) is not null)
             return new UsernameTakenError(input.Username!);
         
+        if (db.Users.FirstOrDefault(u => u.Email == input.Email) is not null)
+            return new EmailTakenError(input.Username!);
+        
         var hashedPassword = await PasswordHasher.Hash(input.Password!);
         var user = new User(input.Username!, input.Email!, hashedPassword);
         
@@ -54,7 +57,12 @@ public static class UserMutations
         
         await accessor.HttpContext!.SignInAsync("default", new ClaimsPrincipal(
             new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, "default")
-        ));
+        ), new AuthenticationProperties
+        {
+            IsPersistent = true,
+            AllowRefresh = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(120)
+        });
         
         return user;
     }

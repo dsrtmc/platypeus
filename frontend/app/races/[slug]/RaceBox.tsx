@@ -328,7 +328,7 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
               data.onRaceEvent.running ||
               data.onRaceEvent.startTime ||
               !data.onRaceEvent.racers?.edges ||
-              data.onRaceEvent.racers!.edges!.length <= 1
+              data.onRaceEvent.racers!.edges!.length < 2
             }
             handleStart={handleStart}
           />
@@ -340,10 +340,10 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
         modeSetting={data.onRaceEvent.modeSetting}
       />
       {/* dev */}
-      <h1 style={{ fontSize: "1.5rem" }}>the start time: {data.onRaceEvent.startTime}</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.startTime ? "true" : "false"}</h1>
-      <h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>
+      {/*<h1 style={{ fontSize: "1.5rem" }}>the start time: {data.onRaceEvent.startTime}</h1>*/}
+      {/*<h1 style={{ fontSize: "1.5rem" }}>running: {data.onRaceEvent.running ? "true" : "false"}</h1>*/}
+      {/*<h1 style={{ fontSize: "1.5rem" }}>started: {data.onRaceEvent.startTime ? "true" : "false"}</h1>*/}
+      {/*<h1 style={{ fontSize: "1.5rem" }}>finished: {data.onRaceEvent.finished ? "true" : "false"}</h1>*/}
       {/* dev */}
       <div className={styles.hr} />
       <Chatbox chatboxId={data.onRaceEvent.chatboxId} me={meData?.me} />

@@ -90,17 +90,25 @@ public static class RaceMutations
         if (user is null)
             return new NotAuthenticatedError();
         
-        var race = await db.Races
+        var raceWithRacerCount = await db.Races
             .Include(r => r.Host)
-            .FirstOrDefaultAsync(r => r.Id == raceId, cancellationToken);
+            .Where(r => r.Id == raceId)
+            .Select(r => new 
+            {
+                Race = r,
+                RacerCount = r.Racers.Count
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var race = raceWithRacerCount?.Race;
         
-        if (race is null)
+        if (race is null || raceWithRacerCount is null)
             return new InvalidRaceError(raceId);
 
         if (race.Finished || race.Running)
             return new RaceAlreadyRunningError(raceId);
-        
-        if (race.Racers.Count < 2)
+
+        if (raceWithRacerCount.RacerCount < 2)
             return new TooFewRacersError(raceId);
 
         if (race.Host.Id != user.Id)

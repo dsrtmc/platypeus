@@ -60,6 +60,10 @@ type DeleteUserPayload {
   boolean: Boolean
 }
 
+type EmailTakenError implements Error {
+  message: String!
+}
+
 type FinishRaceForUserPayload {
   racer: Racer
   errors: [FinishRaceForUserError!] @cost(complexity: 5)
@@ -441,7 +445,7 @@ union LeaveRaceError = NotAuthenticatedError | InvalidRaceError | RaceIsRunningE
 
 union LoginError = InvalidFieldError | IncorrectCredentialsError
 
-union RegisterError = InvalidFieldError | UsernameTakenError
+union RegisterError = InvalidFieldError | UsernameTakenError | EmailTakenError
 
 union RunRaceError = InvalidRaceError | NotAuthenticatedError | NotAuthorizedError
 

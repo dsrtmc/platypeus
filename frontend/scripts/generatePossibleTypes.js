@@ -1,5 +1,7 @@
 const fs = require("fs");
 const https = require("https");
+const path = require('path');
+const dotenvResult = require('dotenv').config({ path: path.resolve(__dirname, '../.env.local') });
 
 const possibleTypesIntrospectionQuery = `
   {
@@ -22,7 +24,7 @@ const agent = new https.Agent({ rejectUnauthorized: true });
 fetch(process.env["NEXT_PUBLIC_API_URL"], {
   agent,
   method: "POST",
-  headers: { "Content-Type": "application/json" },
+  headers: { "Content-Type": "application/json", "X-Allow-Introspection": "true" },
   body: JSON.stringify({
     variables: {},
     query: possibleTypesIntrospectionQuery,

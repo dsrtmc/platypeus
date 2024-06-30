@@ -14,11 +14,14 @@ interface Props {
 export const RacerScoreCard: React.FC<Props> = ({ racer, progress, isMe }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [offset, setOffset] = useState(0);
+
   useLayoutEffect(() => {
     const parentWidth = ref.current?.parentElement?.clientWidth;
     if (!parentWidth) return;
     setOffset((parentWidth - 250 ?? 1) * progress);
+    console.log("Racer:", JSON.stringify(racer));
   }, [racer]);
+
   return (
     <div key={racer.user.username} className={styles.racerCard} ref={ref}>
       <div className={styles.left}>
@@ -33,7 +36,8 @@ export const RacerScoreCard: React.FC<Props> = ({ racer, progress, isMe }) => {
       <div className={styles.accuracy}>{Math.round(progress * 100)}%</div>
       <div className={styles.right}>
         <div className={styles.wpm}>{racer.wpm} wpm</div>
-        <div className={styles.finished}>{racer.finished && <FaCheck style={{ fontSize: "0.8rem" }} />}</div>
+        {/*<div className={styles.finished}>{racer.finished && <FaCheck style={{ fontSize: "0.8rem" }} />}</div>*/}
+        <div className={styles.finished}>{racer.finished && "hello xd"}</div>
       </div>
     </div>
   );

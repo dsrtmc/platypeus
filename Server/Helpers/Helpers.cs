@@ -43,6 +43,15 @@ public static class Helper
         if (input.Username is null)
             errors.Add(new InvalidFieldError("username", input.Username, "Cannot be empty."));
         
+        if (input.Username is not null && !Regex.IsMatch(input.Username, "^[a-z0-9]+$"))
+            errors.Add(new InvalidFieldError("username", input.Username, "Must only contain alphanumeric characters."));
+        
+        if (input.Username is not null && !input.Username.Equals(input.Username.ToLower()))
+            errors.Add(new InvalidFieldError("username", input.Username, "Must only contain alphanumeric characters."));
+        
+        if (input.Username is not null && input.Username.StartsWith(' '))
+            errors.Add(new InvalidFieldError("username", input.Username, "Cannot start with whitespace."));
+        
         if (input.Username is not null && input.Username.Length < 3)
             errors.Add(new InvalidFieldError("username", input.Username, "Too short."));
         
@@ -55,7 +64,7 @@ public static class Helper
         if (input.Password is null)
             errors.Add(new InvalidFieldError("password", input.Password, "Cannot be empty."));
         
-        if (input.Password is not null && input.Password.Length < 8)
+        if (input.Password is not null && input.Password.Length < 3)
             errors.Add(new InvalidFieldError("password", input.Password, "Too short."));
 
         return errors;
