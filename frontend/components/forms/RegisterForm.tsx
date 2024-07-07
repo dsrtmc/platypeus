@@ -9,6 +9,7 @@ import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { RegisterButton } from "@/components/forms/RegisterButton";
 import { ErrorContext } from "@/app/ErrorProvider";
+import { useRouter } from "next/router";
 
 type FormValues = {
   username: string;
@@ -37,6 +38,8 @@ export default function RegisterForm() {
   const [registerUser] = useMutation(RegisterForm_RegisterDocument);
   const { setError } = useContext(ErrorContext)!;
 
+  const router = useRouter();
+
   const {
     register,
     formState: { errors, isSubmitting },
@@ -64,7 +67,7 @@ export default function RegisterForm() {
         });
       },
     });
-    console.log("Register response:", response);
+
     const firstError = response.data?.register.errors?.[0];
     if (firstError) {
       setError({
@@ -72,7 +75,9 @@ export default function RegisterForm() {
         message: firstError.message,
       });
       console.error("Errors:", response.data?.register.errors);
+      return;
     }
+    router.push("/");
   };
 
   useEffect(() => {

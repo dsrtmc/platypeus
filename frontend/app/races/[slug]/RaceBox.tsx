@@ -327,8 +327,8 @@ export const RaceBox: React.FC<Props> = ({ race }) => {
               data.onRaceEvent.finished ||
               data.onRaceEvent.running ||
               data.onRaceEvent.startTime ||
-              !data.onRaceEvent.racers?.edges
-              // data.onRaceEvent.racers!.edges!.length < 2
+              !data.onRaceEvent.racers?.edges ||
+              data.onRaceEvent.racers!.edges!.length < 2
             }
             handleStart={handleStart}
           />

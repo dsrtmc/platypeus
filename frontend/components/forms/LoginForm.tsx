@@ -9,11 +9,12 @@ import {
   MeQuery,
 } from "@/graphql/generated/graphql";
 import styles from "./Form.module.css";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import Link from "next/link";
 import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { LoginButton } from "@/components/forms/LoginButton";
 import { useRouter } from "next/navigation";
+import { ErrorContext } from "@/app/ErrorProvider";
 
 type FormValues = {
   username: string;
@@ -39,6 +40,8 @@ const LoginMutation = gql`
 
 export default function LoginForm() {
   const [login] = useMutation(LoginForm_LoginDocument);
+  const { setError } = useContext(ErrorContext)!;
+
   const router = useRouter();
 
   const {
@@ -46,7 +49,6 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setFocus,
-    setError,
   } = useForm<FormValues>({
     defaultValues: {
       username: "",
@@ -68,12 +70,16 @@ export default function LoginForm() {
         });
       },
     });
-    if (response.data?.login.user) {
-      router.push("/");
-    } else if (response.data?.login.errors) {
-      // I guess we shouldn't set the error on the `password` field. Too bad!
-      setError("password", { type: "custom", message: response.data.login.errors[0].message });
+    const firstError = response.data?.login.errors?.[0];
+    if (firstError) {
+      setError({
+        code: firstError.code,
+        message: firstError.message,
+      });
+      console.error("Errors:", response.data?.login.errors);
+      return;
     }
+    router.push("/");
   };
 
   useEffect(() => {

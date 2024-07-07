@@ -125,7 +125,7 @@ const StartRace = gql`
     startRace(input: $input) {
       race {
         running
-        updatedAt
+        startTime
       }
       errors {
         code: __typename

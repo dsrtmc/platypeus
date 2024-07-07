@@ -16,16 +16,18 @@ const GetScoresForLeaderboard = gql`
     $before: String
     $first: Int
     $last: Int
-    $mode: String!
-    $modeSetting: Int!
+    $where: ScoreFilterInput
+    $order: [ScoreSortInput!]
   ) {
     scoresForLeaderboard(
       after: $after
       before: $before
       first: $first
       last: $last
-      mode: $mode
-      modeSetting: $modeSetting
+      # mode: $mode
+      # modeSetting: $modeSetting
+      where: $where
+      order: $order
     ) {
       edges {
         node {
@@ -59,8 +61,10 @@ interface Props {
 export function Leaderboard({ mode, modeSetting }: Props) {
   const variables: Leaderboard_GetScoresForLeaderboardQueryVariables = {
     first: 25,
-    mode,
-    modeSetting,
+    order: {
+      wpm: SortEnumType.Desc
+    },
+    where: { and: [{ mode: { eq: mode } }, { modeSetting: { eq: modeSetting } }] },
   };
 
   const { data, error, fetchMore } = useSuspenseQuery(Leaderboard_GetScoresForLeaderboardDocument, {
