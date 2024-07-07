@@ -95,6 +95,8 @@
 
 .themeButton {
     all: unset;
+    box-sizing: border-box;
+    height: 2.5rem;
     padding: .5rem .75rem;
     display: flex;
     justify-content: center;

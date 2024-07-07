@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -108,12 +109,25 @@ builder.Services.AddRateLimiter(options =>
             QueueLimit = 1,
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-            TokenLimit = 200,
-            TokensPerPeriod = 60
+            TokenLimit = 150,
+            TokensPerPeriod = 45
         });
     });
     
     options.RejectionStatusCode = 429;
+    options.OnRejected = (context, _) =>
+    {
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter =
+                ((int) retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.");
+
+        return new ValueTask();
+    };
 });
 
 builder.Services.AddAuthorization();

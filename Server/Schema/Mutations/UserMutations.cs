@@ -47,7 +47,7 @@ public static class UserMutations
             return new UsernameTakenError(input.Username!);
         
         if (db.Users.FirstOrDefault(u => u.Email == input.Email) is not null)
-            return new EmailTakenError(input.Username!);
+            return new EmailTakenError(input.Email!);
         
         var hashedPassword = await PasswordHasher.Hash(input.Password!);
         var user = new User(input.Username!, input.Email!, hashedPassword);

@@ -1,5 +1,8 @@
+using System.Text.Json;
 using HotChocolate.Subscriptions;
+using Microsoft.EntityFrameworkCore;
 using Server.Helpers;
+using Server.Models;
 using Server.Schema.Subscriptions;
 
 namespace Server.Services.Races;
@@ -57,7 +60,10 @@ public class RaceManagementService : BackgroundService
         using var scope = _serviceScopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-        var racesToFinish = db.Races.Where(r => raceToFinishIds.Contains(r.Id));
+        var racesToFinish = db.Races
+            .Include(r => r.Racers)
+                .ThenInclude(rr => rr.User)
+            .Where(r => raceToFinishIds.Contains(r.Id));
         
         foreach (var raceToFinish in racesToFinish)
         {
@@ -67,6 +73,7 @@ public class RaceManagementService : BackgroundService
                 racer.Finished = true;
             
             var message = new RaceEventMessage { Finished = true, Racers = raceToFinish.Racers };
+
             await _eventSender.SendAsync(Helper.EncodeOnRaceEventToken(raceToFinish.Id), message, stoppingToken);
         }
         

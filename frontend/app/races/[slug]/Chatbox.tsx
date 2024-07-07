@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, KeyboardEvent, useRef } from "react";
+import React, { FC, KeyboardEvent, useContext, useRef } from "react";
 import styles from "./Race.module.css";
 import {
   Chatbox_OnChatboxEventDocument,
@@ -14,6 +14,7 @@ import { IoSend } from "react-icons/io5";
 import { Message } from "@/app/races/[slug]/Message";
 import TextareaAutosize from "react-textarea-autosize";
 import { ChatboxFallback } from "@/app/races/[slug]/ChatboxFallback";
+import { ErrorContext } from "@/app/ErrorProvider";
 
 const OnChatboxEvent = gql`
   subscription Chatbox_OnChatboxEvent($chatboxId: UUID!, $messagesLast: Int) {
@@ -43,6 +44,12 @@ const SendMessage = gql`
           id
         }
       }
+      errors {
+        code: __typename
+        ... on Error {
+          message
+        }
+      }
     }
   }
 `;
@@ -59,6 +66,8 @@ type FormValues = {
 };
 
 export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
+  const { setError } = useContext(ErrorContext)!;
+
   const { data, loading, error } = useSubscription(Chatbox_OnChatboxEventDocument, {
     variables: {
       chatboxId,
@@ -91,7 +100,7 @@ export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
     event?.preventDefault();
     console.log("Data:", data);
     const trimmedContent = data.content.trim();
-    await sendMessage({
+    const response = await sendMessage({
       variables: {
         input: {
           content: trimmedContent,
@@ -99,6 +108,14 @@ export const Chatbox: FC<Props> = ({ chatboxId, me }) => {
         },
       },
     });
+    const firstError = response.data?.sendMessage.errors?.[0];
+      if (firstError) {
+        setError({
+          code: firstError.code,
+          message: firstError.message,
+        });
+        console.error("Errors:", response.data?.sendMessage.errors);
+      }
     if (wrapperRef.current) {
       wrapperRef.current!.scrollTop = wrapperRef.current!.scrollHeight;
     }

@@ -36,8 +36,7 @@ export const RacerScoreCard: React.FC<Props> = ({ racer, progress, isMe }) => {
       <div className={styles.accuracy}>{Math.round(progress * 100)}%</div>
       <div className={styles.right}>
         <div className={styles.wpm}>{racer.wpm} wpm</div>
-        {/*<div className={styles.finished}>{racer.finished && <FaCheck style={{ fontSize: "0.8rem" }} />}</div>*/}
-        <div className={styles.finished}>{racer.finished && "hello xd"}</div>
+        <div className={styles.finished}>{racer.finished && <FaCheck style={{ fontSize: "0.8rem" }} />}</div>
       </div>
     </div>
   );

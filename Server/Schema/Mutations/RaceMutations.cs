@@ -108,8 +108,8 @@ public static class RaceMutations
         if (race.Finished || race.Running)
             return new RaceAlreadyRunningError(raceId);
 
-        if (raceWithRacerCount.RacerCount < 2)
-            return new TooFewRacersError(raceId);
+        // if (raceWithRacerCount.RacerCount < 2)
+        //     return new TooFewRacersError(raceId);
 
         if (race.Host.Id != user.Id)
             return new NotAuthorizedError();
