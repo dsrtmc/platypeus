@@ -1,4 +1,4 @@
-import { IBM_Plex_Mono, Inter, Itim, JetBrains_Mono, Space_Mono, Lexend_Deca } from "next/font/google";
+import { IBM_Plex_Mono, Inter, Itim, JetBrains_Mono, Space_Mono, Lexend_Deca, Montserrat } from "next/font/google";
 import { NextFont } from "next/dist/compiled/@next/font";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -22,6 +22,12 @@ const lexendDeca = Lexend_Deca({
   variable: "--lexend-deca",
   display: "swap",
 });
+const montserrat = Montserrat({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--lexend-deca",
+  display: "swap",
+})
 
 export const availableFonts: { [name: string]: NextFont & { variable: string } } = {
   Inter: inter,
@@ -30,4 +36,5 @@ export const availableFonts: { [name: string]: NextFont & { variable: string } }
   "IBM Plex Mono": ibmPlexMono,
   "Space Mono": spaceMono,
   "Lexend Deca": lexendDeca,
+  Montserrat: montserrat
 };

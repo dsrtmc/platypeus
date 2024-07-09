@@ -9,7 +9,7 @@ import { FieldPath, SubmitHandler, useForm } from "react-hook-form";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { RegisterButton } from "@/components/forms/RegisterButton";
 import { ErrorContext } from "@/app/ErrorProvider";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 type FormValues = {
   username: string;
