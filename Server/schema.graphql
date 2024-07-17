@@ -206,7 +206,7 @@ type Query {
   race(where: RaceFilterInput): Race @cost(complexity: 5)
   scores("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   score(where: ScoreFilterInput): Score @cost(complexity: 5)
-  scoresForLeaderboard("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ScoreFilterInput order: [ScoreSortInput!]): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
+  scoresForLeaderboard(mode: String! modeSetting: Int! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String order: [ScoreSortInput!]): ScoresForLeaderboardConnection @cost(complexity: 5, multipliers: [ "first", "last" ], defaultMultiplier: 10)
   bye: String! @authorize
   me: User
   usersBestScores(userId: UUID! mode: String! modeSettings: [Int!]!): [Score]!

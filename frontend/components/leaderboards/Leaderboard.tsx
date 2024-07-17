@@ -16,7 +16,8 @@ const GetScoresForLeaderboard = gql`
     $before: String
     $first: Int
     $last: Int
-    $where: ScoreFilterInput
+    $mode: String!
+    $modeSetting: Int!
     $order: [ScoreSortInput!]
   ) {
     scoresForLeaderboard(
@@ -24,9 +25,8 @@ const GetScoresForLeaderboard = gql`
       before: $before
       first: $first
       last: $last
-      # mode: $mode
-      # modeSetting: $modeSetting
-      where: $where
+      mode: $mode
+      modeSetting: $modeSetting
       order: $order
     ) {
       edges {
@@ -64,7 +64,8 @@ export function Leaderboard({ mode, modeSetting }: Props) {
     order: {
       wpm: SortEnumType.Desc
     },
-    where: { and: [{ mode: { eq: mode } }, { modeSetting: { eq: modeSetting } }] },
+    mode: mode,
+    modeSetting: modeSetting,
   };
 
   const { data, error, fetchMore } = useSuspenseQuery(Leaderboard_GetScoresForLeaderboardDocument, {

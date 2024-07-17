@@ -32,22 +32,22 @@ public static class ScoreQueries
     // ↑ see https://github.com/ChilliCream/graphql-platform/discussions/4848
     // While the EF Core's use of this raw SQL isn't amazing either, it's definitely much clearer
     [UsePaging]
-    [UseFiltering]
     [UseSorting]
-    public static IQueryable<Score> GetScoresForLeaderboard(DatabaseContext db)
+    public static IQueryable<Score> GetScoresForLeaderboard(string mode, int modeSetting, DatabaseContext db)
     {
-        return db.Scores.FromSql(
-                // @$"SELECT DISTINCT ON (s.""UserId"") s.*
-                //      FROM ""Scores"" s
-                //      ORDER BY s.""UserId"", s.""Wpm"" DESC"
+        var result = db.Scores.FromSql(
+                // WHERE ""Mode"" = '{mode}' AND ""ModeSetting"" = {modeSetting}
             @$"SELECT DISTINCT ON (s.""UserId"") s.*
             FROM (
                 SELECT *
                 FROM ""Scores""
-                WHERE ""Mode"" = 'time' AND ""ModeSetting"" = 5
+                WHERE ""Mode"" = {mode} AND ""ModeSetting"" = {modeSetting}
                 ORDER BY ""Wpm"" DESC
             ) AS s
             ORDER BY s.""UserId"", s.""Wpm"" DESC"
-            ).Include(s => s.User);
+        ).Include(s => s.User);
+
+        Console.WriteLine($"{result.AsEnumerable().Count()} is the count of elements returned.");
+        return result;
     }
 }
