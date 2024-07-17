@@ -1,4 +1,5 @@
-![platypeus showcase](https://github.com/user-attachments/assets/ca7e19c4-48c2-495f-813b-7b045a3cb67a)
+![i love platypeus](https://github.com/user-attachments/assets/95d22b7f-ccee-44d2-b330-5100174b333c)
+
 <br />
 
 # About
@@ -20,9 +21,7 @@ The main motivation behind Platypeus was a combination of a desire to understand
 
 # Bug report or Feature request
 
-We are aware of certain bugs that are yet to be fixed, however if you feel like you encounter{" "}
-a bug we might not know about, you can simply let the developer know privately if you know them.{" "}
-Otherwise, you're invited to create a [GitHub issue](https://github.com/dsrtmc/platypeus/issues).
+We are aware of certain bugs that are yet to be fixed, however if you feel like you encounter a bug we might not know about, you can simply let the developer know privately if you know them. Otherwise, you're invited to create a [GitHub issue](https://github.com/dsrtmc/platypeus/issues).
 
 # Credits
 
