@@ -1,4 +1,4 @@
-(nice banner here)
+![platypeus showcase](https://github.com/user-attachments/assets/ca7e19c4-48c2-495f-813b-7b045a3cb67a)
 <br />
 
 # About
