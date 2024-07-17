@@ -1,4 +1,4 @@
-![i love platypeus](https://github.com/user-attachments/assets/95d22b7f-ccee-44d2-b330-5100174b333c)
+![platypeus is goat](https://github.com/user-attachments/assets/74a2442d-5bc9-4f9a-ae7a-1d8f62f24197)
 
 <br />
 
