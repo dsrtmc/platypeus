@@ -27,4 +27,5 @@ Otherwise, you're invited to create a [GitHub issue](https://github.com/dsrtmc/p
 # Credits
 
 [Monkeytype](https://monkeytype.com) - by far the most advanced, supported, and arguably the most aesthetically pleasing typing test on the Internet, was the main inspiration behind Platypeus.
+
 [TypeRacer](https://play.typeracer.com) - for being the go-to typing-test racing application since the dawn of time, largely impacting the decision to create this rendition of Platypeus.
