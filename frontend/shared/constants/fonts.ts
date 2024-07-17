@@ -13,19 +13,19 @@ const ibmPlexMono = IBM_Plex_Mono({
 const spaceMono = Space_Mono({
   weight: ["400", "700"],
   subsets: ["latin"],
-  variable: "--space-mono",
+  variable: "--font-space-mono",
   display: "swap",
 });
 const lexendDeca = Lexend_Deca({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
-  variable: "--lexend-deca",
+  variable: "--font-lexend-deca",
   display: "swap",
 });
 const montserrat = Montserrat({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
-  variable: "--lexend-deca",
+  variable: "--font-lexend-deca",
   display: "swap",
 })
 

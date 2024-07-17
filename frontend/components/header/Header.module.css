@@ -7,7 +7,16 @@
 }
 
 .logo {
+    display: flex;
+    flex-direction: column;
     cursor: pointer;
+}
+
+.group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .25rem;
 }
 
 .big {

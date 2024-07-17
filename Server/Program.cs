@@ -39,7 +39,6 @@ builder.Services.AddDbContextPool<DatabaseContext>(o =>
     var database = uri.PathAndQuery.Trim('/');
     var configuration = $"Server={host};Port={port};Password='{password}';Username='{userId}';Database={database}";
         
-    Console.WriteLine($"POSTGRES CONFIGURATION STRING: {configuration}");
     o.UseNpgsql(configuration);
     o.EnableSensitiveDataLogging(__dev__);
 });

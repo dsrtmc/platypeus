@@ -10,8 +10,8 @@
     --error-color: #da3333;
     --error-extra-color: #791717;
     
-    /* Comes from Next.js' next/font/google (see app/layout.tsx) */
-    --font-family: var(--font-itim);
+    /* Comes from Next.js' next/font/google (see /shared/constants/fonts.ts) */
+    --font-family: var(--font-lexend-deca);
     --font-size: 16px;
     
     --test-font-size-multiplier: 2;
@@ -21,11 +21,6 @@
     --caret-speed: 100ms;
     
     --roundness: 5px;
-
-    /* Temporary, remove it in the future */
-    --dark-gray: #222;
-    --gray: #444;
-    --light-gray: #666;
 }
 
 *, *::before, *::after {
@@ -96,9 +91,6 @@ body {
 
 a {
     all: unset;
-}
-
-a:hover {
     cursor: pointer;
 }
 

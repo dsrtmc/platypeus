@@ -44,9 +44,9 @@ public static class ScoreMutations
             Language = language,
         };
 
-        const int maxListLength = 75;
-        if (wpmStats.Count >= maxListLength || rawStats.Count >= maxListLength)
-            return new ListTooLargeError(maxListLength);
+        const int maxTestLength = 125;
+        if (wpmStats.Count >= maxTestLength || rawStats.Count >= maxTestLength)
+            return new ListTooLargeError(maxTestLength);
         
         var userId = accessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
         

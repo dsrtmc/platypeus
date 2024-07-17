@@ -18,7 +18,7 @@ import { Caret } from "@/components/test/Caret";
 import { calculateWpm } from "@/utils/calculateWpm";
 import { generateRandomString } from "@/utils/generateRandomString";
 
-const MAX_TEST_DURATION = 60;
+const MAX_TEST_DURATION = 120;
 
 export type FinishConditionsType = {
   maxWordCount?: number;
