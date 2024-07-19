@@ -88,6 +88,9 @@ builder.Services
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.HttpOnly = true;
         options.Cookie.Domain = Environment.GetEnvironmentVariable("COOKIE_DOMAIN");
+        options.Cookie.IsEssential = true;
+        options.Cookie.MaxAge = TimeSpan.FromDays(90);
+        options.ExpireTimeSpan = TimeSpan.FromDays(90);
     });
 
 // Forwarded headers setup
