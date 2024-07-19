@@ -19,7 +19,20 @@ The main motivation behind Platypeus was a combination of a desire to understand
 - personal over-time progress tracking via graphs
 - account, leaderboard, multiplayer racing system
 
-# Bug report or Feature request
+# Technology
+
+- Frontend
+  - Next.js - used in conjunction with TypeScript providing a well-documented, type-safe, smooth developer experience.
+- Backend
+  - ASP.NET Core - chosen to build the web API due to its structured, opinionated framework thus emphasizing good practices and code reusability.
+  - GraphQL - integrated into the ASP.NET Core app via [HotChocolate](https://github.com/ChilliCream/graphql-platform), allowing much stricter control over the data flow.
+  - PostgreSQL - serves as the main database for the application.
+  - Redis - (as of right now) only serves as the GraphQL subscription provider, enabling running multiple instances of the GraphQL sever and handling subscription events reliably.
+- Deployment
+  - Docker - the application is containarized with Docker, then deployed to a VPS running Ubuntu and internally handled using Dokku.
+  - Dokku - being an extensive, open-source, lightweight PaaS, facilitates swift and trouble-free deployment and integration of various services, such as an NGINX proxy or different databases.
+
+# Bug reports
 
 We are aware of certain bugs that are yet to be fixed, however if you feel like you encounter a bug we might not know about, you can simply let the developer know privately if you know them. Otherwise, you're invited to create a [GitHub issue](https://github.com/dsrtmc/platypeus/issues).
 
@@ -28,3 +41,4 @@ We are aware of certain bugs that are yet to be fixed, however if you feel like 
 [Monkeytype](https://monkeytype.com) - by far the most advanced, supported, and arguably the most aesthetically pleasing typing test on the Internet, was the main inspiration behind Platypeus.
 
 [TypeRacer](https://play.typeracer.com) - for being the go-to typing-test racing application since the dawn of time, largely impacting the decision to create this rendition of Platypeus.
+
