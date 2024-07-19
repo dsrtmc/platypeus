@@ -22,15 +22,15 @@ The main motivation behind Platypeus was a combination of a desire to understand
 # Technology
 
 - Frontend
-  - Next.js - used in conjunction with TypeScript providing a well-documented, type-safe, smooth developer experience.
+  - **Next.js** - used in conjunction with TypeScript providing a well-documented, type-safe, smooth developer experience.
 - Backend
-  - ASP.NET Core - chosen to build the web API due to its structured, opinionated framework thus emphasizing good practices and code reusability.
-  - GraphQL - integrated into the ASP.NET Core app via [HotChocolate](https://github.com/ChilliCream/graphql-platform), allowing much stricter control over the data flow.
-  - PostgreSQL - serves as the main database for the application.
-  - Redis - (as of right now) only serves as the GraphQL subscription provider, enabling running multiple instances of the GraphQL sever and handling subscription events reliably.
+  - **ASP.NET Core** - chosen to build the web API due to its structured, opinionated framework thus emphasizing good practices and code reusability.
+  - **GraphQL** - integrated into the ASP.NET Core app via [HotChocolate](https://github.com/ChilliCream/graphql-platform), allowing much stricter control over the data flow.
+  - **PostgreSQL** - serves as the main database for the application.
+  - **Redis** - (as of right now) only serves as the GraphQL subscription provider, enabling running multiple instances of the GraphQL sever and handling subscription events reliably.
 - Deployment
-  - Docker - the application is containarized with Docker, then deployed to a VPS running Ubuntu and internally handled using Dokku.
-  - Dokku - being an extensive, open-source, lightweight PaaS, facilitates swift and trouble-free deployment and integration of various services, such as an NGINX proxy or different databases.
+  - **Docker** - the application is containarized with Docker, then deployed to a VPS running Ubuntu and internally handled using Dokku.
+  - **Dokku** - being an extensive, open-source, lightweight PaaS, facilitates swift and trouble-free deployment and integration of various services, such as an NGINX proxy or different databases.
 
 # Bug reports
 
